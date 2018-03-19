@@ -9,6 +9,8 @@ namespace Calc4DotNet.Core.Operators
         string SupplementaryText { get; }
         ImmutableArray<IOperator> Operands { get; }
         bool ThisTypeIsPreComputable { get; }
+        void Accept(IOperatorVisitor visitor);
+        T Accept<T>(IOperatorVisitor<T> visitor);
         Number Evaluate(Context context, ReadOnlySpan<Number> arguments);
     }
 
@@ -19,6 +21,8 @@ namespace Calc4DotNet.Core.Operators
         public string SupplementaryText => null;
         public ImmutableArray<IOperator> Operands => ImmutableArray<IOperator>.Empty;
         public bool ThisTypeIsPreComputable => true;
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
         public Number Evaluate(Context context, ReadOnlySpan<Number> arguments) => Number.Zero;
     }
 
@@ -36,6 +40,8 @@ namespace Calc4DotNet.Core.Operators
         public ImmutableArray<IOperator> Operands => ImmutableArray<IOperator>.Empty;
         public bool ThisTypeIsPreComputable => true;
 
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
         public Number Evaluate(Context context, ReadOnlySpan<Number> arguments) => arguments[Index];
     }
 
@@ -51,6 +57,8 @@ namespace Calc4DotNet.Core.Operators
         public ImmutableArray<IOperator> Operands => ImmutableArray<IOperator>.Empty;
         public bool ThisTypeIsPreComputable => true;
 
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
         public Number Evaluate(Context context, ReadOnlySpan<Number> arguments) => Number.Zero;
     }
 
@@ -67,6 +75,9 @@ namespace Calc4DotNet.Core.Operators
 
         public ImmutableArray<IOperator> Operands => ImmutableArray<IOperator>.Empty;
         public bool ThisTypeIsPreComputable => Operators.All(op => op.ThisTypeIsPreComputable);
+
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
 
         public Number Evaluate(Context context, ReadOnlySpan<Number> arguments)
         {
@@ -99,6 +110,8 @@ namespace Calc4DotNet.Core.Operators
         public ImmutableArray<IOperator> Operands => ImmutableArray.Create(Operand);
         public bool ThisTypeIsPreComputable => true;
 
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
         public Number Evaluate(Context context, ReadOnlySpan<Number> arguments)
             => Operand.Evaluate(context, arguments) * 10 + Value;
     }
@@ -122,6 +135,9 @@ namespace Calc4DotNet.Core.Operators
 
         public ImmutableArray<IOperator> Operands => ImmutableArray.Create(Left, Right);
         public bool ThisTypeIsPreComputable => true;
+
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
 
         public Number Evaluate(Context context, ReadOnlySpan<Number> arguments)
         {
@@ -169,6 +185,8 @@ namespace Calc4DotNet.Core.Operators
         public ImmutableArray<IOperator> Operands => ImmutableArray.Create(Condition, IfTrue, IfFalse);
         public bool ThisTypeIsPreComputable => true;
 
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
         public Number Evaluate(Context context, ReadOnlySpan<Number> arguments)
             => Condition.Evaluate(context, arguments) != Number.Zero ? IfTrue.Evaluate(context, arguments) : IfFalse.Evaluate(context, arguments);
     }
@@ -190,6 +208,9 @@ namespace Calc4DotNet.Core.Operators
         }
 
         public bool ThisTypeIsPreComputable => true;
+
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
 
         public Number Evaluate(Context context, ReadOnlySpan<Number> arguments)
         {
