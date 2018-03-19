@@ -1,10 +1,9 @@
-﻿using Calc4DotNet.Core.Operators;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
+using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.SyntaxAnalysis
 {

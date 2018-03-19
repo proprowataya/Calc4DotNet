@@ -1,8 +1,7 @@
-﻿using Calc4DotNet.Core;
-using Calc4DotNet.Core.SyntaxAnalysis;
-using System;
-using System.Collections.Immutable;
+﻿using System;
 using System.Diagnostics;
+using Calc4DotNet.Core;
+using Calc4DotNet.Core.SyntaxAnalysis;
 
 namespace Calc4DotNet
 {

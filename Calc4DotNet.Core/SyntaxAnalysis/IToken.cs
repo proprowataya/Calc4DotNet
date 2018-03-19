@@ -1,6 +1,6 @@
-﻿using Calc4DotNet.Core.Operators;
-using System;
+﻿using System;
 using System.Collections.Immutable;
+using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.SyntaxAnalysis
 {
