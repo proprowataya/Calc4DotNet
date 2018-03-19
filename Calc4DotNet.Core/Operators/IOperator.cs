@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace Calc4DotNet.Core
+namespace Calc4DotNet.Core.Operators
 {
     public interface IOperator
     {

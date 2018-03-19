@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using Calc4DotNet.Core.Operators;
+using System.Collections.Immutable;
 
 namespace Calc4DotNet.Core
 {

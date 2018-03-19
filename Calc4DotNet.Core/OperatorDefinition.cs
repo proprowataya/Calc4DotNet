@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Calc4DotNet.Core.Operators;
+using System;
 
 namespace Calc4DotNet.Core
 {

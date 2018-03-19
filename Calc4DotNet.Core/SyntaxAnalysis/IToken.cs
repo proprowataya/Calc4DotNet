@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Calc4DotNet.Core.Operators;
+using System;
 using System.Collections.Immutable;
 
 namespace Calc4DotNet.Core.SyntaxAnalysis
