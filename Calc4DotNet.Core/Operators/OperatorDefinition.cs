@@ -1,7 +1,6 @@
 ﻿using System;
-using Calc4DotNet.Core.Operators;
 
-namespace Calc4DotNet.Core
+namespace Calc4DotNet.Core.Operators
 {
     public sealed class OperatorDefinition
     {

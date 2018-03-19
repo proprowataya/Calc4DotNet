@@ -1,7 +1,6 @@
 ﻿using System.Collections.Immutable;
-using Calc4DotNet.Core.Operators;
 
-namespace Calc4DotNet.Core
+namespace Calc4DotNet.Core.Operators
 {
     public static class OperatorExtensions
     {

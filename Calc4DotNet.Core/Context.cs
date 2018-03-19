@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core
 {
