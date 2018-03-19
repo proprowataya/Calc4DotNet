@@ -21,7 +21,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
             private readonly Dictionary<string, int> argumentDictionary;
             private int index;
 
-            public Implement(Context context, string text, Dictionary<string, int> argumentDictionary) 
+            public Implement(Context context, string text, Dictionary<string, int> argumentDictionary)
             {
                 this.context = context ?? throw new ArgumentNullException(nameof(context));
                 this.text = text ?? throw new ArgumentNullException(nameof(text));
@@ -35,6 +35,12 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
 
                 while (index < text.Length && text[index] != ')')
                 {
+                    if (char.IsWhiteSpace(text[index]))
+                    {
+                        index++;
+                        continue;
+                    }
+
                     list.Add(NextToken());
                 }
 
