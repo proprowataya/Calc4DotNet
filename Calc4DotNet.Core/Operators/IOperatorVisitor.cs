@@ -3,6 +3,7 @@
     public interface IOperatorVisitor
     {
         void Visit(ZeroOperator op);
+        void Visit(PreComputedOperator op);
         void Visit(ArgumentOperator op);
         void Visit(DefineOperator op);
         void Visit(ParenthesisOperator op);

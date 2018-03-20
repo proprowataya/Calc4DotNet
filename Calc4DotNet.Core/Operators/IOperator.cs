@@ -26,6 +26,23 @@ namespace Calc4DotNet.Core.Operators
         public Number Evaluate(Context context, ReadOnlySpan<Number> arguments) => Number.Zero;
     }
 
+    public sealed class PreComputedOperator : IPrimitiveOperator
+    {
+        public Number Value { get; }
+
+        public PreComputedOperator(Number value)
+        {
+            Value = value;
+        }
+
+        public string SupplementaryText => null;
+        public ImmutableArray<IOperator> Operands => ImmutableArray<IOperator>.Empty;
+        public bool ThisTypeIsPreComputable => true;
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
+        public Number Evaluate(Context context, ReadOnlySpan<Number> arguments) => Value;
+    }
+
     public sealed class ArgumentOperator : IPrimitiveOperator
     {
         public int Index { get; }
@@ -207,7 +224,7 @@ namespace Calc4DotNet.Core.Operators
                 throw new ArgumentException($"Number of operands does not match between {nameof(definition)} and {nameof(operands)}");
         }
 
-        public bool ThisTypeIsPreComputable => true;
+        public bool ThisTypeIsPreComputable => Operands.All(op => op.ThisTypeIsPreComputable);
 
         public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
         public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);

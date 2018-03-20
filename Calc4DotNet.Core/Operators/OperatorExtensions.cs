@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Calc4DotNet.Core.Operators
 {
@@ -6,17 +7,34 @@ namespace Calc4DotNet.Core.Operators
     {
         public static bool IsPreComputable(this IOperator op)
         {
-            if (!op.ThisTypeIsPreComputable)
-                return false;
+            HashSet<IOperator> scanned = new HashSet<IOperator>();
 
-            ImmutableArray<IOperator> operands = op.Operands;
-            for (int i = 0; i < operands.Length; i++)
+            bool Core(IOperator current)
             {
-                if (!operands[i].ThisTypeIsPreComputable)
+                if (scanned.Contains(current))
                     return false;
+                if (!current.ThisTypeIsPreComputable)
+                    return false;
+
+                scanned.Add(current);
+
+                ImmutableArray<IOperator> operands = current.Operands;
+                for (int i = 0; i < operands.Length; i++)
+                {
+                    if (!Core(operands[i]))
+                        return false;
+                }
+
+                if (current is UserDefinedOperator userDefined)
+                {
+                    if (!Core(userDefined.Definition.Root))
+                        return false;
+                }
+
+                return true;
             }
 
-            return true;
+            return Core(op);
         }
     }
 }
