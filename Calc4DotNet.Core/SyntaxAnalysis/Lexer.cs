@@ -81,7 +81,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 string supplementaryText = LexSupplementaryText();
                 var elems = supplementaryText.Split("|");
                 string name = elems[0];
-                string[] arguments = elems[1].Length > 0 ? elems[1].Split(",") : Array.Empty<string>();
+                string[] arguments = elems[1].Length > 0 ? elems[1].Replace(" ", "").Split(",") : Array.Empty<string>();
                 string content = elems[2];
 
                 var definition = new OperatorDefinition(name, arguments.Length, null);
