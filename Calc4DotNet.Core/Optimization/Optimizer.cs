@@ -10,27 +10,27 @@ namespace Calc4DotNet.Core.Optimization
     {
         public static IOperator Optimize(IOperator op, Context context)
         {
-            return op.Accept(new Visitor(context));
+            return op.Accept(new Visitor(context, false));
         }
 
         public static OperatorDefinition Optimize(OperatorDefinition definition, Context context)
         {
-            return new OperatorDefinition(definition.Name, definition.NumOperands, Optimize(definition.Root, context));
+            return new OperatorDefinition(definition.Name, definition.NumOperands, definition.Root.Accept(new Visitor(context, true)));
         }
 
         private sealed class Visitor : IOperatorVisitor<IOperator>
         {
             private readonly Context context;
-            private readonly Stack<Number[]> stack = new Stack<Number[]>();
+            private readonly bool isDefinition;
             private readonly Dictionary<IOperator, bool?> isPreComputable = new Dictionary<IOperator, bool?>();
 
-            public Visitor(Context context)
+            public Visitor(Context context, bool isDefinition)
             {
                 this.context = context ?? throw new ArgumentNullException(nameof(context));
+                this.isDefinition = isDefinition;
             }
 
-            private Span<Number> PeekStackOrDefault() => stack.TryPeek(out var result) ? result : default;
-            private PreComputedOperator PerformPreCompute(IOperator op) => new PreComputedOperator(op.Evaluate(context, PeekStackOrDefault()));
+            private PreComputedOperator PerformPreCompute(IOperator op) => new PreComputedOperator(op.Evaluate(context, default));
             private IOperator PrecomputeIfPossible(IOperator op) => IsPreComputable(op) ? PerformPreCompute(op) : op;
 
             private bool IsPreComputable(IOperator op)
@@ -38,6 +38,8 @@ namespace Calc4DotNet.Core.Optimization
                 bool Core(IOperator current)
                 {
                     if (!current.ThisTypeIsPreComputable)
+                        return false;
+                    if (isDefinition && current is ArgumentOperator)
                         return false;
 
                     ImmutableArray<IOperator> operands = current.Operands;
@@ -77,7 +79,7 @@ namespace Calc4DotNet.Core.Optimization
 
             public IOperator Visit(PreComputedOperator op) => PerformPreCompute(op);
 
-            public IOperator Visit(ArgumentOperator op) => op;  // TODO
+            public IOperator Visit(ArgumentOperator op) => PrecomputeIfPossible(op);
 
             public IOperator Visit(DefineOperator op) => PerformPreCompute(op);
 
