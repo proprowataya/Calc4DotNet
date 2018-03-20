@@ -14,5 +14,7 @@ namespace Calc4DotNet.Core.Operators
             NumOperands = numOperands;
             Root = root;
         }
+
+        public override string ToString() => $"Definition of operator \"{Name}\" ({NumOperands} operand{(NumOperands > 1 ? "s" : "")})";
     }
 }

@@ -1,40 +1,41 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Calc4DotNet.Core.Operators
 {
     public static class OperatorExtensions
     {
-        public static bool IsPreComputable(this IOperator op)
+        private static readonly HashSet<string> HiddenPropertyNames = new HashSet<string>()
         {
-            HashSet<IOperator> scanned = new HashSet<IOperator>();
+            nameof(IOperator.ThisTypeIsPreComputable),
+            nameof(IOperator.Operands),
+        };
 
-            bool Core(IOperator current)
+        public static string ToDetailString(this IOperator op)
+        {
+            var type = op.GetType();
+            var props = type.GetProperties()
+                            .Where(p => !typeof(IOperator).IsAssignableFrom(p.PropertyType)
+                                        && !HiddenPropertyNames.Contains(p.Name));
+            var values = props.Select(p => (Property: p, Value: p.GetValue(op)))
+                              .Where(t => t.Value != null);
+            return $"{type.Name} [{string.Join(", ", values.Select(t => $"{t.Property.Name} = {ObjectToString(t.Value)}"))}]";
+        }
+
+        private static string ObjectToString(object obj)
+        {
+            switch (obj)
             {
-                if (scanned.Contains(current))
-                    return false;
-                if (!current.ThisTypeIsPreComputable)
-                    return false;
-
-                scanned.Add(current);
-
-                ImmutableArray<IOperator> operands = current.Operands;
-                for (int i = 0; i < operands.Length; i++)
-                {
-                    if (!Core(operands[i]))
-                        return false;
-                }
-
-                if (current is UserDefinedOperator userDefined)
-                {
-                    if (!Core(userDefined.Definition.Root))
-                        return false;
-                }
-
-                return true;
+                case string str:
+                    return '"' + str + '"';
+                case IEnumerable enumerable:
+                    return $"{{{string.Join(", ", enumerable.Cast<object>().Select(x => ObjectToString(x)))}}}";
+                case IOperator op:
+                    return op.ToDetailString();
+                default:
+                    return obj.ToString();
             }
-
-            return Core(op);
         }
     }
 }
