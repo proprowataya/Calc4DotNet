@@ -42,8 +42,9 @@ namespace Calc4DotNet
 
         private static void Execute(string text)
         {
-            void PrintAll(IOperator op, Context context)
+            void ExecuteCore(IOperator op, Context context)
             {
+                // Print input and user-defined operators as trees
                 PrintTree(op);
                 foreach (var def in context.OperatorDefinitions)
                 {
@@ -51,36 +52,38 @@ namespace Calc4DotNet
                     Console.WriteLine($"Operator \"{def.Name}\"");
                     PrintTree(def.Root, 1);
                 }
-            }
 
-            try
-            {
-                Context context = new Context();
-                Stopwatch sw = new Stopwatch();
-
-                var tokens = Lexer.Lex(text, context);
-                var op = Parser.Parse(tokens, context);
-                Console.WriteLine("----- Before optimized -----");
-                PrintAll(op, context);
-                sw.Restart();
+                // Execute
+                Stopwatch sw = Stopwatch.StartNew();
                 Console.WriteLine($"Evaluated: {op.Evaluate(context, default)}");
                 sw.Stop();
                 Console.WriteLine($"Elapsed: {sw.Elapsed}");
                 Console.WriteLine();
+            }
 
+            /* ******************** */
+
+            try
+            {
+                // Compile
+                Context context = new Context();
+                var tokens = Lexer.Lex(text, context);
+                var op = Parser.Parse(tokens, context);
+
+                // Execute
+                Console.WriteLine("----- Before optimized -----");
+                ExecuteCore(op, context);
+
+                // Optimize
                 op = Optimizer.Optimize(op, context);
                 foreach (var item in context.OperatorDefinitions)
                 {
                     context.AddOrUpdateOperatorDefinition(Optimizer.Optimize(item, context));
                 }
 
+                // Execute
                 Console.WriteLine("----- After optimized -----");
-                PrintAll(op, context);
-                sw.Restart();
-                Console.WriteLine($"Evaluated: {op.Evaluate(context, default)}");
-                sw.Stop();
-                Console.WriteLine($"Elapsed: {sw.Elapsed}");
-                Console.WriteLine();
+                ExecuteCore(op, context);
             }
             catch (Exception e)
             {
