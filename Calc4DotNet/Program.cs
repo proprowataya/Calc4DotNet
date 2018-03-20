@@ -41,19 +41,35 @@ namespace Calc4DotNet
 
         private static void Execute(string text)
         {
+            void PrintAll(IOperator op, Context context)
+            {
+                PrintTree(op);
+                foreach (var def in context.OperatorDefinitions)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine($"Operator {def.Name}");
+                    PrintTree(def.Root, 1);
+                }
+            }
+
             try
             {
                 Context context = new Context();
                 var tokens = Lexer.Lex(text, context);
                 var op = Parser.Parse(tokens, context);
-                Console.WriteLine("Before optimized:");
-                PrintTree(op);
+                Console.WriteLine("----- Before optimized -----");
+                PrintAll(op, context);
                 Console.WriteLine($"Evaluated: {op.Evaluate(context, default)}");
                 Console.WriteLine();
 
                 op = Optimizer.Optimize(op, context);
-                Console.WriteLine("After optimized:");
-                PrintTree(op);
+                foreach (var item in context.OperatorDefinitions)
+                {
+                    context.AddOrUpdateOperatorDefinition(Optimizer.Optimize(item, context));
+                }
+
+                Console.WriteLine("----- After optimized -----");
+                PrintAll(op, context);
                 Console.WriteLine($"Evaluated: {op.Evaluate(context, default)}");
                 Console.WriteLine();
             }

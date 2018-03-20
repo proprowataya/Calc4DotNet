@@ -13,6 +13,11 @@ namespace Calc4DotNet.Core.Optimization
             return op.Accept(new Visitor(context));
         }
 
+        public static OperatorDefinition Optimize(OperatorDefinition definition, Context context)
+        {
+            return new OperatorDefinition(definition.Name, definition.NumOperands, Optimize(definition.Root, context));
+        }
+
         private sealed class Visitor : IOperatorVisitor<IOperator>
         {
             private readonly Context context;
@@ -72,7 +77,7 @@ namespace Calc4DotNet.Core.Optimization
 
             public IOperator Visit(PreComputedOperator op) => PerformPreCompute(op);
 
-            public IOperator Visit(ArgumentOperator op) => PerformPreCompute(op);
+            public IOperator Visit(ArgumentOperator op) => op;  // TODO
 
             public IOperator Visit(DefineOperator op) => PerformPreCompute(op);
 

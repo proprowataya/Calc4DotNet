@@ -55,7 +55,7 @@ namespace Calc4DotNet.Core.Operators
         }
 
         public ImmutableArray<IOperator> Operands => ImmutableArray<IOperator>.Empty;
-        public bool ThisTypeIsPreComputable => true;
+        public bool ThisTypeIsPreComputable => false;   // TODO
 
         public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
         public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);

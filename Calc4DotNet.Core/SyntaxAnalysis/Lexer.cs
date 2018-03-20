@@ -85,7 +85,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 string content = elems[2];
 
                 var definition = new OperatorDefinition(name, arguments.Length, null);
-                context.AddOperatorDefinition(definition);
+                context.AddOrUpdateOperatorDefinition(definition);
 
                 var dictionary = arguments.Select((argumentName, argumentIndex) => (argumentName, argumentIndex))
                                           .ToDictionary(t => t.argumentName, t => t.argumentIndex);

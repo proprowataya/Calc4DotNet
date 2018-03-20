@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core
@@ -8,9 +9,11 @@ namespace Calc4DotNet.Core
         private readonly Dictionary<string, OperatorDefinition> definitions
             = new Dictionary<string, OperatorDefinition>();
 
-        public void AddOperatorDefinition(OperatorDefinition operatorDefinition)
+        public IEnumerable<OperatorDefinition> OperatorDefinitions => definitions.Values.ToArray();
+
+        public void AddOrUpdateOperatorDefinition(OperatorDefinition operatorDefinition)
         {
-            definitions.Add(operatorDefinition.Name, operatorDefinition);
+            definitions[operatorDefinition.Name] = operatorDefinition;
         }
 
         public bool TryLookUpOperatorDefinition(string name, out OperatorDefinition operatorDefinition)
