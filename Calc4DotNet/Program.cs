@@ -16,6 +16,7 @@ namespace Calc4DotNet
             var texts = new string[]
             {
                 "1?2?3?4?5",
+                "D[get12345||12345] {get12345}+{get12345}",
                 "D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}]1+2*3/4-5+6*7-8?9?10?11{fib}?12{fib}",
                 "D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}] 30{fib}",
                 "D[add|x,y|x+y] 12{add}23",

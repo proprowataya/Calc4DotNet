@@ -38,7 +38,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 {
                     while (index < tokens.Count)
                     {
-                        results.Add(CreateOperator(tokens[index], null));
+                        results.Add(CreateOperator(tokens[index], Array.Empty<IOperator>()));
                         index++;
                     }
                 }
