@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Operators;
 using Calc4DotNet.Core.Optimization;
@@ -15,9 +16,8 @@ namespace Calc4DotNet
             var texts = new string[]
             {
                 "1?2?3?4?5",
+                "D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}]1+2*3/4-5+6*7-8?9?10?11{fib}?12{fib}",
                 "D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}] 30{fib}",
-                "D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}]1+2*3/4-5+6*7-8?9?10?11{fib}?12{fib}",
-                "D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}]1+2*3/4-5+6*7-8?9?10?11{fib}?12{fib}",
                 "D[add|x,y|x+y] 12{add}23",
             };
 
@@ -56,11 +56,16 @@ namespace Calc4DotNet
             try
             {
                 Context context = new Context();
+                Stopwatch sw = new Stopwatch();
+
                 var tokens = Lexer.Lex(text, context);
                 var op = Parser.Parse(tokens, context);
                 Console.WriteLine("----- Before optimized -----");
                 PrintAll(op, context);
+                sw.Restart();
                 Console.WriteLine($"Evaluated: {op.Evaluate(context, default)}");
+                sw.Stop();
+                Console.WriteLine($"Elapsed: {sw.Elapsed}");
                 Console.WriteLine();
 
                 op = Optimizer.Optimize(op, context);
@@ -71,7 +76,10 @@ namespace Calc4DotNet
 
                 Console.WriteLine("----- After optimized -----");
                 PrintAll(op, context);
+                sw.Restart();
                 Console.WriteLine($"Evaluated: {op.Evaluate(context, default)}");
+                sw.Stop();
+                Console.WriteLine($"Elapsed: {sw.Elapsed}");
                 Console.WriteLine();
             }
             catch (Exception e)
