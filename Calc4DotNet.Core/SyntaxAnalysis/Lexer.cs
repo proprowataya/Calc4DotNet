@@ -178,7 +178,12 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                         break;
                 }
 
-                if (argumentDictionary.TryGetValue(text[index].ToString(), out var argumentIndex))
+                if (context.TryLookUpOperatorDefinition(text[index].ToString(), out var definition))
+                {
+                    index++;
+                    return new UserDefinedOperatorToken(definition, LexSupplementaryText());
+                }
+                else if (argumentDictionary.TryGetValue(text[index].ToString(), out var argumentIndex))
                 {
                     string name = text[index].ToString();
                     index++;
