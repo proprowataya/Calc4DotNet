@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using Calc4DotNet.Core;
+using Calc4DotNet.Core.Execution;
 using Calc4DotNet.Core.Operators;
 using Calc4DotNet.Core.Optimization;
 using Calc4DotNet.Core.SyntaxAnalysis;
@@ -46,6 +48,9 @@ namespace Calc4DotNet
         {
             void ExecuteCore(IOperator op, Context context)
             {
+                // Generate low-level operations
+                Module module = LowLevelCodeGenerator.Generate(op, context);
+
                 // Print input and user-defined operators as trees
                 Console.WriteLine("Main");
                 Console.WriteLine("{");
@@ -61,17 +66,35 @@ namespace Calc4DotNet
                     Console.WriteLine();
                 }
 
-                // Execute
-                Stopwatch sw = Stopwatch.StartNew();
-                Console.WriteLine($"Evaluated: {op.Evaluate(context, default)}");
-                sw.Stop();
-                Console.WriteLine($"Elapsed: {sw.Elapsed}");
+                // Print low-level operations
+                Console.WriteLine("Low-level operation codes");
+                Console.WriteLine("{");
+                PrintLowLevelOperations(module);
+                Console.WriteLine("}");
                 Console.WriteLine();
+
+                // Execute
+                {
+                    Stopwatch sw = Stopwatch.StartNew();
+                    Console.WriteLine($"Evaluated (tree): {op.Evaluate(context, default)}");
+                    sw.Stop();
+                    Console.WriteLine($"Elapsed: {sw.Elapsed}");
+                    Console.WriteLine();
+                }
+                {
+                    Stopwatch sw = Stopwatch.StartNew();
+                    Console.WriteLine($"Evaluated (low-level): {Executor.ExecuteInt64(module)}");
+                    sw.Stop();
+                    Console.WriteLine($"Elapsed: {sw.Elapsed}");
+                    Console.WriteLine();
+                }
             }
 
             /* ******************** */
 
+#if !DEBUG
             try
+#endif
             {
                 // Compile
                 Context context = new Context();
@@ -89,11 +112,13 @@ namespace Calc4DotNet
                 Console.WriteLine("----- After optimized -----");
                 ExecuteCore(op, context);
             }
+#if !DEBUG
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
                 Console.WriteLine();
             }
+#endif
         }
 
         private static void PrintTree(IOperator op, int depth = 0)
@@ -102,6 +127,22 @@ namespace Calc4DotNet
             foreach (var item in op.Operands)
             {
                 PrintTree(item, depth + 1);
+            }
+        }
+
+        private static void PrintLowLevelOperations(Module module)
+        {
+            var operations = module.Operations;
+            var dictionary = module.OperatorStartAddresses.ToDictionary(p => p.Address, p => p.Definition);
+
+            Console.WriteLine("Main");
+            for (int i = 0; i < operations.Length; i++)
+            {
+                if (dictionary.TryGetValue(i, out var definition))
+                {
+                    Console.WriteLine($"Operator \"{definition.Name}\"");
+                }
+                Console.WriteLine($"    {i.ToString().PadLeft(4)}: {operations[i].ToString()}");
             }
         }
     }
