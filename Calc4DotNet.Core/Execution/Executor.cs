@@ -103,6 +103,20 @@ namespace Calc4DotNet.Core.Execution
                                 op = _operations + op->Value;
                             }
                             break;
+                        case Opcode.GotoIfLessThan:
+                            top -= 2;
+                            if (top[0] < top[1])
+                            {
+                                op = _operations + op->Value;
+                            }
+                            break;
+                        case Opcode.GotoIfLessThanOrEqual:
+                            top -= 2;
+                            if (top[0] <= top[1])
+                            {
+                                op = _operations + op->Value;
+                            }
+                            break;
                         case Opcode.Call:
                             *ptrSaveTop++ = op;                     // Push current program counter
                             *ptrSaveTop++ = bottom;                 // Push current stack bottom

@@ -43,6 +43,8 @@ namespace Calc4DotNet.Core.Execution
                     case Opcode.Goto:
                     case Opcode.GotoIfTrue:
                     case Opcode.GotoIfFalse:
+                    case Opcode.GotoIfLessThan:
+                    case Opcode.GotoIfLessThanOrEqual:
                     case Opcode.Call:
                         // The destination address in LowLevelOperation should be just before it,
                         // because program counter will be incremented after execution of this operation.
@@ -190,6 +192,42 @@ namespace Calc4DotNet.Core.Execution
             public void Visit(ConditionalOperator op)
             {
                 int ifTrueLabel = nextLabel++, endLabel = nextLabel++;
+
+                if (op.Condition is BinaryOperator binary)
+                {
+                    // Special optimiztion for comparisons
+                    void Emit(Opcode opcode, IOperator ifTrue, IOperator ifFalse)
+                    {
+                        binary.Left.Accept(this);
+                        binary.Right.Accept(this);
+                        list.Add(new LowLevelOperation(opcode, ifTrueLabel));
+                        ifFalse.Accept(this);
+                        list.Add(new LowLevelOperation(Opcode.Goto, endLabel));
+                        list.Add(new LowLevelOperation(Opcode.Lavel, ifTrueLabel));
+                        ifTrue.Accept(this);
+                        list.Add(new LowLevelOperation(Opcode.Lavel, endLabel));
+                    }
+
+                    switch (binary.Type)
+                    {
+                        case BinaryOperator.ArithmeticType.LessThan:
+                            Emit(Opcode.GotoIfLessThan, ifTrue: op.IfTrue, ifFalse: op.IfFalse);
+                            return;
+                        case BinaryOperator.ArithmeticType.LessThanOrEqual:
+                            Emit(Opcode.GotoIfLessThanOrEqual, ifTrue: op.IfTrue, ifFalse: op.IfFalse);
+                            return;
+                        case BinaryOperator.ArithmeticType.GreaterThanOrEqual:
+                            // "a >= b ? c ? d" is equivalent to "a < b ? d ? c"
+                            Emit(Opcode.GotoIfLessThan, ifTrue: op.IfFalse, ifFalse: op.IfTrue);
+                            return;
+                        case BinaryOperator.ArithmeticType.GreaterThan:
+                            // "a > b ? c ? d" is equivalent to "a <= b ? d ? c"
+                            Emit(Opcode.GotoIfLessThanOrEqual, ifTrue: op.IfFalse, ifFalse: op.IfTrue);
+                            return;
+                        default:
+                            break;
+                    }
+                }
 
                 op.Condition.Accept(this);
                 list.Add(new LowLevelOperation(Opcode.GotoIfTrue, ifTrueLabel));
