@@ -71,6 +71,14 @@ namespace Calc4DotNet.Core.Execution
                             top[-2] = top[-2] % top[-1];
                             top--;
                             break;
+                        case Opcode.Equal:
+                            top[-2] = top[-2] == top[-1] ? 1 : 0;
+                            top--;
+                            break;
+                        case Opcode.NotEqual:
+                            top[-2] = top[-2] != top[-1] ? 1 : 0;
+                            top--;
+                            break;
                         case Opcode.LessThan:
                             top[-2] = top[-2] < top[-1] ? 1 : 0;
                             top--;
@@ -98,6 +106,13 @@ namespace Calc4DotNet.Core.Execution
                             break;
                         case Opcode.GotoIfFalse:
                             if (*--top == 0)
+                            {
+                                op = _operations + op->Value;
+                            }
+                            break;
+                        case Opcode.GotoIfEqual:
+                            top -= 2;
+                            if (top[0] == top[1])
                             {
                                 op = _operations + op->Value;
                             }

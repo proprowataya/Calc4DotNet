@@ -140,6 +140,12 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 {
                     switch (text.Substring(index, 2))
                     {
+                        case "==":
+                            index += 2;
+                            return new BinaryOperatorToken(BinaryOperator.ArithmeticType.Equal, LexSupplementaryText());
+                        case "!=":
+                            index += 2;
+                            return new BinaryOperatorToken(BinaryOperator.ArithmeticType.NotEqual, LexSupplementaryText());
                         case ">=":
                             index += 2;
                             return new BinaryOperatorToken(BinaryOperator.ArithmeticType.GreaterThanOrEqual, LexSupplementaryText());

@@ -135,7 +135,7 @@ namespace Calc4DotNet.Core.Operators
 
     public sealed class BinaryOperator : IPrimitiveOperator
     {
-        public enum ArithmeticType { Add, Sub, Mult, Div, Mod, LessThan, LessThanOrEqual, GreaterThanOrEqual, GreaterThan }
+        public enum ArithmeticType { Add, Sub, Mult, Div, Mod, Equal, NotEqual, LessThan, LessThanOrEqual, GreaterThanOrEqual, GreaterThan }
 
         public IOperator Left { get; }
         public IOperator Right { get; }
@@ -170,6 +170,10 @@ namespace Calc4DotNet.Core.Operators
                     return Left.Evaluate(context, arguments) / Right.Evaluate(context, arguments);
                 case ArithmeticType.Mod:
                     return Left.Evaluate(context, arguments) % Right.Evaluate(context, arguments);
+                case ArithmeticType.Equal:
+                    return Left.Evaluate(context, arguments) == Right.Evaluate(context, arguments) ? 1 : 0;
+                case ArithmeticType.NotEqual:
+                    return Left.Evaluate(context, arguments) != Right.Evaluate(context, arguments) ? 1 : 0;
                 case ArithmeticType.LessThan:
                     return Left.Evaluate(context, arguments) < Right.Evaluate(context, arguments) ? 1 : 0;
                 case ArithmeticType.LessThanOrEqual:

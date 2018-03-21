@@ -43,6 +43,7 @@ namespace Calc4DotNet.Core.Execution
                     case Opcode.Goto:
                     case Opcode.GotoIfTrue:
                     case Opcode.GotoIfFalse:
+                    case Opcode.GotoIfEqual:
                     case Opcode.GotoIfLessThan:
                     case Opcode.GotoIfLessThanOrEqual:
                     case Opcode.Call:
@@ -171,6 +172,10 @@ namespace Calc4DotNet.Core.Execution
                             return Opcode.Div;
                         case BinaryOperator.ArithmeticType.Mod:
                             return Opcode.Mod;
+                        case BinaryOperator.ArithmeticType.Equal:
+                            return Opcode.Equal;
+                        case BinaryOperator.ArithmeticType.NotEqual:
+                            return Opcode.NotEqual;
                         case BinaryOperator.ArithmeticType.LessThan:
                             return Opcode.LessThan;
                         case BinaryOperator.ArithmeticType.LessThanOrEqual:
@@ -210,6 +215,13 @@ namespace Calc4DotNet.Core.Execution
 
                     switch (binary.Type)
                     {
+                        case BinaryOperator.ArithmeticType.Equal:
+                            Emit(Opcode.GotoIfEqual, ifTrue: op.IfTrue, ifFalse: op.IfFalse);
+                            return;
+                        case BinaryOperator.ArithmeticType.NotEqual:
+                            // "a != b ? c ? d" is equivalent to "a == b ? d ? c"
+                            Emit(Opcode.GotoIfEqual, ifTrue: op.IfFalse, ifFalse: op.IfTrue);
+                            return;
                         case BinaryOperator.ArithmeticType.LessThan:
                             Emit(Opcode.GotoIfLessThan, ifTrue: op.IfTrue, ifFalse: op.IfFalse);
                             return;
