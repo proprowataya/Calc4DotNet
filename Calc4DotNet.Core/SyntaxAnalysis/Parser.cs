@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using Calc4DotNet.Core.Operators;
 
@@ -91,9 +90,8 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
             {
                 foreach (var token in tokens.OfType<DefineToken>())
                 {
-                    bool result = context.TryLookUpOperatorDefinition(token.Name, out var definition);
-                    Debug.Assert(result);
-                    definition.Root = new Implement(token.Tokens, context).Parse();
+                    IOperator op = new Implement(token.Tokens, context).Parse();
+                    context.AddOrUpdateOperatorImplement(token.Name, op);
                 }
             }
 

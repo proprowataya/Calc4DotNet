@@ -56,7 +56,7 @@ namespace Calc4DotNet
                 {
                     Console.WriteLine($"Operator \"{def.Name}\"");
                     Console.WriteLine("{");
-                    PrintTree(def.Root, 1);
+                    PrintTree(context.LookUpOperatorImplement(def.Name), 1);
                     Console.WriteLine("}");
                     Console.WriteLine();
                 }
@@ -84,10 +84,6 @@ namespace Calc4DotNet
 
                 // Optimize
                 op = Optimizer.Optimize(op, context);
-                foreach (var item in context.OperatorDefinitions)
-                {
-                    context.AddOrUpdateOperatorDefinition(Optimizer.Optimize(item, context));
-                }
 
                 // Execute
                 Console.WriteLine("----- After optimized -----");

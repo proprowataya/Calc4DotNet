@@ -10,12 +10,19 @@ namespace Calc4DotNet.Core.Optimization
     {
         public static IOperator Optimize(IOperator op, Context context)
         {
+            // Optimize user-defined operators
+            foreach (var definition in context.OperatorDefinitions)
+            {
+                OptimizeUserDefinedOperator(definition, context);
+            }
+
             return op.Accept(new Visitor(context, false));
         }
 
-        public static OperatorDefinition Optimize(OperatorDefinition definition, Context context)
+        private static void OptimizeUserDefinedOperator(OperatorDefinition definition, Context context)
         {
-            return new OperatorDefinition(definition.Name, definition.NumOperands, definition.Root.Accept(new Visitor(context, true)));
+            var newRoot = context.LookUpOperatorImplement(definition.Name).Accept(new Visitor(context, true));
+            context.AddOrUpdateOperatorImplement(definition.Name, newRoot);
         }
 
         private sealed class Visitor : IOperatorVisitor<IOperator>
@@ -51,7 +58,7 @@ namespace Calc4DotNet.Core.Optimization
 
                     if (current is UserDefinedOperator userDefined)
                     {
-                        if (!IsPreComputable(userDefined.Definition.Root))
+                        if (!IsPreComputable(context.LookUpOperatorImplement(userDefined.Definition.Name)))
                             return false;
                     }
 

@@ -84,8 +84,8 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 string[] arguments = elems[1].Length > 0 ? elems[1].Replace(" ", "").Split(",") : Array.Empty<string>();
                 string content = elems[2];
 
-                var definition = new OperatorDefinition(name, arguments.Length, null);
-                context.AddOrUpdateOperatorDefinition(definition);
+                var definition = new OperatorDefinition(name, arguments.Length);
+                context.AddOperatorDefinition(definition);
 
                 var dictionary = arguments.Select((argumentName, argumentIndex) => (argumentName, argumentIndex))
                                           .ToDictionary(t => t.argumentName, t => t.argumentIndex);

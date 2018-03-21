@@ -238,7 +238,7 @@ namespace Calc4DotNet.Core.Operators
                 stack[i] = Operands[i].Evaluate(context, arguments);
             }
 
-            return Definition.Root.Evaluate(context, stack);
+            return context.LookUpOperatorImplement(Definition.Name).Evaluate(context, stack);
         }
     }
 }
