@@ -110,14 +110,14 @@ namespace Calc4DotNet.Core.Execution
 
             public void Visit(PreComputedOperator op)
             {
-                if (unchecked((int)op.Value) == op.Value)
+                if (unchecked((short)op.Value) == op.Value)
                 {
-                    list.Add(new LowLevelOperation(Opcode.LoadConst, (int)op.Value));
+                    list.Add(new LowLevelOperation(Opcode.LoadConst, (short)op.Value));
                 }
                 else
                 {
                     // We cannot emit Opcode.LoadConst,
-                    // because the constant value exceeds limit of 32-bit integer.
+                    // because the constant value exceeds limit of 16-bit integer.
                     // So we use constTable.
                     int no = constTable.Count;
                     constTable.Add(op.Value);
