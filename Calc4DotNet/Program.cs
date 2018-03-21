@@ -70,6 +70,10 @@ namespace Calc4DotNet
                 Console.WriteLine("Low-level operation codes");
                 Console.WriteLine("{");
                 PrintLowLevelOperations(module);
+                if (!module.ConstTable.IsDefaultOrEmpty)
+                {
+                    Console.WriteLine("Constants: " + string.Join(", ", module.ConstTable.Select((num, i) => $"[{i}] = {num}")));
+                }
                 Console.WriteLine("}");
                 Console.WriteLine();
 
