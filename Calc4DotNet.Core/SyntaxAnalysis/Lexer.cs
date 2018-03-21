@@ -171,6 +171,9 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                     case '/':
                         index++;
                         return new BinaryOperatorToken(BinaryType.Div, LexSupplementaryText());
+                    case '%':
+                        index++;
+                        return new BinaryOperatorToken(BinaryType.Mod, LexSupplementaryText());
                     case '<':
                         index++;
                         return new BinaryOperatorToken(BinaryType.LessThan, LexSupplementaryText());
