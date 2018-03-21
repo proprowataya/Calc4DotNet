@@ -9,19 +9,19 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
 {
     public static class Lexer
     {
-        public static IReadOnlyList<IToken> Lex(string text, Context context)
+        public static IReadOnlyList<IToken> Lex<TNumber>(string text, Context<TNumber> context)
         {
-            return new Implement(context, text, new Dictionary<string, int>()).Lex();
+            return new Implement<TNumber>(context, text, new Dictionary<string, int>()).Lex();
         }
 
-        private struct Implement
+        private struct Implement<TNumber>
         {
-            private readonly Context context;
+            private readonly Context<TNumber> context;
             private readonly string text;
             private readonly Dictionary<string, int> argumentDictionary;
             private int index;
 
-            public Implement(Context context, string text, Dictionary<string, int> argumentDictionary)
+            public Implement(Context<TNumber> context, string text, Dictionary<string, int> argumentDictionary)
             {
                 this.context = context ?? throw new ArgumentNullException(nameof(context));
                 this.text = text ?? throw new ArgumentNullException(nameof(text));
@@ -89,7 +89,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
 
                 var dictionary = arguments.Select((argumentName, argumentIndex) => (argumentName, argumentIndex))
                                           .ToDictionary(t => t.argumentName, t => t.argumentIndex);
-                var tokens = new Implement(context, content, dictionary).Lex();
+                var tokens = new Implement<TNumber>(context, content, dictionary).Lex();
 
                 return new DefineToken(name, arguments.ToImmutableArray(), tokens.ToImmutableArray(), supplementaryText);
             }
@@ -124,7 +124,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 Debug.Assert(text[index] == '(');
                 index++;
 
-                Implement implement = new Implement(context, text, argumentDictionary) { index = this.index };
+                Implement<TNumber> implement = new Implement<TNumber>(context, text, argumentDictionary) { index = this.index };
                 var tokens = implement.Lex();
 
                 index = implement.index;
@@ -142,16 +142,16 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                     {
                         case "==":
                             index += 2;
-                            return new BinaryOperatorToken(BinaryOperator.ArithmeticType.Equal, LexSupplementaryText());
+                            return new BinaryOperatorToken(BinaryType.Equal, LexSupplementaryText());
                         case "!=":
                             index += 2;
-                            return new BinaryOperatorToken(BinaryOperator.ArithmeticType.NotEqual, LexSupplementaryText());
+                            return new BinaryOperatorToken(BinaryType.NotEqual, LexSupplementaryText());
                         case ">=":
                             index += 2;
-                            return new BinaryOperatorToken(BinaryOperator.ArithmeticType.GreaterThanOrEqual, LexSupplementaryText());
+                            return new BinaryOperatorToken(BinaryType.GreaterThanOrEqual, LexSupplementaryText());
                         case "<=":
                             index += 2;
-                            return new BinaryOperatorToken(BinaryOperator.ArithmeticType.LessThanOrEqual, LexSupplementaryText());
+                            return new BinaryOperatorToken(BinaryType.LessThanOrEqual, LexSupplementaryText());
                         default:
                             break;
                     }
@@ -161,22 +161,22 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 {
                     case '+':
                         index++;
-                        return new BinaryOperatorToken(BinaryOperator.ArithmeticType.Add, LexSupplementaryText());
+                        return new BinaryOperatorToken(BinaryType.Add, LexSupplementaryText());
                     case '-':
                         index++;
-                        return new BinaryOperatorToken(BinaryOperator.ArithmeticType.Sub, LexSupplementaryText());
+                        return new BinaryOperatorToken(BinaryType.Sub, LexSupplementaryText());
                     case '*':
                         index++;
-                        return new BinaryOperatorToken(BinaryOperator.ArithmeticType.Mult, LexSupplementaryText());
+                        return new BinaryOperatorToken(BinaryType.Mult, LexSupplementaryText());
                     case '/':
                         index++;
-                        return new BinaryOperatorToken(BinaryOperator.ArithmeticType.Div, LexSupplementaryText());
+                        return new BinaryOperatorToken(BinaryType.Div, LexSupplementaryText());
                     case '<':
                         index++;
-                        return new BinaryOperatorToken(BinaryOperator.ArithmeticType.LessThan, LexSupplementaryText());
+                        return new BinaryOperatorToken(BinaryType.LessThan, LexSupplementaryText());
                     case '>':
                         index++;
-                        return new BinaryOperatorToken(BinaryOperator.ArithmeticType.GreaterThan, LexSupplementaryText());
+                        return new BinaryOperatorToken(BinaryType.GreaterThan, LexSupplementaryText());
                     case '?':
                         index++;
                         return new ConditionalOperatorToken(LexSupplementaryText());

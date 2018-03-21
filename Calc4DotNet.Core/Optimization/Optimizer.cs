@@ -2,61 +2,63 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.Optimization
 {
     public static class Optimizer
     {
-        public static IOperator Optimize(IOperator op, Context context)
+        public static IOperator<TNumber> Optimize<TNumber>(IOperator<TNumber> op, Context<TNumber> context)
         {
             // Optimize user-defined operators
             foreach (var definition in context.OperatorDefinitions)
             {
-                OptimizeUserDefinedOperator(definition, context);
+                OptimizeUserDefinedOperator<TNumber>(definition, context);
             }
 
-            return op.Accept(new Visitor(context, false));
+            return op.Accept(new Visitor<TNumber>(context, false));
         }
 
-        private static void OptimizeUserDefinedOperator(OperatorDefinition definition, Context context)
+        private static void OptimizeUserDefinedOperator<TNumber>(OperatorDefinition definition, Context<TNumber> context)
         {
-            var newRoot = context.LookUpOperatorImplement(definition.Name).Accept(new Visitor(context, true));
+            var newRoot = context.LookUpOperatorImplement(definition.Name).Accept(new Visitor<TNumber>(context, true));
             context.AddOrUpdateOperatorImplement(definition.Name, newRoot);
         }
 
-        private sealed class Visitor : IOperatorVisitor<IOperator>
+        private sealed class Visitor<TNumber> : IOperatorVisitor<TNumber, IOperator<TNumber>>
         {
-            private readonly Context context;
+            private readonly Context<TNumber> context;
             private readonly bool isDefinition;
-            private readonly Dictionary<IOperator, bool?> isPreComputable = new Dictionary<IOperator, bool?>();
+            private readonly Dictionary<IOperator<TNumber>, bool?> isPreComputable = new Dictionary<IOperator<TNumber>, bool?>();
 
-            public Visitor(Context context, bool isDefinition)
+            public Visitor(Context<TNumber> context, bool isDefinition)
             {
                 this.context = context ?? throw new ArgumentNullException(nameof(context));
                 this.isDefinition = isDefinition;
             }
 
-            private PreComputedOperator PerformPreCompute(IOperator op) => new PreComputedOperator(op.Evaluate(context, default));
-            private IOperator PrecomputeIfPossible(IOperator op) => IsPreComputable(op) ? PerformPreCompute(op) : op;
+            private PreComputedOperator<TNumber> PreCompute(IOperator<TNumber> op)
+                => new PreComputedOperator<TNumber>(Evaluator.EvaluateGeneric(op, context));
 
-            private bool IsPreComputable(IOperator op)
+            private IOperator<TNumber> PrecomputeIfPossible(IOperator<TNumber> op)
+                => IsPreComputable(op) ? PreCompute(op) : op;
+
+            private bool IsPreComputable(IOperator<TNumber> op)
             {
-                bool Core(IOperator current)
+                bool Core(IOperator<TNumber> current)
                 {
-                    if (!current.ThisTypeIsPreComputable)
-                        return false;
-                    if (isDefinition && current is ArgumentOperator)
+                    if (isDefinition && current is ArgumentOperator<TNumber>)
                         return false;
 
-                    ImmutableArray<IOperator> operands = current.Operands;
-                    for (int i = 0; i < operands.Length; i++)
+                    var operands = current.Operands;
+                    for (int i = 0; i < operands.Count; i++)
                     {
                         if (!IsPreComputable(operands[i]))
                             return false;
                     }
 
-                    if (current is UserDefinedOperator userDefined)
+                    if (current is UserDefinedOperator<TNumber> userDefined)
                     {
                         if (!IsPreComputable(context.LookUpOperatorImplement(userDefined.Definition.Name)))
                             return false;
@@ -82,53 +84,54 @@ namespace Calc4DotNet.Core.Optimization
                 return (isPreComputable[op] = Core(op)).Value;
             }
 
-            public IOperator Visit(ZeroOperator op) => PerformPreCompute(op);
+            public IOperator<TNumber> Visit(ZeroOperator<TNumber> op) => PreCompute(op);
 
-            public IOperator Visit(PreComputedOperator op) => PerformPreCompute(op);
+            public IOperator<TNumber> Visit(PreComputedOperator<TNumber> op) => PreCompute(op);
 
-            public IOperator Visit(ArgumentOperator op) => PrecomputeIfPossible(op);
+            public IOperator<TNumber> Visit(ArgumentOperator<TNumber> op) => PrecomputeIfPossible(op);
 
-            public IOperator Visit(DefineOperator op) => PerformPreCompute(op);
+            public IOperator<TNumber> Visit(DefineOperator<TNumber> op) => PreCompute(op);
 
-            public IOperator Visit(ParenthesisOperator op)
+            public IOperator<TNumber> Visit(ParenthesisOperator<TNumber> op)
             {
-                ImmutableArray<IOperator> operators = op.Operators;
-                var builder = ImmutableArray.CreateBuilder<IOperator>(operators.Length);
+                ImmutableArray<IOperator<TNumber>> operators = op.Operators;
+                var builder = ImmutableArray.CreateBuilder<IOperator<TNumber>>(operators.Length);
 
                 for (int i = 0; i < operators.Length; i++)
                 {
                     builder.Add(operators[i].Accept(this));
                 }
 
-                var newOp = new ParenthesisOperator(builder.MoveToImmutable(), op.SupplementaryText);
+                var newOp = new ParenthesisOperator<TNumber>(builder.MoveToImmutable(), op.SupplementaryText);
                 return PrecomputeIfPossible(newOp);
             }
 
-            public IOperator Visit(DecimalOperator op)
+            public IOperator<TNumber> Visit(DecimalOperator<TNumber> op)
             {
                 var operand = op.Operand.Accept(this);
-                var newOp = new DecimalOperator(operand, op.Value, op.SupplementaryText);
+                var newOp = new DecimalOperator<TNumber>(operand, op.Value, op.SupplementaryText);
                 return PrecomputeIfPossible(newOp);
             }
 
-            public IOperator Visit(BinaryOperator op)
+            public IOperator<TNumber> Visit(BinaryOperator<TNumber> op)
             {
                 var left = op.Left.Accept(this);
                 var right = op.Right.Accept(this);
-                var newOp = new BinaryOperator(left, right, op.Type, op.SupplementaryText);
+                var newOp = new BinaryOperator<TNumber>(left, right, op.Type, op.SupplementaryText);
                 return PrecomputeIfPossible(newOp);
             }
 
-            public IOperator Visit(ConditionalOperator op)
+            public IOperator<TNumber> Visit(ConditionalOperator<TNumber> op)
             {
                 var condition = op.Condition.Accept(this);
                 var ifTrue = op.IfTrue.Accept(this);
                 var ifFalse = op.IfFalse.Accept(this);
-                var newOp = new ConditionalOperator(condition, ifTrue, ifFalse, op.SupplementaryText);
+                var newOp = new ConditionalOperator<TNumber>(condition, ifTrue, ifFalse, op.SupplementaryText);
 
                 if (IsPreComputable(condition))
                 {
-                    return PerformPreCompute(condition).Value != 0 ? ifTrue : ifFalse;
+                    // TODO: More wise determination method of whether the value is zero or not
+                    return (dynamic)PreCompute(condition).Value != 0 ? ifTrue : ifFalse;
                 }
                 else
                 {
@@ -136,10 +139,10 @@ namespace Calc4DotNet.Core.Optimization
                 }
             }
 
-            public IOperator Visit(UserDefinedOperator op)
+            public IOperator<TNumber> Visit(UserDefinedOperator<TNumber> op)
             {
                 var operands = op.Operands.Select(x => x.Accept(this)).ToImmutableArray();
-                var newOp = new UserDefinedOperator(op.Definition, operands, op.SupplementaryText);
+                var newOp = new UserDefinedOperator<TNumber>(op.Definition, operands, op.SupplementaryText);
                 return PrecomputeIfPossible(newOp);
             }
         }

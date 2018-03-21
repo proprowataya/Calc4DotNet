@@ -8,15 +8,15 @@ namespace Calc4DotNet.Core.Execution
 {
     public static class LowLevelCodeGenerator
     {
-        public static Module Generate(IOperator op, Context context)
+        public static Module<TNumber> Generate<TNumber>(IOperator<TNumber> op, Context<TNumber> context)
         {
-            Visitor visitor = new Visitor(context);
+            Visitor<TNumber> visitor = new Visitor<TNumber>(context);
             visitor.Generate(op);
             var (Operations, StartAddresses) = ResolveLabels(visitor);
-            return new Module(Operations.ToImmutableArray(), visitor.ConstTable.ToImmutableArray(), StartAddresses);
+            return new Module<TNumber>(Operations.ToImmutableArray(), visitor.ConstTable.ToImmutableArray(), StartAddresses);
         }
 
-        private static (List<LowLevelOperation> Operations, ImmutableArray<(OperatorDefinition, int)> StartAddresses) ResolveLabels(Visitor visitor)
+        private static (List<LowLevelOperation> Operations, ImmutableArray<(OperatorDefinition, int)> StartAddresses) ResolveLabels<TNumber>(Visitor<TNumber> visitor)
         {
             List<LowLevelOperation> list = new List<LowLevelOperation>();
             Dictionary<int, int> labelMap = new Dictionary<int, int>();
@@ -60,26 +60,26 @@ namespace Calc4DotNet.Core.Execution
             return (list, visitor.OperatorBeginLabels.Select(p => (p.Key, labelMap[p.Value])).ToImmutableArray());
         }
 
-        private sealed class Visitor : IOperatorVisitor
+        private sealed class Visitor<TNumber> : IOperatorVisitor<TNumber>
         {
-            private readonly Context context;
+            private readonly Context<TNumber> context;
 
             private List<LowLevelOperation> list = new List<LowLevelOperation>();
-            private List<Number> constTable = new List<Number>();
+            private List<TNumber> constTable = new List<TNumber>();
             private Dictionary<OperatorDefinition, int> operatorBeginLabels = new Dictionary<OperatorDefinition, int>();
             private OperatorDefinition definition = null;
             private int nextLabel = 0;
 
             public List<LowLevelOperation> Operations => list;
-            public List<Number> ConstTable => constTable;
+            public List<TNumber> ConstTable => constTable;
             public Dictionary<OperatorDefinition, int> OperatorBeginLabels => operatorBeginLabels;
 
-            public Visitor(Context context)
+            public Visitor(Context<TNumber> context)
             {
                 this.context = context ?? throw new ArgumentNullException(nameof(context));
             }
 
-            public void Generate(IOperator op)
+            public void Generate(IOperator<TNumber> op)
             {
                 // Determine user-defined operators' label
                 foreach (var item in context.OperatorDefinitions)
@@ -104,16 +104,30 @@ namespace Calc4DotNet.Core.Execution
 
             /* ******************** */
 
-            public void Visit(ZeroOperator op)
+            public void Visit(ZeroOperator<TNumber> op)
             {
                 list.Add(new LowLevelOperation(Opcode.LoadConst, 0));
             }
 
-            public void Visit(PreComputedOperator op)
+            public void Visit(PreComputedOperator<TNumber> op)
             {
-                if (unchecked((short)op.Value) == op.Value)
+                bool TryCastToShort(TNumber number, out short casted)
                 {
-                    list.Add(new LowLevelOperation(Opcode.LoadConst, (short)op.Value));
+                    try
+                    {
+                        casted = unchecked((short)(dynamic)number);
+                        return ((TNumber)(dynamic)casted).Equals(number);
+                    }
+                    catch
+                    {
+                        casted = default;
+                        return false;
+                    }
+                }
+
+                if (TryCastToShort(op.Value, out var value))
+                {
+                    list.Add(new LowLevelOperation(Opcode.LoadConst, value));
                 }
                 else
                 {
@@ -126,19 +140,19 @@ namespace Calc4DotNet.Core.Execution
                 }
             }
 
-            public void Visit(ArgumentOperator op)
+            public void Visit(ArgumentOperator<TNumber> op)
             {
                 list.Add(new LowLevelOperation(Opcode.LoadArg, definition.NumOperands - op.Index));
             }
 
-            public void Visit(DefineOperator op)
+            public void Visit(DefineOperator<TNumber> op)
             {
                 list.Add(new LowLevelOperation(Opcode.LoadConst, 0));
             }
 
-            public void Visit(ParenthesisOperator op)
+            public void Visit(ParenthesisOperator<TNumber> op)
             {
-                ImmutableArray<IOperator> operators = op.Operators;
+                ImmutableArray<IOperator<TNumber>> operators = op.Operators;
                 for (int i = 0; i < operators.Length; i++)
                 {
                     operators[i].Accept(this);
@@ -147,7 +161,7 @@ namespace Calc4DotNet.Core.Execution
                 }
             }
 
-            public void Visit(DecimalOperator op)
+            public void Visit(DecimalOperator<TNumber> op)
             {
                 op.Operand.Accept(this);
                 list.Add(new LowLevelOperation(Opcode.LoadConst, 10));
@@ -156,33 +170,33 @@ namespace Calc4DotNet.Core.Execution
                 list.Add(new LowLevelOperation(Opcode.Add));
             }
 
-            public void Visit(BinaryOperator op)
+            public void Visit(BinaryOperator<TNumber> op)
             {
-                Opcode ConvertArithmeticType(BinaryOperator.ArithmeticType type)
+                Opcode ConvertArithmeticType(BinaryType type)
                 {
                     switch (type)
                     {
-                        case BinaryOperator.ArithmeticType.Add:
+                        case BinaryType.Add:
                             return Opcode.Add;
-                        case BinaryOperator.ArithmeticType.Sub:
+                        case BinaryType.Sub:
                             return Opcode.Sub;
-                        case BinaryOperator.ArithmeticType.Mult:
+                        case BinaryType.Mult:
                             return Opcode.Mult;
-                        case BinaryOperator.ArithmeticType.Div:
+                        case BinaryType.Div:
                             return Opcode.Div;
-                        case BinaryOperator.ArithmeticType.Mod:
+                        case BinaryType.Mod:
                             return Opcode.Mod;
-                        case BinaryOperator.ArithmeticType.Equal:
+                        case BinaryType.Equal:
                             return Opcode.Equal;
-                        case BinaryOperator.ArithmeticType.NotEqual:
+                        case BinaryType.NotEqual:
                             return Opcode.NotEqual;
-                        case BinaryOperator.ArithmeticType.LessThan:
+                        case BinaryType.LessThan:
                             return Opcode.LessThan;
-                        case BinaryOperator.ArithmeticType.LessThanOrEqual:
+                        case BinaryType.LessThanOrEqual:
                             return Opcode.LessThanOrEqual;
-                        case BinaryOperator.ArithmeticType.GreaterThanOrEqual:
+                        case BinaryType.GreaterThanOrEqual:
                             return Opcode.GreaterThanOrEqual;
-                        case BinaryOperator.ArithmeticType.GreaterThan:
+                        case BinaryType.GreaterThan:
                             return Opcode.GreaterThan;
                         default:
                             throw new InvalidOperationException();
@@ -194,14 +208,14 @@ namespace Calc4DotNet.Core.Execution
                 list.Add(new LowLevelOperation(ConvertArithmeticType(op.Type)));
             }
 
-            public void Visit(ConditionalOperator op)
+            public void Visit(ConditionalOperator<TNumber> op)
             {
                 int ifTrueLabel = nextLabel++, endLabel = nextLabel++;
 
-                if (op.Condition is BinaryOperator binary)
+                if (op.Condition is BinaryOperator<TNumber> binary)
                 {
                     // Special optimiztion for comparisons
-                    void Emit(Opcode opcode, IOperator ifTrue, IOperator ifFalse)
+                    void Emit(Opcode opcode, IOperator<TNumber> ifTrue, IOperator<TNumber> ifFalse)
                     {
                         binary.Left.Accept(this);
                         binary.Right.Accept(this);
@@ -215,24 +229,24 @@ namespace Calc4DotNet.Core.Execution
 
                     switch (binary.Type)
                     {
-                        case BinaryOperator.ArithmeticType.Equal:
+                        case BinaryType.Equal:
                             Emit(Opcode.GotoIfEqual, ifTrue: op.IfTrue, ifFalse: op.IfFalse);
                             return;
-                        case BinaryOperator.ArithmeticType.NotEqual:
+                        case BinaryType.NotEqual:
                             // "a != b ? c ? d" is equivalent to "a == b ? d ? c"
                             Emit(Opcode.GotoIfEqual, ifTrue: op.IfFalse, ifFalse: op.IfTrue);
                             return;
-                        case BinaryOperator.ArithmeticType.LessThan:
+                        case BinaryType.LessThan:
                             Emit(Opcode.GotoIfLessThan, ifTrue: op.IfTrue, ifFalse: op.IfFalse);
                             return;
-                        case BinaryOperator.ArithmeticType.LessThanOrEqual:
+                        case BinaryType.LessThanOrEqual:
                             Emit(Opcode.GotoIfLessThanOrEqual, ifTrue: op.IfTrue, ifFalse: op.IfFalse);
                             return;
-                        case BinaryOperator.ArithmeticType.GreaterThanOrEqual:
+                        case BinaryType.GreaterThanOrEqual:
                             // "a >= b ? c ? d" is equivalent to "a < b ? d ? c"
                             Emit(Opcode.GotoIfLessThan, ifTrue: op.IfFalse, ifFalse: op.IfTrue);
                             return;
-                        case BinaryOperator.ArithmeticType.GreaterThan:
+                        case BinaryType.GreaterThan:
                             // "a > b ? c ? d" is equivalent to "a <= b ? d ? c"
                             Emit(Opcode.GotoIfLessThanOrEqual, ifTrue: op.IfFalse, ifFalse: op.IfTrue);
                             return;
@@ -250,7 +264,7 @@ namespace Calc4DotNet.Core.Execution
                 list.Add(new LowLevelOperation(Opcode.Lavel, endLabel));
             }
 
-            public void Visit(UserDefinedOperator op)
+            public void Visit(UserDefinedOperator<TNumber> op)
             {
                 for (int i = 0; i < op.Operands.Length; i++)
                 {

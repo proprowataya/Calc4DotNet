@@ -8,15 +8,14 @@ namespace Calc4DotNet.Core.Operators
     {
         private static readonly HashSet<string> HiddenPropertyNames = new HashSet<string>()
         {
-            nameof(IOperator.ThisTypeIsPreComputable),
-            nameof(IOperator.Operands),
+            nameof(IMinimalOperator.Operands),
         };
 
-        public static string ToDetailString(this IOperator op)
+        public static string ToDetailString(this IMinimalOperator op)
         {
             var type = op.GetType();
             var props = type.GetProperties()
-                            .Where(p => !typeof(IOperator).IsAssignableFrom(p.PropertyType)
+                            .Where(p => !typeof(IMinimalOperator).IsAssignableFrom(p.PropertyType)
                                         && !HiddenPropertyNames.Contains(p.Name));
             var values = props.Select(p => (Property: p, Value: p.GetValue(op)))
                               .Where(t => t.Value != null);
@@ -31,7 +30,7 @@ namespace Calc4DotNet.Core.Operators
                     return '"' + str + '"';
                 case IEnumerable enumerable:
                     return $"{{{string.Join(", ", enumerable.Cast<object>().Select(x => ObjectToString(x)))}}}";
-                case IOperator op:
+                case IMinimalOperator op:
                     return op.ToDetailString();
                 default:
                     return obj.ToString();

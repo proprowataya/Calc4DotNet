@@ -8,7 +8,7 @@ namespace Calc4DotNet.Core.Execution
         public const int StackSizeByBytes = 1 << 20;
         private const int NumPtrSave = 1 << 20;
 
-        public unsafe static Int64 ExecuteInt64(Module module)
+        public unsafe static Int64 ExecuteInt64(Module<Int64> module)
         {
             Int64[] stack = new Int64[StackSizeByBytes / sizeof(Int64)];
             void*[] prtSave = new void*[NumPtrSave];
@@ -37,7 +37,7 @@ namespace Calc4DotNet.Core.Execution
                             top++;
                             break;
                         case Opcode.LoadConstTable:
-                            *top = module.ConstTable[op->Value].Value;
+                            *top = module.ConstTable[op->Value];
                             top++;
                             break;
                         case Opcode.Store:

@@ -70,11 +70,11 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
 
     public sealed class BinaryOperatorToken : IToken
     {
-        public BinaryOperator.ArithmeticType Type { get; }
+        public BinaryType Type { get; }
         public string SupplementaryText { get; }
         public int NumOperands => 2;
 
-        public BinaryOperatorToken(BinaryOperator.ArithmeticType type, string supplementaryText = null)
+        public BinaryOperatorToken(BinaryType type, string supplementaryText = null)
         {
             Type = type;
             SupplementaryText = supplementaryText;

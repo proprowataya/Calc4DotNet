@@ -1,49 +1,54 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 
 namespace Calc4DotNet.Core.Operators
 {
-    public interface IOperator
+    public interface IMinimalOperator
     {
         string SupplementaryText { get; }
-        ImmutableArray<IOperator> Operands { get; }
-        bool ThisTypeIsPreComputable { get; }
-        void Accept(IOperatorVisitor visitor);
-        T Accept<T>(IOperatorVisitor<T> visitor);
-        Number Evaluate(Context context, ReadOnlySpan<Number> arguments);
+        IReadOnlyList<IMinimalOperator> Operands { get; }
     }
 
-    public interface IPrimitiveOperator : IOperator { }
+    public interface IOperator<TNumber> : IMinimalOperator
+    {
+        new IReadOnlyList<IOperator<TNumber>> Operands { get; }
 
-    public sealed class ZeroOperator : IPrimitiveOperator
+        void Accept(IOperatorVisitor<TNumber> visitor);
+        TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor);
+        TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param);
+    }
+
+    public sealed class ZeroOperator<TNumber> : IOperator<TNumber>
     {
         public string SupplementaryText => null;
-        public ImmutableArray<IOperator> Operands => ImmutableArray<IOperator>.Empty;
-        public bool ThisTypeIsPreComputable => true;
-        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
-        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
-        public Number Evaluate(Context context, ReadOnlySpan<Number> arguments) => Number.Zero;
+        public IReadOnlyList<IOperator<TNumber>> Operands => Array.Empty<IOperator<TNumber>>();
+        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
+
+        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 
-    public sealed class PreComputedOperator : IPrimitiveOperator
+    public sealed class PreComputedOperator<TNumber> : IOperator<TNumber>
     {
-        public Number Value { get; }
+        public TNumber Value { get; }
 
-        public PreComputedOperator(Number value)
+        public PreComputedOperator(TNumber value)
         {
             Value = value;
         }
 
         public string SupplementaryText => null;
-        public ImmutableArray<IOperator> Operands => ImmutableArray<IOperator>.Empty;
-        public bool ThisTypeIsPreComputable => true;
-        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
-        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
-        public Number Evaluate(Context context, ReadOnlySpan<Number> arguments) => Value;
+        public IReadOnlyList<IOperator<TNumber>> Operands => Array.Empty<IOperator<TNumber>>();
+        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
+
+        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 
-    public sealed class ArgumentOperator : IPrimitiveOperator
+    public sealed class ArgumentOperator<TNumber> : IOperator<TNumber>
     {
         public int Index { get; }
         public string SupplementaryText { get; }
@@ -54,15 +59,15 @@ namespace Calc4DotNet.Core.Operators
             SupplementaryText = supplementaryText;
         }
 
-        public ImmutableArray<IOperator> Operands => ImmutableArray<IOperator>.Empty;
-        public bool ThisTypeIsPreComputable => true;
+        public IReadOnlyList<IOperator<TNumber>> Operands => Array.Empty<IOperator<TNumber>>();
+        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
 
-        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
-        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
-        public Number Evaluate(Context context, ReadOnlySpan<Number> arguments) => arguments[Index];
+        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 
-    public sealed class DefineOperator : IPrimitiveOperator
+    public sealed class DefineOperator<TNumber> : IOperator<TNumber>
     {
         public string SupplementaryText { get; }
 
@@ -71,51 +76,40 @@ namespace Calc4DotNet.Core.Operators
             SupplementaryText = supplementaryText;
         }
 
-        public ImmutableArray<IOperator> Operands => ImmutableArray<IOperator>.Empty;
-        public bool ThisTypeIsPreComputable => true;
+        public IReadOnlyList<IOperator<TNumber>> Operands => Array.Empty<IOperator<TNumber>>();
+        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
 
-        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
-        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
-        public Number Evaluate(Context context, ReadOnlySpan<Number> arguments) => Number.Zero;
+        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 
-    public sealed class ParenthesisOperator : IPrimitiveOperator
+    public sealed class ParenthesisOperator<TNumber> : IOperator<TNumber>
     {
-        public ImmutableArray<IOperator> Operators { get; }
+        public ImmutableArray<IOperator<TNumber>> Operators { get; }
         public string SupplementaryText { get; }
 
-        public ParenthesisOperator(ImmutableArray<IOperator> operators, string supplementaryText = null)
+        public ParenthesisOperator(ImmutableArray<IOperator<TNumber>> operators, string supplementaryText = null)
         {
             Operators = operators;
             SupplementaryText = supplementaryText;
         }
 
-        public ImmutableArray<IOperator> Operands => ImmutableArray<IOperator>.Empty;
-        public bool ThisTypeIsPreComputable => Operators.All(op => op.ThisTypeIsPreComputable);
+        public IReadOnlyList<IOperator<TNumber>> Operands => Array.Empty<IOperator<TNumber>>();
+        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
 
-        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
-        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
-
-        public Number Evaluate(Context context, ReadOnlySpan<Number> arguments)
-        {
-            Number result = Number.Zero;
-
-            for (int i = 0; i < Operators.Length; i++)
-            {
-                result = Operators[i].Evaluate(context, arguments);
-            }
-
-            return result;
-        }
+        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 
-    public sealed class DecimalOperator : IPrimitiveOperator
+    public sealed class DecimalOperator<TNumber> : IOperator<TNumber>
     {
-        public IOperator Operand { get; }
+        public IOperator<TNumber> Operand { get; }
         public int Value { get; }
         public string SupplementaryText { get; }
 
-        public DecimalOperator(IOperator operand, int value, string supplementaryText = null)
+        public DecimalOperator(IOperator<TNumber> operand, int value, string supplementaryText = null)
         {
             Operand = operand ?? throw new ArgumentNullException(nameof(operand));
             Value = value;
@@ -124,25 +118,24 @@ namespace Calc4DotNet.Core.Operators
                 throw new ArgumentException(nameof(value));
         }
 
-        public ImmutableArray<IOperator> Operands => ImmutableArray.Create(Operand);
-        public bool ThisTypeIsPreComputable => true;
+        public IReadOnlyList<IOperator<TNumber>> Operands => new[] { Operand };
+        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
 
-        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
-        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
-        public Number Evaluate(Context context, ReadOnlySpan<Number> arguments)
-            => Operand.Evaluate(context, arguments) * 10 + Value;
+        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 
-    public sealed class BinaryOperator : IPrimitiveOperator
-    {
-        public enum ArithmeticType { Add, Sub, Mult, Div, Mod, Equal, NotEqual, LessThan, LessThanOrEqual, GreaterThanOrEqual, GreaterThan }
+    public enum BinaryType { Add, Sub, Mult, Div, Mod, Equal, NotEqual, LessThan, LessThanOrEqual, GreaterThanOrEqual, GreaterThan }
 
-        public IOperator Left { get; }
-        public IOperator Right { get; }
-        public ArithmeticType Type { get; }
+    public sealed class BinaryOperator<TNumber> : IOperator<TNumber>
+    {
+        public IOperator<TNumber> Left { get; }
+        public IOperator<TNumber> Right { get; }
+        public BinaryType Type { get; }
         public string SupplementaryText { get; }
 
-        public BinaryOperator(IOperator left, IOperator right, ArithmeticType type, string supplementaryText = null)
+        public BinaryOperator(IOperator<TNumber> left, IOperator<TNumber> right, BinaryType type, string supplementaryText = null)
         {
             Left = left ?? throw new ArgumentNullException(nameof(left));
             Right = right ?? throw new ArgumentNullException(nameof(right));
@@ -150,52 +143,22 @@ namespace Calc4DotNet.Core.Operators
             SupplementaryText = supplementaryText;
         }
 
-        public ImmutableArray<IOperator> Operands => ImmutableArray.Create(Left, Right);
-        public bool ThisTypeIsPreComputable => true;
+        public IReadOnlyList<IOperator<TNumber>> Operands => new[] { Left, Right };
+        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
 
-        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
-        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
-
-        public Number Evaluate(Context context, ReadOnlySpan<Number> arguments)
-        {
-            switch (Type)
-            {
-                case ArithmeticType.Add:
-                    return Left.Evaluate(context, arguments) + Right.Evaluate(context, arguments);
-                case ArithmeticType.Sub:
-                    return Left.Evaluate(context, arguments) - Right.Evaluate(context, arguments);
-                case ArithmeticType.Mult:
-                    return Left.Evaluate(context, arguments) * Right.Evaluate(context, arguments);
-                case ArithmeticType.Div:
-                    return Left.Evaluate(context, arguments) / Right.Evaluate(context, arguments);
-                case ArithmeticType.Mod:
-                    return Left.Evaluate(context, arguments) % Right.Evaluate(context, arguments);
-                case ArithmeticType.Equal:
-                    return Left.Evaluate(context, arguments) == Right.Evaluate(context, arguments) ? 1 : 0;
-                case ArithmeticType.NotEqual:
-                    return Left.Evaluate(context, arguments) != Right.Evaluate(context, arguments) ? 1 : 0;
-                case ArithmeticType.LessThan:
-                    return Left.Evaluate(context, arguments) < Right.Evaluate(context, arguments) ? 1 : 0;
-                case ArithmeticType.LessThanOrEqual:
-                    return Left.Evaluate(context, arguments) <= Right.Evaluate(context, arguments) ? 1 : 0;
-                case ArithmeticType.GreaterThanOrEqual:
-                    return Left.Evaluate(context, arguments) >= Right.Evaluate(context, arguments) ? 1 : 0;
-                case ArithmeticType.GreaterThan:
-                    return Left.Evaluate(context, arguments) > Right.Evaluate(context, arguments) ? 1 : 0;
-                default:
-                    throw new InvalidOperationException();
-            }
-        }
+        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 
-    public sealed class ConditionalOperator : IPrimitiveOperator
+    public sealed class ConditionalOperator<TNumber> : IOperator<TNumber>
     {
-        public IOperator Condition { get; }
-        public IOperator IfTrue { get; }
-        public IOperator IfFalse { get; }
+        public IOperator<TNumber> Condition { get; }
+        public IOperator<TNumber> IfTrue { get; }
+        public IOperator<TNumber> IfFalse { get; }
         public string SupplementaryText { get; }
 
-        public ConditionalOperator(IOperator condition, IOperator ifTrue, IOperator ifFalse, string supplementaryText = null)
+        public ConditionalOperator(IOperator<TNumber> condition, IOperator<TNumber> ifTrue, IOperator<TNumber> ifFalse, string supplementaryText = null)
         {
             Condition = condition ?? throw new ArgumentNullException(nameof(condition));
             IfTrue = ifTrue ?? throw new ArgumentNullException(nameof(ifTrue));
@@ -203,22 +166,21 @@ namespace Calc4DotNet.Core.Operators
             SupplementaryText = supplementaryText;
         }
 
-        public ImmutableArray<IOperator> Operands => ImmutableArray.Create(Condition, IfTrue, IfFalse);
-        public bool ThisTypeIsPreComputable => true;
+        public IReadOnlyList<IOperator<TNumber>> Operands => new[] { Condition, IfTrue, IfFalse };
+        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
 
-        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
-        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
-        public Number Evaluate(Context context, ReadOnlySpan<Number> arguments)
-            => Condition.Evaluate(context, arguments) != Number.Zero ? IfTrue.Evaluate(context, arguments) : IfFalse.Evaluate(context, arguments);
+        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 
-    public sealed class UserDefinedOperator : IOperator
+    public sealed class UserDefinedOperator<TNumber> : IOperator<TNumber>
     {
         public OperatorDefinition Definition { get; }
-        public ImmutableArray<IOperator> Operands { get; }
+        public ImmutableArray<IOperator<TNumber>> Operands { get; }
         public string SupplementaryText { get; }
 
-        public UserDefinedOperator(OperatorDefinition definition, ImmutableArray<IOperator> operands, string supplementaryText = null)
+        public UserDefinedOperator(OperatorDefinition definition, ImmutableArray<IOperator<TNumber>> operands, string supplementaryText = null)
         {
             Definition = definition ?? throw new ArgumentNullException(nameof(definition));
             Operands = operands;
@@ -228,21 +190,11 @@ namespace Calc4DotNet.Core.Operators
                 throw new ArgumentException($"Number of operands does not match between {nameof(definition)} and {nameof(operands)}");
         }
 
-        public bool ThisTypeIsPreComputable => Operands.All(op => op.ThisTypeIsPreComputable);
+        IReadOnlyList<IOperator<TNumber>> IOperator<TNumber>.Operands => Operands;
+        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
 
-        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
-        public T Accept<T>(IOperatorVisitor<T> visitor) => visitor.Visit(this);
-
-        public Number Evaluate(Context context, ReadOnlySpan<Number> arguments)
-        {
-            Span<Number> stack = stackalloc Number[Operands.Length];
-
-            for (int i = 0; i < Operands.Length; i++)
-            {
-                stack[i] = Operands[i].Evaluate(context, arguments);
-            }
-
-            return context.LookUpOperatorImplement(Definition.Name).Evaluate(context, stack);
-        }
+        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 }
