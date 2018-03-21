@@ -13,7 +13,6 @@ namespace Calc4DotNet.Core.Execution
             Int64[] stack = new Int64[StackSizeByBytes / sizeof(Int64)];
             void*[] prtSave = new void*[NumPtrSave];
 
-            fixed (Number* table = module.ConstTable.ToArray())
             fixed (LowLevelOperation* _operations = module.Operations.ToArray())
             fixed (Int64* _stack = stack)
             fixed (void** _prtSave = prtSave)
@@ -38,7 +37,7 @@ namespace Calc4DotNet.Core.Execution
                             top++;
                             break;
                         case Opcode.LoadConstTable:
-                            *top = table[op->Value].Value;
+                            *top = module.ConstTable[op->Value].Value;
                             top++;
                             break;
                         case Opcode.Store:
