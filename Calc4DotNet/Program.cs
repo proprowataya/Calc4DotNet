@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using Calc4DotNet.Core;
+using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Execution;
 using Calc4DotNet.Core.Operators;
 using Calc4DotNet.Core.Optimization;
@@ -9,6 +10,8 @@ using Calc4DotNet.Core.SyntaxAnalysis;
 
 namespace Calc4DotNet
 {
+    using NumberType = Int64;
+
     class Program
     {
         private const int Indent = 4;
@@ -46,10 +49,10 @@ namespace Calc4DotNet
 
         private static void Execute(string text)
         {
-            void ExecuteCore(IOperator op, Context context)
+            void ExecuteCore(IOperator<NumberType> op, Context<NumberType> context)
             {
                 // Generate low-level operations
-                Module module = LowLevelCodeGenerator.Generate(op, context);
+                Module<NumberType> module = LowLevelCodeGenerator.Generate(op, context);
 
                 // Print input and user-defined operators as trees
                 Console.WriteLine("Main");
@@ -80,7 +83,7 @@ namespace Calc4DotNet
                 // Execute
                 {
                     Stopwatch sw = Stopwatch.StartNew();
-                    Console.WriteLine($"Evaluated (tree): {op.Evaluate(context, default)}");
+                    Console.WriteLine($"Evaluated (tree): {Evaluator.Evaluate(op, context)}");
                     sw.Stop();
                     Console.WriteLine($"Elapsed: {sw.Elapsed}");
                     Console.WriteLine();
@@ -101,7 +104,7 @@ namespace Calc4DotNet
 #endif
             {
                 // Compile
-                Context context = new Context();
+                Context<NumberType> context = new Context<NumberType>();
                 var tokens = Lexer.Lex(text, context);
                 var op = Parser.Parse(tokens, context);
 
@@ -125,7 +128,7 @@ namespace Calc4DotNet
 #endif
         }
 
-        private static void PrintTree(IOperator op, int depth = 0)
+        private static void PrintTree(IOperator<NumberType> op, int depth = 0)
         {
             Console.WriteLine(new string(' ', Indent * depth) + op.ToDetailString());
             foreach (var item in op.Operands)
@@ -134,7 +137,7 @@ namespace Calc4DotNet
             }
         }
 
-        private static void PrintLowLevelOperations(Module module)
+        private static void PrintLowLevelOperations(Module<NumberType> module)
         {
             var operations = module.Operations;
             var dictionary = module.OperatorStartAddresses.ToDictionary(p => p.Address, p => p.Definition);
