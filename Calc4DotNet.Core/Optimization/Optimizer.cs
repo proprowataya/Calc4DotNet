@@ -27,7 +27,9 @@ namespace Calc4DotNet.Core.Optimization
 
         private static IOperator<TNumber> OptimizeCore<TNumber>(IOperator<TNumber> op, Context<TNumber> context, bool isDefinition)
         {
-            return op.Accept(new PreEvaluateVisitor<TNumber>(context, isDefinition));
+            op = op.Accept(new PreEvaluateVisitor<TNumber>(context, isDefinition));
+            op = op.Accept(new TailCallVisitor<TNumber>(), /* isTailCallable */ true);
+            return op;
         }
     }
 }

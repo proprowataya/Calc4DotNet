@@ -112,7 +112,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                     case ConditionalOperatorToken conditional:
                         return new ConditionalOperator<TNumber>(operands[0], operands[1], operands[2], conditional.SupplementaryText);
                     case UserDefinedOperatorToken userDefined:
-                        return new UserDefinedOperator<TNumber>(userDefined.Definition, operands.ToImmutableArray(), userDefined.SupplementaryText);
+                        return new UserDefinedOperator<TNumber>(userDefined.Definition, operands.ToImmutableArray(), null, userDefined.SupplementaryText);
                     default:
                         throw new InvalidOperationException();
                 }

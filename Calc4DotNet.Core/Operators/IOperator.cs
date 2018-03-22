@@ -178,12 +178,14 @@ namespace Calc4DotNet.Core.Operators
     {
         public OperatorDefinition Definition { get; }
         public ImmutableArray<IOperator<TNumber>> Operands { get; }
+        public bool? IsTailCallable { get; }
         public string SupplementaryText { get; }
 
-        public UserDefinedOperator(OperatorDefinition definition, ImmutableArray<IOperator<TNumber>> operands, string supplementaryText = null)
+        public UserDefinedOperator(OperatorDefinition definition, ImmutableArray<IOperator<TNumber>> operands, bool? isTailCallable = null, string supplementaryText = null)
         {
             Definition = definition ?? throw new ArgumentNullException(nameof(definition));
             Operands = operands;
+            IsTailCallable = isTailCallable;
             SupplementaryText = supplementaryText;
 
             if (operands.Length != definition.NumOperands)

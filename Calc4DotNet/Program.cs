@@ -25,6 +25,7 @@ namespace Calc4DotNet
                 "D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}]1+2*3/4-5+6*7-8?9?10?11{fib}?12{fib}",
                 "D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}] 30{fib}",
                 "D[add|x,y|x+y] 12{add}23",
+                "D[Fact|x,y|x==0?y?(x-1){Fact}(x*y)] 10{Fact}1",
                 "D[Earth||12742] D[Moon||3474] D[RoundDiv|x,y|(x * 10 / y + 5) / 10] {Earth}{RoundDiv}{Moon}",
             };
 

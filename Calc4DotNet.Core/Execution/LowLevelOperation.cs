@@ -25,7 +25,7 @@ namespace Calc4DotNet.Core.Execution
 
     public enum Opcode : byte
     {
-        Push, Pop, LoadConst, LoadConstTable, Store, LoadArg, Input,
+        Push, Pop, LoadConst, LoadConstTable, LoadArg, StoreArg, Input,
         Add, Sub, Mult, Div, Mod,
         Equal, NotEqual, LessThan, LessThanOrEqual, GreaterThanOrEqual, GreaterThan,
         Goto, GotoIfTrue, GotoIfFalse, GotoIfEqual, GotoIfLessThan, GotoIfLessThanOrEqual,
