@@ -74,6 +74,7 @@ namespace Calc4DotNet.Core.ILCompilation
                         {
                             il.Emit(OpCodes.Dup);
                             il.EmitLdc(i);
+                            il.EmitLdc((int)array[i]);
                             il.Emit(OpCodes.Stelem_I1);
                         }
 
