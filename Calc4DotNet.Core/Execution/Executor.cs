@@ -72,41 +72,11 @@ namespace Calc4DotNet.Core.Execution
                             top[-2] = top[-2] % top[-1];
                             top--;
                             break;
-                        case Opcode.Equal:
-                            top[-2] = top[-2] == top[-1] ? 1 : 0;
-                            top--;
-                            break;
-                        case Opcode.NotEqual:
-                            top[-2] = top[-2] != top[-1] ? 1 : 0;
-                            top--;
-                            break;
-                        case Opcode.LessThan:
-                            top[-2] = top[-2] < top[-1] ? 1 : 0;
-                            top--;
-                            break;
-                        case Opcode.LessThanOrEqual:
-                            top[-2] = top[-2] <= top[-1] ? 1 : 0;
-                            top--;
-                            break;
-                        case Opcode.GreaterThanOrEqual:
-                            top[-2] = top[-2] >= top[-1] ? 1 : 0;
-                            top--;
-                            break;
-                        case Opcode.GreaterThan:
-                            top[-2] = top[-2] > top[-1] ? 1 : 0;
-                            top--;
-                            break;
                         case Opcode.Goto:
                             op = _operations + op->Value;
                             break;
                         case Opcode.GotoIfTrue:
                             if (*--top != 0)
-                            {
-                                op = _operations + op->Value;
-                            }
-                            break;
-                        case Opcode.GotoIfFalse:
-                            if (*--top == 0)
                             {
                                 op = _operations + op->Value;
                             }

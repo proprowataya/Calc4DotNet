@@ -58,7 +58,28 @@ namespace Calc4DotNet.Core.ILCompilation
                     il.Emit(OpCodes.Ldc_R8, d);
                     break;
                 case BigInteger bigInteger:
-                    throw new NotImplementedException();
+                    try
+                    {
+                        long i64 = (long)bigInteger;
+                        il.EmitLdc(i64);
+                        il.Emit(OpCodes.Newobj, typeof(BigInteger).GetConstructor(new[] { typeof(long) }));
+                    }
+                    catch (OverflowException)
+                    {
+                        byte[] array = bigInteger.ToByteArray();
+                        il.EmitLdc(array.Length);
+                        il.Emit(OpCodes.Newarr, typeof(byte));
+
+                        for (int i = 0; i < array.Length; i++)
+                        {
+                            il.Emit(OpCodes.Dup);
+                            il.EmitLdc(i);
+                            il.Emit(OpCodes.Stelem_I1);
+                        }
+
+                        il.Emit(OpCodes.Newobj, typeof(BigInteger).GetConstructor(new[] { typeof(byte[]) }));
+                    }
+                    break;
                 default:
                     throw new InvalidOperationException();
             }
@@ -100,18 +121,6 @@ namespace Calc4DotNet.Core.ILCompilation
                     il.Emit(OpCodes.Starg, index);
                     break;
             }
-        }
-
-        public static void EmitComparison<TNumber>(this ILGenerator il, OpCode opcode)
-        {
-            Label ifFalse = il.DefineLabel(), end = il.DefineLabel();
-
-            il.Emit(opcode, ifFalse);
-            il.EmitLdc((TNumber)(dynamic)0);
-            il.Emit(OpCodes.Br, end);
-            il.MarkLabel(ifFalse);
-            il.EmitLdc((TNumber)(dynamic)1);
-            il.MarkLabel(end);
         }
     }
 }

@@ -42,7 +42,6 @@ namespace Calc4DotNet.Core.Execution
                 {
                     case Opcode.Goto:
                     case Opcode.GotoIfTrue:
-                    case Opcode.GotoIfFalse:
                     case Opcode.GotoIfEqual:
                     case Opcode.GotoIfLessThan:
                     case Opcode.GotoIfLessThanOrEqual:
@@ -184,40 +183,61 @@ namespace Calc4DotNet.Core.Execution
 
             public void Visit(BinaryOperator<TNumber> op)
             {
-                Opcode ConvertArithmeticType(BinaryType type)
+                void EmitComparisonBranch(Opcode opcode, bool reverse)
                 {
-                    switch (type)
-                    {
-                        case BinaryType.Add:
-                            return Opcode.Add;
-                        case BinaryType.Sub:
-                            return Opcode.Sub;
-                        case BinaryType.Mult:
-                            return Opcode.Mult;
-                        case BinaryType.Div:
-                            return Opcode.Div;
-                        case BinaryType.Mod:
-                            return Opcode.Mod;
-                        case BinaryType.Equal:
-                            return Opcode.Equal;
-                        case BinaryType.NotEqual:
-                            return Opcode.NotEqual;
-                        case BinaryType.LessThan:
-                            return Opcode.LessThan;
-                        case BinaryType.LessThanOrEqual:
-                            return Opcode.LessThanOrEqual;
-                        case BinaryType.GreaterThanOrEqual:
-                            return Opcode.GreaterThanOrEqual;
-                        case BinaryType.GreaterThan:
-                            return Opcode.GreaterThan;
-                        default:
-                            throw new InvalidOperationException();
-                    }
+                    int ifFalse = nextLabel++, end = nextLabel++;
+
+                    list.Add(new LowLevelOperation(opcode));
+                    list.Add(new LowLevelOperation(Opcode.LoadConst, reverse ? 1 : 0));
+                    list.Add(new LowLevelOperation(Opcode.Goto, end));
+                    list.Add(new LowLevelOperation(Opcode.Lavel, ifFalse));
+                    list.Add(new LowLevelOperation(Opcode.LoadConst, reverse ? 0 : 1));
+                    list.Add(new LowLevelOperation(Opcode.Lavel, end));
                 }
+
+                /* ******************** */
 
                 op.Left.Accept(this);
                 op.Right.Accept(this);
-                list.Add(new LowLevelOperation(ConvertArithmeticType(op.Type)));
+
+                switch (op.Type)
+                {
+                    case BinaryType.Add:
+                        list.Add(new LowLevelOperation(Opcode.Add));
+                        break;
+                    case BinaryType.Sub:
+                        list.Add(new LowLevelOperation(Opcode.Sub));
+                        break;
+                    case BinaryType.Mult:
+                        list.Add(new LowLevelOperation(Opcode.Mult));
+                        break;
+                    case BinaryType.Div:
+                        list.Add(new LowLevelOperation(Opcode.Div));
+                        break;
+                    case BinaryType.Mod:
+                        list.Add(new LowLevelOperation(Opcode.Mod));
+                        break;
+                    case BinaryType.Equal:
+                        EmitComparisonBranch(Opcode.GotoIfEqual, reverse: false);
+                        break;
+                    case BinaryType.NotEqual:
+                        EmitComparisonBranch(Opcode.GotoIfEqual, reverse: true);
+                        break;
+                    case BinaryType.LessThan:
+                        EmitComparisonBranch(Opcode.GotoIfLessThan, reverse: false);
+                        break;
+                    case BinaryType.LessThanOrEqual:
+                        EmitComparisonBranch(Opcode.GotoIfLessThanOrEqual, reverse: false);
+                        break;
+                    case BinaryType.GreaterThanOrEqual:
+                        EmitComparisonBranch(Opcode.GotoIfLessThan, reverse: true);
+                        break;
+                    case BinaryType.GreaterThan:
+                        EmitComparisonBranch(Opcode.GotoIfLessThanOrEqual, reverse: true);
+                        break;
+                    default:
+                        throw new InvalidOperationException();
+                }
             }
 
             public void Visit(ConditionalOperator<TNumber> op)

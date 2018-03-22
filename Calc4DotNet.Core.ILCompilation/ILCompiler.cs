@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using System.Reflection.Emit;
 using Calc4DotNet.Core.Execution;
@@ -107,55 +108,97 @@ namespace Calc4DotNet.Core.ILCompilation
                     case Opcode.Input:
                         throw new NotImplementedException();
                     case Opcode.Add:
-                        il.Emit(OpCodes.Add);
+                        if (typeof(TNumber) == typeof(BigInteger))
+                        {
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod(nameof(BigInteger.Add)));
+                        }
+                        else
+                        {
+                            il.Emit(OpCodes.Add);
+                        }
                         break;
                     case Opcode.Sub:
-                        il.Emit(OpCodes.Sub);
+                        if (typeof(TNumber) == typeof(BigInteger))
+                        {
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod(nameof(BigInteger.Subtract)));
+                        }
+                        else
+                        {
+                            il.Emit(OpCodes.Sub);
+                        }
                         break;
                     case Opcode.Mult:
-                        il.Emit(OpCodes.Mul);
+                        if (typeof(TNumber) == typeof(BigInteger))
+                        {
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod(nameof(BigInteger.Multiply)));
+                        }
+                        else
+                        {
+                            il.Emit(OpCodes.Mul);
+                        }
                         break;
                     case Opcode.Div:
-                        il.Emit(OpCodes.Div);
+                        if (typeof(TNumber) == typeof(BigInteger))
+                        {
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod(nameof(BigInteger.Divide)));
+                        }
+                        else
+                        {
+                            il.Emit(OpCodes.Div);
+                        }
                         break;
                     case Opcode.Mod:
-                        il.Emit(OpCodes.Rem);
-                        break;
-                    case Opcode.Equal:
-                        il.EmitComparison<TNumber>(OpCodes.Beq);
-                        break;
-                    case Opcode.NotEqual:
-                        il.EmitComparison<TNumber>(OpCodes.Bne_Un);
-                        break;
-                    case Opcode.LessThan:
-                        il.EmitComparison<TNumber>(OpCodes.Blt);
-                        break;
-                    case Opcode.LessThanOrEqual:
-                        il.EmitComparison<TNumber>(OpCodes.Ble);
-                        break;
-                    case Opcode.GreaterThanOrEqual:
-                        il.EmitComparison<TNumber>(OpCodes.Bge);
-                        break;
-                    case Opcode.GreaterThan:
-                        il.EmitComparison<TNumber>(OpCodes.Bgt);
+                        if (typeof(TNumber) == typeof(BigInteger))
+                        {
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod(nameof(BigInteger.Remainder)));
+                        }
+                        else
+                        {
+                            il.Emit(OpCodes.Rem);
+                        }
                         break;
                     case Opcode.Goto:
                         il.Emit(OpCodes.Br, labels[op.Value + 1]);
                         break;
                     case Opcode.GotoIfTrue:
+                        if (typeof(TNumber) == typeof(BigInteger))
+                        {
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("get_IsZero"));
+                        }
                         il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
                         break;
-                    case Opcode.GotoIfFalse:
-                        il.Emit(OpCodes.Brfalse, labels[op.Value + 1]);
-                        break;
                     case Opcode.GotoIfEqual:
-                        il.Emit(OpCodes.Beq, labels[op.Value + 1]);
+                        if (typeof(TNumber) == typeof(BigInteger))
+                        {
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Equality", new[] { typeof(BigInteger), typeof(BigInteger) }));
+                            il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
+                        }
+                        else
+                        {
+                            il.Emit(OpCodes.Beq, labels[op.Value + 1]);
+                        }
                         break;
                     case Opcode.GotoIfLessThan:
-                        il.Emit(OpCodes.Blt, labels[op.Value + 1]);
+                        if (typeof(TNumber) == typeof(BigInteger))
+                        {
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_LessThan", new[] { typeof(BigInteger), typeof(BigInteger) }));
+                            il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
+                        }
+                        else
+                        {
+                            il.Emit(OpCodes.Blt, labels[op.Value + 1]);
+                        }
                         break;
                     case Opcode.GotoIfLessThanOrEqual:
-                        il.Emit(OpCodes.Ble, labels[op.Value + 1]);
+                        if (typeof(TNumber) == typeof(BigInteger))
+                        {
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_LessThanOrEqual", new[] { typeof(BigInteger), typeof(BigInteger) }));
+                            il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
+                        }
+                        else
+                        {
+                            il.Emit(OpCodes.Ble, labels[op.Value + 1]);
+                        }
                         break;
                     case Opcode.Call:
                         il.Emit(OpCodes.Call, methods[op.Value + 1].Method);

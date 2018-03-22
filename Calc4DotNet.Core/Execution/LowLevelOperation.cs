@@ -27,8 +27,7 @@ namespace Calc4DotNet.Core.Execution
     {
         Push, Pop, LoadConst, LoadConstTable, LoadArg, StoreArg, Input,
         Add, Sub, Mult, Div, Mod,
-        Equal, NotEqual, LessThan, LessThanOrEqual, GreaterThanOrEqual, GreaterThan,
-        Goto, GotoIfTrue, GotoIfFalse, GotoIfEqual, GotoIfLessThan, GotoIfLessThanOrEqual,
+        Goto, GotoIfTrue, GotoIfEqual, GotoIfLessThan, GotoIfLessThanOrEqual,
         Call, Return, Halt,
         Lavel,
     }
