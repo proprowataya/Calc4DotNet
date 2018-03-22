@@ -67,7 +67,7 @@ namespace Calc4DotNet.Core.Optimization
 
                 for (int i = 0; i < operands.Length; i++)
                 {
-                    builder.Add(operands[i].Accept(this, isTailCallable));
+                    builder.Add(operands[i].Accept(this, false));
                 }
 
                 return new UserDefinedOperator<TNumber>(op.Definition, builder.MoveToImmutable(), isTailCallable, op.SupplementaryText);
