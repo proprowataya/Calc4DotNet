@@ -4,6 +4,7 @@ using System.Linq;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Execution;
+using Calc4DotNet.Core.ILCompilation;
 using Calc4DotNet.Core.Operators;
 using Calc4DotNet.Core.Optimization;
 using Calc4DotNet.Core.SyntaxAnalysis;
@@ -96,6 +97,14 @@ namespace Calc4DotNet
                     Console.WriteLine($"Elapsed: {sw.Elapsed}");
                     Console.WriteLine();
                 }
+                {
+                    Stopwatch sw = Stopwatch.StartNew();
+                    ICompiledModule<NumberType> compiledModule = ILCompiler.Compile(module);
+                    Console.WriteLine($"Evaluated (JIT): {compiledModule.Run(context)}");
+                    sw.Stop();
+                    Console.WriteLine($"Elapsed: {sw.Elapsed}");
+                    Console.WriteLine();
+                }
             }
 
             /* ******************** */
@@ -141,7 +150,7 @@ namespace Calc4DotNet
         private static void PrintLowLevelOperations(Module<NumberType> module)
         {
             var operations = module.Operations;
-            var dictionary = module.OperatorStartAddresses.ToDictionary(p => p.Address, p => p.Definition);
+            var dictionary = module.UserDefinedOperators.ToDictionary(p => p.StartAddress, p => p.Definition);
 
             Console.WriteLine("Main");
             for (int i = 0; i < operations.Length; i++)

@@ -12,11 +12,11 @@ namespace Calc4DotNet.Core.Execution
         {
             Visitor<TNumber> visitor = new Visitor<TNumber>(context);
             visitor.Generate(op);
-            var (Operations, StartAddresses) = ResolveLabels(visitor);
-            return new Module<TNumber>(Operations.ToImmutableArray(), visitor.ConstTable.ToImmutableArray(), StartAddresses);
+            var (operations, userDefinedOperators) = ResolveLabels(visitor);
+            return new Module<TNumber>(operations.ToImmutableArray(), visitor.ConstTable.ToImmutableArray(), userDefinedOperators);
         }
 
-        private static (List<LowLevelOperation> Operations, ImmutableArray<(OperatorDefinition, int)> StartAddresses) ResolveLabels<TNumber>(Visitor<TNumber> visitor)
+        private static (List<LowLevelOperation> Operations, ImmutableArray<(OperatorDefinition Definition, int StartAddress, int Length)> UserDefinedOperators) ResolveLabels<TNumber>(Visitor<TNumber> visitor)
         {
             List<LowLevelOperation> list = new List<LowLevelOperation>();
             Dictionary<int, int> labelMap = new Dictionary<int, int>();
@@ -57,7 +57,19 @@ namespace Calc4DotNet.Core.Execution
                 }
             }
 
-            return (list, visitor.OperatorBeginLabels.Select(p => (p.Key, labelMap[p.Value])).ToImmutableArray());
+            // Length is not determined here
+            (OperatorDefinition Definition, int StartAddress, int Length)[] userDefinedOperators =
+                visitor.OperatorBeginLabels.Select(p => (p.Key, labelMap[p.Value], default(int))).ToArray();
+
+            for (int i = 0; i < userDefinedOperators.Length; i++)
+            {
+                int endAddress = (i + 1 < userDefinedOperators.Length)
+                                 ? userDefinedOperators[i + 1].StartAddress
+                                 : list.Count;
+                userDefinedOperators[i].Length = endAddress - userDefinedOperators[i].StartAddress;
+            }
+
+            return (list, userDefinedOperators.ToImmutableArray());
         }
 
         private sealed class Visitor<TNumber> : IOperatorVisitor<TNumber>

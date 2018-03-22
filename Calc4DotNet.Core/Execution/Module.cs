@@ -7,13 +7,13 @@ namespace Calc4DotNet.Core.Execution
     {
         public ImmutableArray<LowLevelOperation> Operations { get; }
         public ImmutableArray<TNumber> ConstTable { get; }
-        public ImmutableArray<(OperatorDefinition Definition, int Address)> OperatorStartAddresses { get; }
+        public ImmutableArray<(OperatorDefinition Definition, int StartAddress, int Length)> UserDefinedOperators { get; }
 
-        public Module(ImmutableArray<LowLevelOperation> operations, ImmutableArray<TNumber> constTable, ImmutableArray<(OperatorDefinition Definition, int Address)> operatorStartAddresses)
+        public Module(ImmutableArray<LowLevelOperation> operations, ImmutableArray<TNumber> constTable, ImmutableArray<(OperatorDefinition Definition, int StartAddress, int Length)> userDefinedOperators)
         {
             Operations = operations;
             ConstTable = constTable;
-            OperatorStartAddresses = operatorStartAddresses;
+            UserDefinedOperators = userDefinedOperators;
         }
     }
 }
