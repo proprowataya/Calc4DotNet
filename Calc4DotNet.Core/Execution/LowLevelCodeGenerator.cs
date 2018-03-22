@@ -142,7 +142,7 @@ namespace Calc4DotNet.Core.Execution
 
             public void Visit(ArgumentOperator<TNumber> op)
             {
-                list.Add(new LowLevelOperation(Opcode.LoadArg, definition.NumOperands - op.Index));
+                list.Add(new LowLevelOperation(Opcode.LoadArg, GetArgumentAddress(definition.NumOperands, op.Index)));
             }
 
             public void Visit(DefineOperator<TNumber> op)
@@ -271,8 +271,24 @@ namespace Calc4DotNet.Core.Execution
                     op.Operands[i].Accept(this);
                 }
 
-                list.Add(new LowLevelOperation(Opcode.Call, operatorBeginLabels[op.Definition]));
+                if (definition == op.Definition && (op.IsTailCallable ?? false))
+                {
+                    for (int i = op.Operands.Length - 1; i >= 0; i--)
+                    {
+                        list.Add(new LowLevelOperation(Opcode.StoreArg, GetArgumentAddress(definition.NumOperands, i)));
+                    }
+
+                    list.Add(new LowLevelOperation(Opcode.Goto, operatorBeginLabels[definition]));
+                }
+                else
+                {
+                    list.Add(new LowLevelOperation(Opcode.Call, operatorBeginLabels[op.Definition]));
+                }
             }
+
+            /* ******************** */
+
+            private static int GetArgumentAddress(int numOperands, int index) => numOperands - index;
         }
     }
 }

@@ -125,7 +125,7 @@ namespace Calc4DotNet.Core.Optimization
             public IOperator<TNumber> Visit(UserDefinedOperator<TNumber> op)
             {
                 var operands = op.Operands.Select(x => x.Accept(this)).ToImmutableArray();
-                var newOp = new UserDefinedOperator<TNumber>(op.Definition, operands, op.SupplementaryText);
+                var newOp = new UserDefinedOperator<TNumber>(op.Definition, operands, op.IsTailCallable, op.SupplementaryText);
                 return PrecomputeIfPossible(newOp);
             }
         }

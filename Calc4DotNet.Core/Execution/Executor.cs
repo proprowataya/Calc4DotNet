@@ -40,11 +40,12 @@ namespace Calc4DotNet.Core.Execution
                             *top = module.ConstTable[op->Value];
                             top++;
                             break;
-                        case Opcode.Store:
-                            throw new NotImplementedException();
                         case Opcode.LoadArg:
                             *top = bottom[-op->Value];
                             top++;
+                            break;
+                        case Opcode.StoreArg:
+                            bottom[-op->Value] = *--top;
                             break;
                         case Opcode.Input:
                             Console.Write("Input >> ");
