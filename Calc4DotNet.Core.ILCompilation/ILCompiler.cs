@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
@@ -75,6 +76,7 @@ namespace Calc4DotNet.Core.ILCompilation
 
             ILGenerator il = method.GetILGenerator();
             Dictionary<int, Label> labels = new Dictionary<int, Label>();
+            LocalBuilder temp = null;
             for (int i = 0; i < operations.Length; i++)
             {
                 labels[firstOriginalAddress + i] = il.DefineLabel();
@@ -163,10 +165,18 @@ namespace Calc4DotNet.Core.ILCompilation
                     case Opcode.GotoIfTrue:
                         if (typeof(TNumber) == typeof(BigInteger))
                         {
-                            il.EmitLdc((TNumber)(dynamic)0);
-                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Inequality", new[] { typeof(BigInteger), typeof(BigInteger) }));
+                            temp = temp ?? il.DeclareLocal(typeof(TNumber));
+                            Debug.Assert(temp.LocalIndex == 0); // Temp variable must be first variable in this method.
+
+                            il.Emit(OpCodes.Stloc_0);
+                            il.Emit(OpCodes.Ldloca_S, 0);
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetProperty(nameof(BigInteger.IsZero)).GetMethod);
+                            il.Emit(OpCodes.Brfalse, labels[op.Value + 1]);
                         }
-                        il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
+                        else
+                        {
+                            il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
+                        }
                         break;
                     case Opcode.GotoIfEqual:
                         if (typeof(TNumber) == typeof(BigInteger))
