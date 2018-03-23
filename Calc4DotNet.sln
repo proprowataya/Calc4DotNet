@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calc4DotNet.Core", "Calc4Do
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calc4DotNet.Core.ILCompilation", "Calc4DotNet.Core.ILCompilation\Calc4DotNet.Core.ILCompilation.csproj", "{D3380A4D-9FD5-49AB-9E2C-3708175789D2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calc4DotNet.Test", "Calc4DotNet.Test\Calc4DotNet.Test.csproj", "{58E805A5-8464-47F7-9315-6F591365B93C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D3380A4D-9FD5-49AB-9E2C-3708175789D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3380A4D-9FD5-49AB-9E2C-3708175789D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3380A4D-9FD5-49AB-9E2C-3708175789D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58E805A5-8464-47F7-9315-6F591365B93C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58E805A5-8464-47F7-9315-6F591365B93C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58E805A5-8464-47F7-9315-6F591365B93C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58E805A5-8464-47F7-9315-6F591365B93C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
