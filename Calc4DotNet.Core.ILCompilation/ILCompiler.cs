@@ -110,7 +110,7 @@ namespace Calc4DotNet.Core.ILCompilation
                     case Opcode.Add:
                         if (typeof(TNumber) == typeof(BigInteger))
                         {
-                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod(nameof(BigInteger.Add)));
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Addition", new[] { typeof(BigInteger), typeof(BigInteger) }));
                         }
                         else
                         {
@@ -120,7 +120,7 @@ namespace Calc4DotNet.Core.ILCompilation
                     case Opcode.Sub:
                         if (typeof(TNumber) == typeof(BigInteger))
                         {
-                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod(nameof(BigInteger.Subtract)));
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Subtraction", new[] { typeof(BigInteger), typeof(BigInteger) }));
                         }
                         else
                         {
@@ -130,7 +130,7 @@ namespace Calc4DotNet.Core.ILCompilation
                     case Opcode.Mult:
                         if (typeof(TNumber) == typeof(BigInteger))
                         {
-                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod(nameof(BigInteger.Multiply)));
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Multiply", new[] { typeof(BigInteger), typeof(BigInteger) }));
                         }
                         else
                         {
@@ -140,7 +140,7 @@ namespace Calc4DotNet.Core.ILCompilation
                     case Opcode.Div:
                         if (typeof(TNumber) == typeof(BigInteger))
                         {
-                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod(nameof(BigInteger.Divide)));
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Division", new[] { typeof(BigInteger), typeof(BigInteger) }));
                         }
                         else
                         {
@@ -150,7 +150,7 @@ namespace Calc4DotNet.Core.ILCompilation
                     case Opcode.Mod:
                         if (typeof(TNumber) == typeof(BigInteger))
                         {
-                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod(nameof(BigInteger.Remainder)));
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Modulus", new[] { typeof(BigInteger), typeof(BigInteger) }));
                         }
                         else
                         {
