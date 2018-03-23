@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Numerics;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Execution;
@@ -34,7 +35,7 @@ namespace Calc4DotNet.Test
 
         public static readonly object[][] Source =
             (from test in TestCases
-             from type in new[] { typeof(Int32), typeof(Int64), typeof(Double) } // TODO: Support of BigInteger
+             from type in new[] { typeof(Int32), typeof(Int64), typeof(Double), typeof(BigInteger) }
              where !test.skipTypes?.Contains(type) ?? true
              from optimize in new[] { false, true }
              select new object[] { test.text, test.expected, type, optimize })

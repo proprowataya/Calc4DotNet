@@ -40,7 +40,7 @@ namespace Calc4DotNet.Core.ILCompilation
             {
                 MethodBuilder methodBuilder
                     = typeBuilder.DefineMethod(op.Definition.Name,
-                                               MethodAttributes.Public | MethodAttributes.Static,
+                                               MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig,
                                                typeof(TNumber),
                                                Enumerable.Repeat(typeof(TNumber), op.Definition.NumOperands).ToArray());
                 methods[op.StartAddress] = (methodBuilder, op.Definition.NumOperands);
@@ -163,7 +163,8 @@ namespace Calc4DotNet.Core.ILCompilation
                     case Opcode.GotoIfTrue:
                         if (typeof(TNumber) == typeof(BigInteger))
                         {
-                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("get_IsZero"));
+                            il.EmitLdc((TNumber)(dynamic)0);
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Inequality", new[] { typeof(BigInteger), typeof(BigInteger) }));
                         }
                         il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
                         break;

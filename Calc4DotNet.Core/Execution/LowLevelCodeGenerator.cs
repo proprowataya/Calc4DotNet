@@ -253,7 +253,12 @@ namespace Calc4DotNet.Core.Execution
                         binary.Right.Accept(this);
                         list.Add(new LowLevelOperation(opcode, ifTrueLabel));
                         ifFalse.Accept(this);
-                        list.Add(new LowLevelOperation(Opcode.Goto, endLabel));
+                        if (list.Last(x => x.Opcode != Opcode.Lavel).Opcode != Opcode.Goto)
+                        {
+                            // "list.Last().Opcode == Opcode.Goto" means
+                            // elimination of "Call" (tail-call)
+                            list.Add(new LowLevelOperation(Opcode.Goto, endLabel));
+                        }
                         list.Add(new LowLevelOperation(Opcode.Lavel, ifTrueLabel));
                         ifTrue.Accept(this);
                         list.Add(new LowLevelOperation(Opcode.Lavel, endLabel));
@@ -290,7 +295,12 @@ namespace Calc4DotNet.Core.Execution
                 op.Condition.Accept(this);
                 list.Add(new LowLevelOperation(Opcode.GotoIfTrue, ifTrueLabel));
                 op.IfFalse.Accept(this);
-                list.Add(new LowLevelOperation(Opcode.Goto, endLabel));
+                if (list.Last(x => x.Opcode != Opcode.Lavel).Opcode != Opcode.Goto)
+                {
+                    // "list.Last().Opcode == Opcode.Goto" means
+                    // elimination of "Call" (tail-call)
+                    list.Add(new LowLevelOperation(Opcode.Goto, endLabel));
+                }
                 list.Add(new LowLevelOperation(Opcode.Lavel, ifTrueLabel));
                 op.IfTrue.Accept(this);
                 list.Add(new LowLevelOperation(Opcode.Lavel, endLabel));
@@ -303,7 +313,7 @@ namespace Calc4DotNet.Core.Execution
                     op.Operands[i].Accept(this);
                 }
 
-                if (definition == op.Definition && (op.IsTailCallable ?? false))
+                if (OptimizableTailCall(op))
                 {
                     for (int i = op.Operands.Length - 1; i >= 0; i--)
                     {
@@ -316,6 +326,13 @@ namespace Calc4DotNet.Core.Execution
                 {
                     list.Add(new LowLevelOperation(Opcode.Call, operatorBeginLabels[op.Definition]));
                 }
+            }
+
+            private bool OptimizableTailCall(IOperator<TNumber> op)
+            {
+                return op is UserDefinedOperator<TNumber> userDefined
+                        && definition == userDefined.Definition
+                        && (userDefined.IsTailCallable ?? false);
             }
 
             /* ******************** */
