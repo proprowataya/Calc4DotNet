@@ -31,7 +31,7 @@ namespace Calc4DotNet.Core.ILCompilation
                 = typeBuilder.DefineMethod(nameof(ICompiledModule<TNumber>.Run),
                                            MethodAttributes.Public | MethodAttributes.Virtual,
                                            typeof(TNumber),
-                                           new[] { typeof(Context<TNumber>) });
+                                           Type.EmptyTypes);
             typeBuilder.DefineMethodOverride(runMethod,
                                              typeof(ICompiledModule<TNumber>).GetMethod(nameof(ICompiledModule<TNumber>.Run)));
 

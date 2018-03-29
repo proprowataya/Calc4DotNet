@@ -48,19 +48,42 @@ namespace Calc4DotNet.Test
 
         #region Helpers
 
-        private static object NewContext(Type type) => Activator.CreateInstance(typeof(Context<>).MakeGenericType(type));
-
-        private static void TestCore(string text, object expected, Type type, bool optimize, object context, Func<object, object> executor)
+        private static void TestCore(string text, object expected, Type type, bool optimize, Func<object, object, object> executor)
         {
-            var tokens = Lexer.Lex(text, (dynamic)context);
-            var op = Parser.Parse(tokens, (dynamic)context);
+            if (type == typeof(Int32))
+            {
+                TestCoreGeneric<Int32>(text, (Int32)(dynamic)expected, type, optimize, executor);
+            }
+            else if (type == typeof(Int64))
+            {
+                TestCoreGeneric<Int64>(text, (Int64)(dynamic)expected, type, optimize, executor);
+            }
+            else if (type == typeof(Double))
+            {
+                TestCoreGeneric<Double>(text, (Double)(dynamic)expected, type, optimize, executor);
+            }
+            else if (type == typeof(BigInteger))
+            {
+                TestCoreGeneric<BigInteger>(text, (BigInteger)(dynamic)expected, type, optimize, executor);
+            }
+            else
+            {
+                throw new InvalidOperationException($"{type} is not suported.");
+            }
+        }
+
+        private static void TestCoreGeneric<TNumber>(string text, TNumber expected, Type type, bool optimize, Func<object, object, object> executor)
+        {
+            var context = CompilationContext<TNumber>.Empty;
+            var tokens = Lexer.Lex(text, ref context);
+            var op = Parser.Parse(tokens, ref context);
             if (optimize)
             {
-                op = Optimizer.Optimize(op, (dynamic)context);
+                op = Optimizer.Optimize(op, ref context);
             }
 
             // TODO
-            Assert.Equal(expected.ToString(), executor(op).ToString());
+            Assert.Equal(expected, executor(op, context));
         }
 
         #endregion
@@ -68,8 +91,7 @@ namespace Calc4DotNet.Test
         [Theory, MemberData(nameof(Source))]
         public static void TestByTreeEvaluator(string text, object expected, Type type, bool optimize)
         {
-            var context = NewContext(type);
-            TestCore(text, expected, type, optimize, context, op =>
+            TestCore(text, expected, type, optimize, (op, context) =>
             {
                 return Evaluator.Evaluate((dynamic)op, (dynamic)context);
             });
@@ -78,8 +100,7 @@ namespace Calc4DotNet.Test
         [Theory, MemberData(nameof(SourceForLowLevelExecutor))]
         public static void TestByLowLevelExecutor(string text, object expected, Type type, bool optimize)
         {
-            var context = NewContext(type);
-            TestCore(text, expected, type, optimize, context, op =>
+            TestCore(text, expected, type, optimize, (op, context) =>
             {
                 var module = LowLevelCodeGenerator.Generate((dynamic)op, (dynamic)context);
                 return Executor.ExecuteInt64(module);
@@ -89,12 +110,11 @@ namespace Calc4DotNet.Test
         [Theory, MemberData(nameof(Source))]
         public static void TestByJIT(string text, object expected, Type type, bool optimize)
         {
-            var context = NewContext(type);
-            TestCore(text, expected, type, optimize, context, op =>
+            TestCore(text, expected, type, optimize, (op, context) =>
             {
                 var module = LowLevelCodeGenerator.Generate((dynamic)op, (dynamic)context);
                 var compiled = ILCompiler.Compile(module);
-                return compiled.Run((dynamic)context);
+                return compiled.Run();
             });
         }
     }

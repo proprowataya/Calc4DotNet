@@ -9,19 +9,24 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
 {
     public static class Lexer
     {
-        public static IReadOnlyList<IToken> Lex<TNumber>(string text, Context<TNumber> context)
+        public static List<IToken> Lex<TNumber>(string text, ref CompilationContext<TNumber> context)
         {
-            return new Implement<TNumber>(context, text, new Dictionary<string, int>()).Lex();
+            var boxedContext = new CompilationContext<TNumber>.Boxed(context);
+            var implement = new Implement<TNumber>(boxedContext, text, new Dictionary<string, int>());
+            var tokens = implement.Lex();
+
+            context = boxedContext.Value;
+            return tokens;
         }
 
         private struct Implement<TNumber>
         {
-            private readonly Context<TNumber> context;
+            private readonly CompilationContext<TNumber>.Boxed context;
             private readonly string text;
             private readonly Dictionary<string, int> argumentDictionary;
             private int index;
 
-            public Implement(Context<TNumber> context, string text, Dictionary<string, int> argumentDictionary)
+            public Implement(CompilationContext<TNumber>.Boxed context, string text, Dictionary<string, int> argumentDictionary)
             {
                 this.context = context ?? throw new ArgumentNullException(nameof(context));
                 this.text = text ?? throw new ArgumentNullException(nameof(text));
@@ -29,7 +34,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 this.index = 0;
             }
 
-            public IReadOnlyList<IToken> Lex()
+            public List<IToken> Lex()
             {
                 var list = new List<IToken>();
 
@@ -85,7 +90,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 string content = elems[2];
 
                 var definition = new OperatorDefinition(name, arguments.Length);
-                context.AddOperatorDefinition(definition);
+                context.Value = context.Value.WithAddOrUpdateOperatorImplement(new OperatorImplement<TNumber>(definition));
 
                 var dictionary = arguments.Select((argumentName, argumentIndex) => (argumentName, argumentIndex))
                                           .ToDictionary(t => t.argumentName, t => t.argumentIndex);
@@ -111,8 +116,8 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 Debug.Assert(text[end] == '}');
                 index = end + 1;
 
-                if (context.TryLookUpOperatorDefinition(name, out var definition))
-                    return new UserDefinedOperatorToken(definition, LexSupplementaryText());
+                if (context.Value.TryLookupOperatorImplement(name, out var implement))
+                    return new UserDefinedOperatorToken(implement.Definition, LexSupplementaryText());
                 else if (argumentDictionary.TryGetValue(name, out var argumentIndex))
                     return new ArgumentToken(name, argumentIndex, LexSupplementaryText());
                 else
@@ -187,10 +192,10 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                         break;
                 }
 
-                if (context.TryLookUpOperatorDefinition(text[index].ToString(), out var definition))
+                if (context.Value.TryLookupOperatorImplement(text[index].ToString(), out var implement))
                 {
                     index++;
-                    return new UserDefinedOperatorToken(definition, LexSupplementaryText());
+                    return new UserDefinedOperatorToken(implement.Definition, LexSupplementaryText());
                 }
                 else if (argumentDictionary.TryGetValue(text[index].ToString(), out var argumentIndex))
                 {

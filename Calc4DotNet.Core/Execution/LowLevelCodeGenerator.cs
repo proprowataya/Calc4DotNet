@@ -8,7 +8,7 @@ namespace Calc4DotNet.Core.Execution
 {
     public static class LowLevelCodeGenerator
     {
-        public static Module<TNumber> Generate<TNumber>(IOperator<TNumber> op, Context<TNumber> context)
+        public static Module<TNumber> Generate<TNumber>(IOperator<TNumber> op, CompilationContext<TNumber> context)
         {
             Visitor<TNumber> visitor = new Visitor<TNumber>(context);
             visitor.Generate(op);
@@ -73,7 +73,7 @@ namespace Calc4DotNet.Core.Execution
 
         private sealed class Visitor<TNumber> : IOperatorVisitor<TNumber>
         {
-            private readonly Context<TNumber> context;
+            private readonly CompilationContext<TNumber> context;
 
             private List<LowLevelOperation> list = new List<LowLevelOperation>();
             private List<TNumber> constTable = new List<TNumber>();
@@ -85,7 +85,7 @@ namespace Calc4DotNet.Core.Execution
             public List<TNumber> ConstTable => constTable;
             public Dictionary<OperatorDefinition, int> OperatorBeginLabels => operatorBeginLabels;
 
-            public Visitor(Context<TNumber> context)
+            public Visitor(CompilationContext<TNumber> context)
             {
                 this.context = context ?? throw new ArgumentNullException(nameof(context));
             }
@@ -93,9 +93,9 @@ namespace Calc4DotNet.Core.Execution
             public void Generate(IOperator<TNumber> op)
             {
                 // Determine user-defined operators' label
-                foreach (var item in context.OperatorDefinitions)
+                foreach (var item in context.OperatorImplements)
                 {
-                    operatorBeginLabels[item] = nextLabel++;
+                    operatorBeginLabels[item.Definition] = nextLabel++;
                 }
 
                 // Generate Main code
@@ -104,11 +104,11 @@ namespace Calc4DotNet.Core.Execution
                 list.Add(new LowLevelOperation(Opcode.Halt));
 
                 // Generate user-defined operators' codes
-                foreach (var item in context.OperatorDefinitions)
+                foreach (var item in context.OperatorImplements)
                 {
-                    definition = item;
+                    definition = item.Definition;
                     list.Add(new LowLevelOperation(Opcode.Lavel, operatorBeginLabels[definition]));
-                    context.LookUpOperatorImplement(definition.Name).Accept(this);
+                    context.LookupOperatorImplement(definition.Name).Operator.Accept(this);
                     list.Add(new LowLevelOperation(Opcode.Return, definition.NumOperands));
                 }
             }

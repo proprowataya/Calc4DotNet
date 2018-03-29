@@ -34,7 +34,7 @@ namespace Calc4DotNet
 
         private static void Execute(string text)
         {
-            void ExecuteCore(IOperator<NumberType> op, Context<NumberType> context)
+            void ExecuteCore(IOperator<NumberType> op, CompilationContext<NumberType> context)
             {
                 // Generate low-level operations
                 Module<NumberType> module = LowLevelCodeGenerator.Generate(op, context);
@@ -45,11 +45,11 @@ namespace Calc4DotNet
                 PrintTree(op, 1);
                 Console.WriteLine("}");
                 Console.WriteLine();
-                foreach (var def in context.OperatorDefinitions)
+                foreach (var implement in context.OperatorImplements)
                 {
-                    Console.WriteLine($"Operator \"{def.Name}\"");
+                    Console.WriteLine($"Operator \"{implement.Definition.Name}\"");
                     Console.WriteLine("{");
-                    PrintTree(context.LookUpOperatorImplement(def.Name), 1);
+                    PrintTree(implement.Operator, 1);
                     Console.WriteLine("}");
                     Console.WriteLine();
                 }
@@ -83,7 +83,7 @@ namespace Calc4DotNet
                 {
                     Stopwatch sw = Stopwatch.StartNew();
                     ICompiledModule<NumberType> compiledModule = ILCompiler.Compile(module);
-                    Console.WriteLine($"Evaluated (JIT): {compiledModule.Run(context)}");
+                    Console.WriteLine($"Evaluated (JIT): {compiledModule.Run()}");
                     sw.Stop();
                     Console.WriteLine($"Elapsed: {sw.Elapsed}");
                     Console.WriteLine();
@@ -97,16 +97,16 @@ namespace Calc4DotNet
 #endif
             {
                 // Compile
-                Context<NumberType> context = new Context<NumberType>();
-                var tokens = Lexer.Lex(text, context);
-                var op = Parser.Parse(tokens, context);
+                var context = CompilationContext<NumberType>.Empty;
+                var tokens = Lexer.Lex(text, ref context);
+                var op = Parser.Parse(tokens, ref context);
 
                 // Execute
                 Console.WriteLine("----- Before optimized -----");
                 ExecuteCore(op, context);
 
                 // Optimize
-                op = Optimizer.Optimize(op, context);
+                op = Optimizer.Optimize(op, ref context);
 
                 // Execute
                 Console.WriteLine("----- After optimized -----");

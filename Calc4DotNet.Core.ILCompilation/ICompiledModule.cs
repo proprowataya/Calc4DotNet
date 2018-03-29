@@ -2,6 +2,6 @@
 {
     public interface ICompiledModule<TNumber>
     {
-        TNumber Run(Context<TNumber> context);
+        TNumber Run();
     }
 }

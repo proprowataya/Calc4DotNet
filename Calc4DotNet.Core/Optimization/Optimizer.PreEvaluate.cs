@@ -11,11 +11,11 @@ namespace Calc4DotNet.Core.Optimization
     {
         private sealed class PreEvaluateVisitor<TNumber> : IOperatorVisitor<TNumber, IOperator<TNumber>>
         {
-            private readonly Context<TNumber> context;
+            private readonly CompilationContext<TNumber> context;
             private readonly bool isDefinition;
             private readonly Dictionary<IOperator<TNumber>, bool?> isPreComputable = new Dictionary<IOperator<TNumber>, bool?>();
 
-            public PreEvaluateVisitor(Context<TNumber> context, bool isDefinition)
+            public PreEvaluateVisitor(CompilationContext<TNumber> context, bool isDefinition)
             {
                 this.context = context ?? throw new ArgumentNullException(nameof(context));
                 this.isDefinition = isDefinition;
@@ -43,7 +43,7 @@ namespace Calc4DotNet.Core.Optimization
 
                     if (current is UserDefinedOperator<TNumber> userDefined)
                     {
-                        if (!IsPreComputable(context.LookUpOperatorImplement(userDefined.Definition.Name)))
+                        if (!IsPreComputable(context.LookupOperatorImplement(userDefined.Definition.Name).Operator))
                             return false;
                     }
 

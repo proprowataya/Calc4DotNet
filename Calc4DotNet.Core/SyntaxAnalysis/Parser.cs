@@ -8,19 +8,24 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
 {
     public static class Parser
     {
-        public static IOperator<TNumber> Parse<TNumber>(IReadOnlyList<IToken> tokens, Context<TNumber> context)
+        public static IOperator<TNumber> Parse<TNumber>(IReadOnlyList<IToken> tokens, ref CompilationContext<TNumber> context)
         {
-            return new Implement<TNumber>(tokens, context).Parse();
+            var boxedContext = new CompilationContext<TNumber>.Boxed(context);
+            var implement = new Implement<TNumber>(tokens, boxedContext);
+            var op = implement.Parse();
+
+            context = boxedContext.Value;
+            return op;
         }
 
         private struct Implement<TNumber>
         {
             private readonly IReadOnlyList<IToken> tokens;
-            private readonly Context<TNumber> context;
+            private readonly CompilationContext<TNumber>.Boxed context;
             private readonly int maxNumOperands;
             private int index;
 
-            public Implement(IReadOnlyList<IToken> tokens, Context<TNumber> context)
+            public Implement(IReadOnlyList<IToken> tokens, CompilationContext<TNumber>.Boxed context)
             {
                 this.tokens = tokens ?? throw new ArgumentNullException(nameof(tokens));
                 this.context = context ?? throw new ArgumentNullException(nameof(context));
@@ -91,7 +96,8 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 foreach (var token in tokens.OfType<DefineToken>())
                 {
                     IOperator<TNumber> op = new Implement<TNumber>(token.Tokens, context).Parse();
-                    context.AddOrUpdateOperatorImplement(token.Name, op);
+                    context.Value = context.Value.WithAddOrUpdateOperatorImplement(
+                                                    context.Value.LookupOperatorImplement(token.Name).WithOperator(op));
                 }
             }
 

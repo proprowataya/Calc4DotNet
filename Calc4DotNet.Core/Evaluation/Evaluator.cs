@@ -7,54 +7,54 @@ namespace Calc4DotNet.Core.Evaluation
 {
     public static class Evaluator
     {
-        public static TNumber EvaluateGeneric<TNumber>(IOperator<TNumber> op, Context<TNumber> context)
+        public static TNumber EvaluateGeneric<TNumber>(IOperator<TNumber> op, CompilationContext<TNumber> context)
         {
             return Evaluate((dynamic)op, (dynamic)context);
         }
 
-        public static Int32 Evaluate(IOperator<Int32> op, Context<Int32> context)
+        public static Int32 Evaluate(IOperator<Int32> op, CompilationContext<Int32> context)
         {
             return op.Accept(new Visitor<Int32, Int32Computer>(), (context, null));
         }
 
-        public static Int64 Evaluate(IOperator<Int64> op, Context<Int64> context)
+        public static Int64 Evaluate(IOperator<Int64> op, CompilationContext<Int64> context)
         {
             return op.Accept(new Visitor<Int64, Int64Computer>(), (context, null));
         }
 
-        public static Double Evaluate(IOperator<Double> op, Context<Double> context)
+        public static Double Evaluate(IOperator<Double> op, CompilationContext<Double> context)
         {
             return op.Accept(new Visitor<Double, DoubleComputer>(), (context, null));
         }
 
-        public static BigInteger Evaluate(IOperator<BigInteger> op, Context<BigInteger> context)
+        public static BigInteger Evaluate(IOperator<BigInteger> op, CompilationContext<BigInteger> context)
         {
             return op.Accept(new Visitor<BigInteger, BigIntegerComputer>(), (context, null));
         }
 
-        private static TNumber EvaluateCore<TNumber, TNumberComputer>(IOperator<TNumber> op, Context<TNumber> context)
+        private static TNumber EvaluateCore<TNumber, TNumberComputer>(IOperator<TNumber> op, CompilationContext<TNumber> context)
             where TNumberComputer : INumberComputer<TNumber>
         {
             return op.Accept(new Visitor<TNumber, TNumberComputer>(), (context, null));
         }
 
         private sealed class Visitor<TNumber, TNumberComputer>
-            : IOperatorVisitor<TNumber, TNumber, (Context<TNumber> context, TNumber[] arguments)>
+            : IOperatorVisitor<TNumber, TNumber, (CompilationContext<TNumber> context, TNumber[] arguments)>
             where TNumberComputer : INumberComputer<TNumber>
         {
-            public TNumber Visit(ZeroOperator<TNumber> op, (Context<TNumber> context, TNumber[] arguments) param)
+            public TNumber Visit(ZeroOperator<TNumber> op, (CompilationContext<TNumber> context, TNumber[] arguments) param)
                 => default(TNumberComputer).Zero;
 
-            public TNumber Visit(PreComputedOperator<TNumber> op, (Context<TNumber> context, TNumber[] arguments) param)
+            public TNumber Visit(PreComputedOperator<TNumber> op, (CompilationContext<TNumber> context, TNumber[] arguments) param)
                 => op.Value;
 
-            public TNumber Visit(ArgumentOperator<TNumber> op, (Context<TNumber> context, TNumber[] arguments) param)
+            public TNumber Visit(ArgumentOperator<TNumber> op, (CompilationContext<TNumber> context, TNumber[] arguments) param)
                 => param.arguments[op.Index];
 
-            public TNumber Visit(DefineOperator<TNumber> op, (Context<TNumber> context, TNumber[] arguments) param)
+            public TNumber Visit(DefineOperator<TNumber> op, (CompilationContext<TNumber> context, TNumber[] arguments) param)
                 => default(TNumberComputer).Zero;
 
-            public TNumber Visit(ParenthesisOperator<TNumber> op, (Context<TNumber> context, TNumber[] arguments) param)
+            public TNumber Visit(ParenthesisOperator<TNumber> op, (CompilationContext<TNumber> context, TNumber[] arguments) param)
             {
                 TNumber result = default(TNumberComputer).Zero;
                 ImmutableArray<IOperator<TNumber>> operators = op.Operators;
@@ -67,14 +67,14 @@ namespace Calc4DotNet.Core.Evaluation
                 return result;
             }
 
-            public TNumber Visit(DecimalOperator<TNumber> op, (Context<TNumber> context, TNumber[] arguments) param)
+            public TNumber Visit(DecimalOperator<TNumber> op, (CompilationContext<TNumber> context, TNumber[] arguments) param)
             {
                 var c = default(TNumberComputer);
                 TNumber operand = op.Operand.Accept(this, param);
                 return c.Add(c.Multiply(operand, c.Ten), c.FromInt(op.Value));
             }
 
-            public TNumber Visit(BinaryOperator<TNumber> op, (Context<TNumber> context, TNumber[] arguments) param)
+            public TNumber Visit(BinaryOperator<TNumber> op, (CompilationContext<TNumber> context, TNumber[] arguments) param)
             {
                 var c = default(TNumberComputer);
                 TNumber left = op.Left.Accept(this, param);
@@ -109,14 +109,14 @@ namespace Calc4DotNet.Core.Evaluation
                 }
             }
 
-            public TNumber Visit(ConditionalOperator<TNumber> op, (Context<TNumber> context, TNumber[] arguments) param)
+            public TNumber Visit(ConditionalOperator<TNumber> op, (CompilationContext<TNumber> context, TNumber[] arguments) param)
             {
                 var c = default(TNumberComputer);
                 TNumber condition = op.Condition.Accept(this, param);
                 return c.NotEquals(condition, c.Zero) ? op.IfTrue.Accept(this, param) : op.IfFalse.Accept(this, param);
             }
 
-            public TNumber Visit(UserDefinedOperator<TNumber> op, (Context<TNumber> context, TNumber[] arguments) param)
+            public TNumber Visit(UserDefinedOperator<TNumber> op, (CompilationContext<TNumber> context, TNumber[] arguments) param)
             {
                 TNumber[] stack = new TNumber[op.Operands.Length];
 
@@ -125,7 +125,7 @@ namespace Calc4DotNet.Core.Evaluation
                     stack[i] = op.Operands[i].Accept(this, param);
                 }
 
-                return param.context.LookUpOperatorImplement(op.Definition.Name).Accept(this, (param.context, stack));
+                return param.context.LookupOperatorImplement(op.Definition.Name).Operator.Accept(this, (param.context, stack));
             }
         }
     }
