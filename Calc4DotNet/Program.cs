@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using Calc4DotNet.Core;
@@ -37,7 +38,7 @@ namespace Calc4DotNet
             void ExecuteCore(IOperator<NumberType> op, CompilationContext<NumberType> context)
             {
                 // Generate low-level operations
-                Module<NumberType> module = LowLevelCodeGenerator.Generate(op, context);
+                LowLevelModule<NumberType> module = LowLevelCodeGenerator.Generate(op, context);
 
                 // Print input and user-defined operators as trees
                 Console.WriteLine("Main");
@@ -73,13 +74,15 @@ namespace Calc4DotNet
                     Console.WriteLine($"Elapsed: {sw.Elapsed}");
                     Console.WriteLine();
                 }
+#if false
                 {
                     Stopwatch sw = Stopwatch.StartNew();
-                    Console.WriteLine($"Evaluated (low-level): {Executor.ExecuteInt64(module)}");
+                    Console.WriteLine($"Evaluated (low-level): {UnsafeExecutor.ExecuteInt64(module)}");
                     sw.Stop();
                     Console.WriteLine($"Elapsed: {sw.Elapsed}");
                     Console.WriteLine();
                 }
+#endif
                 {
                     Stopwatch sw = Stopwatch.StartNew();
                     ICompiledModule<NumberType> compiledModule = ILCompiler.Compile(module);
@@ -130,19 +133,21 @@ namespace Calc4DotNet
             }
         }
 
-        private static void PrintLowLevelOperations(Module<NumberType> module)
+        private static void PrintLowLevelOperations(LowLevelModule<NumberType> module)
         {
-            var operations = module.Operations;
-            var dictionary = module.UserDefinedOperators.ToDictionary(p => p.StartAddress, p => p.Definition);
-
-            Console.WriteLine("Main");
-            for (int i = 0; i < operations.Length; i++)
+            void Print(ImmutableArray<LowLevelOperation> operations, string name)
             {
-                if (dictionary.TryGetValue(i, out var definition))
+                Console.WriteLine($"Operator \"{name}\"");
+                for (int i = 0; i < operations.Length; i++)
                 {
-                    Console.WriteLine($"Operator \"{definition.Name}\"");
+                    Console.WriteLine($"    {i.ToString().PadLeft(4)}: {operations[i].ToString()}");
                 }
-                Console.WriteLine($"    {i.ToString().PadLeft(4)}: {operations[i].ToString()}");
+            }
+
+            Print(module.EntryPoint, "Main");
+            foreach (var (definition, operations) in module.UserDefinedOperators)
+            {
+                Print(operations, definition.Name);
             }
         }
     }

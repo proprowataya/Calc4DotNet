@@ -1,14 +1,15 @@
-﻿using System;
+﻿#if false
+using System;
 using System.Linq;
 
 namespace Calc4DotNet.Core.Execution
 {
-    public static class Executor
+    public static class UnsafeExecutor
     {
         public const int StackSizeByBytes = 1 << 20;
         private const int NumPtrSave = 1 << 20;
 
-        public unsafe static Int64 ExecuteInt64(Module<Int64> module)
+        public unsafe static Int64 ExecuteInt64(LowLevelModule<Int64> module)
         {
             Int64[] stack = new Int64[StackSizeByBytes / sizeof(Int64)];
             void*[] prtSave = new void*[NumPtrSave];
@@ -128,3 +129,4 @@ namespace Calc4DotNet.Core.Execution
         }
     }
 }
+#endif

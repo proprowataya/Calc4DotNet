@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
@@ -15,7 +16,7 @@ namespace Calc4DotNet.Core.ILCompilation
         private const string ClassName = "<Calc4Implement>";
         private const string RunMethodName = nameof(ICompiledModule<object>.Run);
 
-        public static ICompiledModule<TNumber> Compile<TNumber>(Module<TNumber> module)
+        public static ICompiledModule<TNumber> Compile<TNumber>(LowLevelModule<TNumber> module)
         {
             AssemblyBuilder assemblyBuilder
                 = AssemblyBuilder.DefineDynamicAssembly(AsmName, AssemblyBuilderAccess.Run);
@@ -36,15 +37,16 @@ namespace Calc4DotNet.Core.ILCompilation
                                              typeof(ICompiledModule<TNumber>).GetMethod(nameof(ICompiledModule<TNumber>.Run)));
 
             // User defined methods
-            var methods = new Dictionary<int, (MethodBuilder Method, int NumOperands)>();
-            foreach (var op in module.UserDefinedOperators)
+            var methods = new(MethodBuilder Method, int NumOperands)[module.UserDefinedOperators.Length];
+            for (int i = 0; i < module.UserDefinedOperators.Length; i++)
             {
+                var op = module.UserDefinedOperators[i];
                 MethodBuilder methodBuilder
                     = typeBuilder.DefineMethod(op.Definition.Name,
                                                MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig,
                                                typeof(TNumber),
                                                Enumerable.Repeat(typeof(TNumber), op.Definition.NumOperands).ToArray());
-                methods[op.StartAddress] = (methodBuilder, op.Definition.NumOperands);
+                methods[i] = (methodBuilder, op.Definition.NumOperands);
             }
 
             EmitIL(module, runMethod, methods);
@@ -52,24 +54,19 @@ namespace Calc4DotNet.Core.ILCompilation
             return (ICompiledModule<TNumber>)Activator.CreateInstance(type);
         }
 
-        private static void EmitIL<TNumber>(Module<TNumber> module, MethodBuilder runMethod, Dictionary<int, (MethodBuilder Method, int NumOperands)> methods)
+        private static void EmitIL<TNumber>(LowLevelModule<TNumber> module, MethodBuilder runMethod, (MethodBuilder Method, int NumOperands)[] methods)
         {
-            ReadOnlySpan<LowLevelOperation> operations = module.Operations.ToArray().AsReadOnlySpan();
-
             // Emit Main(Run) operator
-            int mainOperatorLength = module.UserDefinedOperators.IsDefaultOrEmpty
-                                     ? operations.Length : module.UserDefinedOperators[0].StartAddress;
-            EmitILCore<TNumber>(module, operations.Slice(0, mainOperatorLength), 0, runMethod, 0, methods);
+            EmitILCore(module, module.EntryPoint, runMethod, 0, methods);
 
             // Emit user-defined operators
-            foreach (var op in module.UserDefinedOperators)
+            for (int i = 0; i < module.UserDefinedOperators.Length; i++)
             {
-                EmitILCore<TNumber>(module, operations.Slice(op.StartAddress, op.Length),
-                                    op.StartAddress, methods[op.StartAddress].Method, methods[op.StartAddress].NumOperands, methods);
+                EmitILCore(module, module.UserDefinedOperators[i].Operations, methods[i].Method, methods[i].NumOperands, methods);
             }
         }
 
-        private static void EmitILCore<TNumber>(Module<TNumber> module, ReadOnlySpan<LowLevelOperation> operations, int firstOriginalAddress, MethodBuilder method, int numOperands, Dictionary<int, (MethodBuilder Method, int NumOperands)> methods)
+        private static void EmitILCore<TNumber>(LowLevelModule<TNumber> module, ImmutableArray<LowLevelOperation> operations, MethodBuilder method, int numOperands, (MethodBuilder Method, int NumOperands)[] methods)
         {
             /* Local method */
             int RestoreMethodParameterIndex(int value) => numOperands - value;
@@ -79,12 +76,12 @@ namespace Calc4DotNet.Core.ILCompilation
             LocalBuilder temp = null;
             for (int i = 0; i < operations.Length; i++)
             {
-                labels[firstOriginalAddress + i] = il.DefineLabel();
+                labels[i] = il.DefineLabel();
             }
 
             for (int i = 0; i < operations.Length; i++)
             {
-                il.MarkLabel(labels[firstOriginalAddress + i]);
+                il.MarkLabel(labels[i]);
                 LowLevelOperation op = operations[i];
 
                 switch (op.Opcode)
@@ -212,7 +209,7 @@ namespace Calc4DotNet.Core.ILCompilation
                         }
                         break;
                     case Opcode.Call:
-                        il.Emit(OpCodes.Call, methods[op.Value + 1].Method);
+                        il.Emit(OpCodes.Call, methods[op.Value].Method);
                         break;
                     case Opcode.Return:
                     case Opcode.Halt:

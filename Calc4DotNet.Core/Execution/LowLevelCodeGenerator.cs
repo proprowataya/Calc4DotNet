@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using Calc4DotNet.Core.Operators;
 
@@ -8,109 +9,124 @@ namespace Calc4DotNet.Core.Execution
 {
     public static class LowLevelCodeGenerator
     {
-        public static Module<TNumber> Generate<TNumber>(IOperator<TNumber> op, CompilationContext<TNumber> context)
+        public static LowLevelModule<TNumber> Generate<TNumber>(IOperator<TNumber> op, CompilationContext<TNumber> context)
         {
-            Visitor<TNumber> visitor = new Visitor<TNumber>(context);
-            visitor.Generate(op);
-            var (operations, userDefinedOperators) = ResolveLabels(visitor);
-            return new Module<TNumber>(operations.ToImmutableArray(), visitor.ConstTable.ToImmutableArray(), userDefinedOperators);
-        }
+            var constTable = new List<TNumber>();
+            var userDefinedOperators = ImmutableArray.CreateBuilder<(OperatorDefinition Definition, ImmutableArray<LowLevelOperation> Operations)>();
+            var operatorLabels = new Dictionary<OperatorDefinition, int>();
 
-        private static (List<LowLevelOperation> Operations, ImmutableArray<(OperatorDefinition Definition, int StartAddress, int Length)> UserDefinedOperators) ResolveLabels<TNumber>(Visitor<TNumber> visitor)
-        {
-            List<LowLevelOperation> list = new List<LowLevelOperation>();
-            Dictionary<int, int> labelMap = new Dictionary<int, int>();
-
-            foreach (var op in visitor.Operations)
+            // Initialize operatorLabels
+            int index = 0;
+            foreach (var implement in context.OperatorImplements)
             {
-                switch (op.Opcode)
-                {
-                    case Opcode.Lavel:
-                        labelMap[op.Value] = list.Count;
-                        break;
-                    default:
-                        list.Add(op);
-                        break;
-                }
+                operatorLabels[implement.Definition] = index++;
             }
 
-            for (int i = 0; i < list.Count; i++)
+            // Generate user-defined operators' codes
+            foreach (var implement in context.OperatorImplements)
             {
-                LowLevelOperation op = list[i];
-
-                switch (op.Opcode)
-                {
-                    case Opcode.Goto:
-                    case Opcode.GotoIfTrue:
-                    case Opcode.GotoIfEqual:
-                    case Opcode.GotoIfLessThan:
-                    case Opcode.GotoIfLessThanOrEqual:
-                    case Opcode.Call:
-                        // The destination address in LowLevelOperation should be just before it,
-                        // because program counter will be incremented after execution of this operation.
-                        list[i] = new LowLevelOperation(op.Opcode, labelMap[op.Value] - 1);
-                        break;
-                    default:
-                        // Do nothing
-                        break;
-                }
+                var visitor = new Visitor<TNumber>(context, constTable, operatorLabels, implement.Definition);
+                visitor.Generate(implement.Operator);
+                userDefinedOperators.Add((implement.Definition, visitor.Operations.ToImmutableArray()));
             }
 
-            // Length is not determined here
-            (OperatorDefinition Definition, int StartAddress, int Length)[] userDefinedOperators =
-                visitor.OperatorBeginLabels.Select(p => (p.Key, labelMap[p.Value], default(int))).ToArray();
-
-            for (int i = 0; i < userDefinedOperators.Length; i++)
+            // Generate Main code
+            ImmutableArray<LowLevelOperation> entryPoint;
             {
-                int endAddress = (i + 1 < userDefinedOperators.Length)
-                                 ? userDefinedOperators[i + 1].StartAddress
-                                 : list.Count;
-                userDefinedOperators[i].Length = endAddress - userDefinedOperators[i].StartAddress;
+                var visitor = new Visitor<TNumber>(context, constTable, operatorLabels, null);
+                visitor.Generate(op);
+                entryPoint = visitor.Operations.ToImmutableArray();
             }
 
-            return (list, userDefinedOperators.ToImmutableArray());
+            return new LowLevelModule<TNumber>(entryPoint,
+                                               constTable.ToImmutableArray(),
+                                               userDefinedOperators.ToImmutable());
         }
 
         private sealed class Visitor<TNumber> : IOperatorVisitor<TNumber>
         {
+            private const int OperatorBeginLabel = 0;
+
             private readonly CompilationContext<TNumber> context;
+            private readonly List<TNumber> constTable;
+            private readonly Dictionary<OperatorDefinition, int> operatorLabels;
+            private readonly OperatorDefinition definition;
 
             private List<LowLevelOperation> list = new List<LowLevelOperation>();
-            private List<TNumber> constTable = new List<TNumber>();
-            private Dictionary<OperatorDefinition, int> operatorBeginLabels = new Dictionary<OperatorDefinition, int>();
-            private OperatorDefinition definition = null;
-            private int nextLabel = 0;
+            private int nextLabel = OperatorBeginLabel;
 
             public List<LowLevelOperation> Operations => list;
-            public List<TNumber> ConstTable => constTable;
-            public Dictionary<OperatorDefinition, int> OperatorBeginLabels => operatorBeginLabels;
 
-            public Visitor(CompilationContext<TNumber> context)
+            public Visitor(CompilationContext<TNumber> context, List<TNumber> constTable, Dictionary<OperatorDefinition, int> operatorLabels, OperatorDefinition definition)
             {
                 this.context = context ?? throw new ArgumentNullException(nameof(context));
+                this.constTable = constTable ?? throw new ArgumentNullException(nameof(constTable));
+                this.operatorLabels = operatorLabels ?? throw new ArgumentNullException(nameof(operatorLabels));
+                this.definition = definition;
             }
 
             public void Generate(IOperator<TNumber> op)
             {
-                // Determine user-defined operators' label
-                foreach (var item in context.OperatorImplements)
+                // Add lavel at begin
+                Debug.Assert(nextLabel == OperatorBeginLabel);
+                list.Add(new LowLevelOperation(Opcode.Lavel, nextLabel++));
+
+                if (definition == null)
                 {
-                    operatorBeginLabels[item.Definition] = nextLabel++;
+                    // Generate Main code
+                    op.Accept(this);
+                    list.Add(new LowLevelOperation(Opcode.Halt));
                 }
-
-                // Generate Main code
-                definition = null;
-                op.Accept(this);
-                list.Add(new LowLevelOperation(Opcode.Halt));
-
-                // Generate user-defined operators' codes
-                foreach (var item in context.OperatorImplements)
+                else
                 {
-                    definition = item.Definition;
-                    list.Add(new LowLevelOperation(Opcode.Lavel, operatorBeginLabels[definition]));
-                    context.LookupOperatorImplement(definition.Name).Operator.Accept(this);
+                    // Generate user-defined operators' codes
+                    op.Accept(this);
                     list.Add(new LowLevelOperation(Opcode.Return, definition.NumOperands));
                 }
+
+                ResolveLavels();
+            }
+
+            private void ResolveLavels()
+            {
+                List<LowLevelOperation> newList = new List<LowLevelOperation>();
+                Dictionary<int, int> labelMap = new Dictionary<int, int>();
+
+                foreach (var op in list)
+                {
+                    switch (op.Opcode)
+                    {
+                        case Opcode.Lavel:
+                            labelMap[op.Value] = newList.Count;
+                            break;
+                        default:
+                            newList.Add(op);
+                            break;
+                    }
+                }
+
+                for (int i = 0; i < newList.Count; i++)
+                {
+                    LowLevelOperation op = newList[i];
+
+                    switch (op.Opcode)
+                    {
+                        case Opcode.Goto:
+                        case Opcode.GotoIfTrue:
+                        case Opcode.GotoIfEqual:
+                        case Opcode.GotoIfLessThan:
+                        case Opcode.GotoIfLessThanOrEqual:
+                            // The destination address in LowLevelOperation should be just before it,
+                            // because program counter will be incremented after execution of this operation.
+                            newList[i] = new LowLevelOperation(op.Opcode, labelMap[op.Value] - 1);
+                            break;
+                        default:
+                            // Do nothing
+                            break;
+                    }
+                }
+
+                list = newList;
             }
 
             /* ******************** */
@@ -320,11 +336,11 @@ namespace Calc4DotNet.Core.Execution
                         list.Add(new LowLevelOperation(Opcode.StoreArg, GetArgumentAddress(definition.NumOperands, i)));
                     }
 
-                    list.Add(new LowLevelOperation(Opcode.Goto, operatorBeginLabels[definition]));
+                    list.Add(new LowLevelOperation(Opcode.Goto, OperatorBeginLabel));
                 }
                 else
                 {
-                    list.Add(new LowLevelOperation(Opcode.Call, operatorBeginLabels[op.Definition]));
+                    list.Add(new LowLevelOperation(Opcode.Call, operatorLabels[op.Definition]));
                 }
             }
 

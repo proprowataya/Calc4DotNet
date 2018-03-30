@@ -97,15 +97,17 @@ namespace Calc4DotNet.Test
             });
         }
 
+#if false
         [Theory, MemberData(nameof(SourceForLowLevelExecutor))]
         public static void TestByLowLevelExecutor(string text, object expected, Type type, bool optimize)
         {
             TestCore(text, expected, type, optimize, (op, context) =>
             {
                 var module = LowLevelCodeGenerator.Generate((dynamic)op, (dynamic)context);
-                return Executor.ExecuteInt64(module);
+                return UnsafeExecutor.ExecuteInt64(module);
             });
         }
+#endif
 
         [Theory, MemberData(nameof(Source))]
         public static void TestByJIT(string text, object expected, Type type, bool optimize)
