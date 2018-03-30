@@ -17,6 +17,7 @@ namespace Calc4DotNet.Test
 
         private static readonly (string text, int expected, Type[] skipTypes)[] TestCases = new(string text, int expected, Type[] skipTypes)[]
         {
+            ("1<2", 1, null),
             ("12345678", 12345678, null),
             ("1+2*3", (1 + 2) * 3, null),
             ("0?1?2?3?4", 3, null),
@@ -40,9 +41,6 @@ namespace Calc4DotNet.Test
              from optimize in new[] { false, true }
              select new object[] { test.text, test.expected, type, optimize })
             .ToArray();
-
-        public static object[][] SourceForLowLevelExecutor =>
-            Source.Where(s => (Type)s[2] == typeof(Int64)).ToArray();
 
         #endregion
 
@@ -97,17 +95,15 @@ namespace Calc4DotNet.Test
             });
         }
 
-#if false
-        [Theory, MemberData(nameof(SourceForLowLevelExecutor))]
+        [Theory, MemberData(nameof(Source))]
         public static void TestByLowLevelExecutor(string text, object expected, Type type, bool optimize)
         {
             TestCore(text, expected, type, optimize, (op, context) =>
             {
                 var module = LowLevelCodeGenerator.Generate((dynamic)op, (dynamic)context);
-                return UnsafeExecutor.ExecuteInt64(module);
+                return LowLevelExecutor.Execute(module);
             });
         }
-#endif
 
         [Theory, MemberData(nameof(Source))]
         public static void TestByJIT(string text, object expected, Type type, bool optimize)

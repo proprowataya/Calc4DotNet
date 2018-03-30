@@ -203,7 +203,7 @@ namespace Calc4DotNet.Core.Execution
                 {
                     int ifFalse = nextLabel++, end = nextLabel++;
 
-                    list.Add(new LowLevelOperation(opcode));
+                    list.Add(new LowLevelOperation(opcode, ifFalse));
                     list.Add(new LowLevelOperation(Opcode.LoadConst, reverse ? 1 : 0));
                     list.Add(new LowLevelOperation(Opcode.Goto, end));
                     list.Add(new LowLevelOperation(Opcode.Lavel, ifFalse));

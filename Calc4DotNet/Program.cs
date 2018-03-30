@@ -74,15 +74,13 @@ namespace Calc4DotNet
                     Console.WriteLine($"Elapsed: {sw.Elapsed}");
                     Console.WriteLine();
                 }
-#if false
                 {
                     Stopwatch sw = Stopwatch.StartNew();
-                    Console.WriteLine($"Evaluated (low-level): {UnsafeExecutor.ExecuteInt64(module)}");
+                    Console.WriteLine($"Evaluated (low-level): {LowLevelExecutor.Execute(module)}");
                     sw.Stop();
                     Console.WriteLine($"Elapsed: {sw.Elapsed}");
                     Console.WriteLine();
                 }
-#endif
                 {
                     Stopwatch sw = Stopwatch.StartNew();
                     ICompiledModule<NumberType> compiledModule = ILCompiler.Compile(module);
