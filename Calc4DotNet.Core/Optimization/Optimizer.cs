@@ -12,10 +12,10 @@ namespace Calc4DotNet.Core.Optimization
             }
         }
 
-        public static IOperator<TNumber> Optimize<TNumber>(IOperator<TNumber> op, ref CompilationContext<TNumber> context)
+        public static void Optimize<TNumber>(ref IOperator<TNumber> op, ref CompilationContext<TNumber> context)
         {
             OptimizeUserDefinedOperators(ref context);
-            return OptimizeCore(op, context, isDefinition: false);
+            op = OptimizeCore(op, context, isDefinition: false);
         }
 
         private static void OptimizeUserDefinedOperator<TNumber>(OperatorImplement<TNumber> implement, ref CompilationContext<TNumber> context)

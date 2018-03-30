@@ -7,7 +7,7 @@ namespace Calc4DotNet.Core.Evaluation
 {
     public static class Evaluator
     {
-        public static TNumber EvaluateGeneric<TNumber>(IOperator<TNumber> op, CompilationContext<TNumber> context)
+        internal static TNumber EvaluateGeneric<TNumber>(IOperator<TNumber> op, CompilationContext<TNumber> context)
         {
             return Evaluate((dynamic)op, (dynamic)context);
         }

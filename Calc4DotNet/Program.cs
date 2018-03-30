@@ -106,7 +106,7 @@ namespace Calc4DotNet
                 ExecuteCore(op, context);
 
                 // Optimize
-                op = Optimizer.Optimize(op, ref context);
+                Optimizer.Optimize(ref op, ref context);
 
                 // Execute
                 Console.WriteLine("----- After optimized -----");

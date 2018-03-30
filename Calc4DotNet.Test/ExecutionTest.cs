@@ -79,7 +79,7 @@ namespace Calc4DotNet.Test
             var op = Parser.Parse(tokens, ref context);
             if (optimize)
             {
-                op = Optimizer.Optimize(op, ref context);
+                Optimizer.Optimize(ref op, ref context);
             }
 
             // TODO
