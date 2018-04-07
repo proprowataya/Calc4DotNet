@@ -5,43 +5,53 @@ using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.Evaluation
 {
+    public sealed class EvaluationStepLimitExceedException : Exception
+    { }
+
+    internal sealed class EvaluationArgumentNotSetException : Exception
+    { }
+
     public static class Evaluator
     {
-        internal static TNumber EvaluateGeneric<TNumber>(IOperator<TNumber> op, CompilationContext<TNumber> context)
+        internal static TNumber EvaluateGeneric<TNumber>(IOperator<TNumber> op, CompilationContext<TNumber> context, int maxStep = int.MaxValue)
         {
-            return Evaluate((dynamic)op, (dynamic)context);
+            return Evaluate((dynamic)op, (dynamic)context, maxStep);
         }
 
-        public static Int32 Evaluate(IOperator<Int32> op, CompilationContext<Int32> context)
+        public static Int32 Evaluate(IOperator<Int32> op, CompilationContext<Int32> context, int maxStep = int.MaxValue)
         {
-            return op.Accept(new Visitor<Int32, Int32Computer>(), (context, null));
+            return op.Accept(new Visitor<Int32, Int32Computer>(maxStep), (context, null));
         }
 
-        public static Int64 Evaluate(IOperator<Int64> op, CompilationContext<Int64> context)
+        public static Int64 Evaluate(IOperator<Int64> op, CompilationContext<Int64> context, int maxStep = int.MaxValue)
         {
-            return op.Accept(new Visitor<Int64, Int64Computer>(), (context, null));
+            return op.Accept(new Visitor<Int64, Int64Computer>(maxStep), (context, null));
         }
 
-        public static Double Evaluate(IOperator<Double> op, CompilationContext<Double> context)
+        public static Double Evaluate(IOperator<Double> op, CompilationContext<Double> context, int maxStep = int.MaxValue)
         {
-            return op.Accept(new Visitor<Double, DoubleComputer>(), (context, null));
+            return op.Accept(new Visitor<Double, DoubleComputer>(maxStep), (context, null));
         }
 
-        public static BigInteger Evaluate(IOperator<BigInteger> op, CompilationContext<BigInteger> context)
+        public static BigInteger Evaluate(IOperator<BigInteger> op, CompilationContext<BigInteger> context, int maxStep = int.MaxValue)
         {
-            return op.Accept(new Visitor<BigInteger, BigIntegerComputer>(), (context, null));
-        }
-
-        private static TNumber EvaluateCore<TNumber, TNumberComputer>(IOperator<TNumber> op, CompilationContext<TNumber> context)
-            where TNumberComputer : INumberComputer<TNumber>
-        {
-            return op.Accept(new Visitor<TNumber, TNumberComputer>(), (context, null));
+            return op.Accept(new Visitor<BigInteger, BigIntegerComputer>(maxStep), (context, null));
         }
 
         private sealed class Visitor<TNumber, TNumberComputer>
             : IOperatorVisitor<TNumber, TNumber, (CompilationContext<TNumber> context, TNumber[] arguments)>
             where TNumberComputer : INumberComputer<TNumber>
         {
+            private readonly int maxStep = 0;
+            private int step;
+
+            public Visitor(int maxStep)
+            {
+                this.maxStep = maxStep;
+            }
+
+            /* ******************** */
+
             public TNumber Visit(ZeroOperator<TNumber> op, (CompilationContext<TNumber> context, TNumber[] arguments) param)
                 => default(TNumberComputer).Zero;
 
@@ -49,7 +59,11 @@ namespace Calc4DotNet.Core.Evaluation
                 => op.Value;
 
             public TNumber Visit(ArgumentOperator<TNumber> op, (CompilationContext<TNumber> context, TNumber[] arguments) param)
-                => param.arguments[op.Index];
+            {
+                if (param.arguments is null)
+                    throw new EvaluationArgumentNotSetException();
+                return param.arguments[op.Index];
+            }
 
             public TNumber Visit(DefineOperator<TNumber> op, (CompilationContext<TNumber> context, TNumber[] arguments) param)
                 => default(TNumberComputer).Zero;
@@ -118,6 +132,11 @@ namespace Calc4DotNet.Core.Evaluation
 
             public TNumber Visit(UserDefinedOperator<TNumber> op, (CompilationContext<TNumber> context, TNumber[] arguments) param)
             {
+                if (++step > maxStep)
+                {
+                    throw new EvaluationStepLimitExceedException();
+                }
+
                 TNumber[] stack = new TNumber[op.Operands.Length];
 
                 for (int i = 0; i < op.Operands.Length; i++)
