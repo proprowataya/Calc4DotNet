@@ -142,10 +142,10 @@ namespace Calc4DotNet.Core.Execution
                 {
                     try
                     {
-                        casted = unchecked((short)(dynamic)number);
-                        return ((TNumber)(dynamic)casted).Equals(number);
+                        casted = checked((short)(dynamic)number);
+                        return true;
                     }
-                    catch
+                    catch (OverflowException)
                     {
                         casted = default;
                         return false;
