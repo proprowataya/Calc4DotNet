@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Calc4DotNet.Core.Execution
 {
@@ -34,16 +35,21 @@ namespace Calc4DotNet.Core.Execution
             where TNumberComputer : INumberComputer<TNumber>
         {
             TNumberComputer c = default;
-            LowLevelOperation[] operations = FlattenOperators(module);
+
+            LowLevelOperation[] operationsArray = FlattenOperators(module);
+            Span<LowLevelOperation> operations = stackalloc LowLevelOperation[operationsArray.Length];
+            operationsArray.AsSpan().CopyTo(operations);
+            ref LowLevelOperation firstOperation = ref operations[0];
+
             TNumber[] stack = new TNumber[StackSize];
             int[] ptrStack = new int[PtrStackSize];
-
             int top = 0, bottom = 0;
             int ptrIndex = 0;
 
             for (int programCounter = 0; ; programCounter++)
             {
-                LowLevelOperation op = operations[programCounter];
+                Debug.Assert((uint)programCounter < (uint)operations.Length);
+                LowLevelOperation op = Unsafe.Add(ref firstOperation, programCounter);
 
                 switch (op.Opcode)
                 {
