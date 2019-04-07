@@ -8,24 +8,24 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
 {
     public static class Parser
     {
-        public static IOperator<TNumber> Parse<TNumber>(IReadOnlyList<IToken> tokens, ref CompilationContext<TNumber> context)
+        public static IOperator Parse(IReadOnlyList<IToken> tokens, ref CompilationContext context)
         {
-            var boxedContext = new CompilationContext<TNumber>.Boxed(context);
-            var implement = new Implement<TNumber>(tokens, boxedContext);
+            var boxedContext = new CompilationContext.Boxed(context);
+            var implement = new Implement(tokens, boxedContext);
             var op = implement.Parse();
 
             context = boxedContext.Value;
             return op;
         }
 
-        private struct Implement<TNumber>
+        private struct Implement
         {
             private readonly IReadOnlyList<IToken> tokens;
-            private readonly CompilationContext<TNumber>.Boxed context;
+            private readonly CompilationContext.Boxed context;
             private readonly int maxNumOperands;
             private int index;
 
-            public Implement(IReadOnlyList<IToken> tokens, CompilationContext<TNumber>.Boxed context)
+            public Implement(IReadOnlyList<IToken> tokens, CompilationContext.Boxed context)
             {
                 this.tokens = tokens ?? throw new ArgumentNullException(nameof(tokens));
                 this.context = context ?? throw new ArgumentNullException(nameof(context));
@@ -33,31 +33,31 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 this.index = 0;
             }
 
-            public IOperator<TNumber> Parse()
+            public IOperator Parse()
             {
                 GenerateUserDefinedCode();
-                List<IOperator<TNumber>> results = new List<IOperator<TNumber>>();
+                List<IOperator> results = new List<IOperator>();
 
                 if (maxNumOperands == 0)
                 {
                     while (index < tokens.Count)
                     {
-                        results.Add(CreateOperator(tokens[index], Array.Empty<IOperator<TNumber>>()));
+                        results.Add(CreateOperator(tokens[index], Array.Empty<IOperator>()));
                         index++;
                     }
                 }
                 else
                 {
-                    List<IOperator<TNumber>> operands = new List<IOperator<TNumber>>();
+                    List<IOperator> operands = new List<IOperator>();
 
                     var lower = ReadLower();
                     if (lower.Count == 0 && tokens.FirstOrDefault() is DecimalToken)
                     {
-                        operands.Add(new ZeroOperator<TNumber>());
+                        operands.Add(new ZeroOperator());
                     }
                     else
                     {
-                        operands.Add(new Implement<TNumber>(lower, context).Parse());
+                        operands.Add(new Implement(lower, context).Parse());
                     }
 
                     while (index < tokens.Count)
@@ -67,12 +67,12 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
 
                         while (operands.Count < maxNumOperands)
                         {
-                            operands.Add(new Implement<TNumber>(ReadLower(), context).Parse());
+                            operands.Add(new Implement(ReadLower(), context).Parse());
                             if (operands.Count < maxNumOperands)
                                 index++;
                         }
 
-                        IOperator<TNumber> op = CreateOperator(token, operands);
+                        IOperator op = CreateOperator(token, operands);
                         operands.Clear();
                         operands.Add(op);
                     }
@@ -87,7 +87,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                     case 1:
                         return results[0];
                     default:
-                        return new ParenthesisOperator<TNumber>(results.ToImmutableArray());
+                        return new ParenthesisOperator(results.ToImmutableArray());
                 }
             }
 
@@ -95,30 +95,30 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
             {
                 foreach (var token in tokens.OfType<DefineToken>())
                 {
-                    IOperator<TNumber> op = new Implement<TNumber>(token.Tokens, context).Parse();
+                    IOperator op = new Implement(token.Tokens, context).Parse();
                     context.Value = context.Value.WithAddOrUpdateOperatorImplement(
                                                     context.Value.LookupOperatorImplement(token.Name).WithOperator(op));
                 }
             }
 
-            private IOperator<TNumber> CreateOperator(IToken token, IReadOnlyList<IOperator<TNumber>> operands)
+            private IOperator CreateOperator(IToken token, IReadOnlyList<IOperator> operands)
             {
                 switch (token)
                 {
                     case ArgumentToken arg:
-                        return new ArgumentOperator<TNumber>(arg.Index, arg.SupplementaryText);
+                        return new ArgumentOperator(arg.Index, arg.SupplementaryText);
                     case DefineToken def:
-                        return new DefineOperator<TNumber>(def.SupplementaryText);
+                        return new DefineOperator(def.SupplementaryText);
                     case ParenthesisToken parenthesis:
-                        return new Implement<TNumber>(parenthesis.Tokens, context).Parse();
+                        return new Implement(parenthesis.Tokens, context).Parse();
                     case DecimalToken dec:
-                        return new DecimalOperator<TNumber>(operands[0], dec.Value, dec.SupplementaryText);
+                        return new DecimalOperator(operands[0], dec.Value, dec.SupplementaryText);
                     case BinaryOperatorToken binary:
-                        return new BinaryOperator<TNumber>(operands[0], operands[1], binary.Type, binary.SupplementaryText);
+                        return new BinaryOperator(operands[0], operands[1], binary.Type, binary.SupplementaryText);
                     case ConditionalOperatorToken conditional:
-                        return new ConditionalOperator<TNumber>(operands[0], operands[1], operands[2], conditional.SupplementaryText);
+                        return new ConditionalOperator(operands[0], operands[1], operands[2], conditional.SupplementaryText);
                     case UserDefinedOperatorToken userDefined:
-                        return new UserDefinedOperator<TNumber>(userDefined.Definition, operands.ToImmutableArray(), null, userDefined.SupplementaryText);
+                        return new UserDefinedOperator(userDefined.Definition, operands.ToImmutableArray(), null, userDefined.SupplementaryText);
                     default:
                         throw new InvalidOperationException();
                 }

@@ -5,72 +5,72 @@ namespace Calc4DotNet.Core.Optimization
 {
     public static partial class Optimizer
     {
-        private sealed class TailCallVisitor<TNumber> : IOperatorVisitor<TNumber, IOperator<TNumber>, bool>
+        private sealed class TailCallVisitor : IOperatorVisitor<IOperator, bool>
         {
-            public IOperator<TNumber> Visit(ZeroOperator<TNumber> op, bool isTailCallable)
+            public IOperator Visit(ZeroOperator op, bool isTailCallable)
             {
                 return op;
             }
 
-            public IOperator<TNumber> Visit(PreComputedOperator<TNumber> op, bool isTailCallable)
+            public IOperator Visit(PreComputedOperator op, bool isTailCallable)
             {
                 return op;
             }
 
-            public IOperator<TNumber> Visit(ArgumentOperator<TNumber> op, bool isTailCallable)
+            public IOperator Visit(ArgumentOperator op, bool isTailCallable)
             {
                 return op;
             }
 
-            public IOperator<TNumber> Visit(DefineOperator<TNumber> op, bool isTailCallable)
+            public IOperator Visit(DefineOperator op, bool isTailCallable)
             {
                 return op;
             }
 
-            public IOperator<TNumber> Visit(ParenthesisOperator<TNumber> op, bool isTailCallable)
+            public IOperator Visit(ParenthesisOperator op, bool isTailCallable)
             {
-                ImmutableArray<IOperator<TNumber>> operators = op.Operators;
-                var builder = ImmutableArray.CreateBuilder<IOperator<TNumber>>(operators.Length);
+                ImmutableArray<IOperator> operators = op.Operators;
+                var builder = ImmutableArray.CreateBuilder<IOperator>(operators.Length);
 
                 for (int i = 0; i < operators.Length; i++)
                 {
                     builder.Add(operators[i].Accept(this, i < operators.Length - 1 ? false : isTailCallable));
                 }
 
-                return new ParenthesisOperator<TNumber>(builder.MoveToImmutable(), op.SupplementaryText);
+                return new ParenthesisOperator(builder.MoveToImmutable(), op.SupplementaryText);
             }
 
-            public IOperator<TNumber> Visit(DecimalOperator<TNumber> op, bool isTailCallable)
+            public IOperator Visit(DecimalOperator op, bool isTailCallable)
             {
-                return new DecimalOperator<TNumber>(op.Operand.Accept(this, false), op.Value, op.SupplementaryText);
+                return new DecimalOperator(op.Operand.Accept(this, false), op.Value, op.SupplementaryText);
             }
 
-            public IOperator<TNumber> Visit(BinaryOperator<TNumber> op, bool isTailCallable)
+            public IOperator Visit(BinaryOperator op, bool isTailCallable)
             {
                 var left = op.Left.Accept(this, false);
                 var right = op.Right.Accept(this, false);
-                return new BinaryOperator<TNumber>(left, right, op.Type, op.SupplementaryText);
+                return new BinaryOperator(left, right, op.Type, op.SupplementaryText);
             }
 
-            public IOperator<TNumber> Visit(ConditionalOperator<TNumber> op, bool isTailCallable)
+            public IOperator Visit(ConditionalOperator op, bool isTailCallable)
             {
                 var condition = op.Condition.Accept(this, false);
                 var ifTrue = op.IfTrue.Accept(this, isTailCallable);
                 var ifFalse = op.IfFalse.Accept(this, isTailCallable);
-                return new ConditionalOperator<TNumber>(condition, ifTrue, ifFalse, op.SupplementaryText);
+                return new ConditionalOperator(condition, ifTrue, ifFalse, op.SupplementaryText);
             }
 
-            public IOperator<TNumber> Visit(UserDefinedOperator<TNumber> op, bool isTailCallable)
+            public IOperator Visit(UserDefinedOperator op, bool isTailCallable)
             {
                 var operands = op.Operands;
-                var builder = ImmutableArray.CreateBuilder<IOperator<TNumber>>(operands.Length);
+                var builder = ImmutableArray.CreateBuilder<IOperator>(operands.Length);
 
                 for (int i = 0; i < operands.Length; i++)
                 {
                     builder.Add(operands[i].Accept(this, false));
                 }
 
-                return new UserDefinedOperator<TNumber>(op.Definition, builder.MoveToImmutable(), isTailCallable, op.SupplementaryText);
+                return new UserDefinedOperator(op.Definition, builder.MoveToImmutable(), isTailCallable, op.SupplementaryText);
             }
         }
     }

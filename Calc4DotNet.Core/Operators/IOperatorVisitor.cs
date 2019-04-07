@@ -1,41 +1,41 @@
 ﻿namespace Calc4DotNet.Core.Operators
 {
-    public interface IOperatorVisitor<TNumber>
+    public interface IOperatorVisitor
     {
-        void Visit(ZeroOperator<TNumber> op);
-        void Visit(PreComputedOperator<TNumber> op);
-        void Visit(ArgumentOperator<TNumber> op);
-        void Visit(DefineOperator<TNumber> op);
-        void Visit(ParenthesisOperator<TNumber> op);
-        void Visit(DecimalOperator<TNumber> op);
-        void Visit(BinaryOperator<TNumber> op);
-        void Visit(ConditionalOperator<TNumber> op);
-        void Visit(UserDefinedOperator<TNumber> op);
+        void Visit(ZeroOperator op);
+        void Visit(PreComputedOperator op);
+        void Visit(ArgumentOperator op);
+        void Visit(DefineOperator op);
+        void Visit(ParenthesisOperator op);
+        void Visit(DecimalOperator op);
+        void Visit(BinaryOperator op);
+        void Visit(ConditionalOperator op);
+        void Visit(UserDefinedOperator op);
     }
 
-    public interface IOperatorVisitor<TNumber, TResult>
+    public interface IOperatorVisitor<TResult>
     {
-        TResult Visit(ZeroOperator<TNumber> op);
-        TResult Visit(PreComputedOperator<TNumber> op);
-        TResult Visit(ArgumentOperator<TNumber> op);
-        TResult Visit(DefineOperator<TNumber> op);
-        TResult Visit(ParenthesisOperator<TNumber> op);
-        TResult Visit(DecimalOperator<TNumber> op);
-        TResult Visit(BinaryOperator<TNumber> op);
-        TResult Visit(ConditionalOperator<TNumber> op);
-        TResult Visit(UserDefinedOperator<TNumber> op);
+        TResult Visit(ZeroOperator op);
+        TResult Visit(PreComputedOperator op);
+        TResult Visit(ArgumentOperator op);
+        TResult Visit(DefineOperator op);
+        TResult Visit(ParenthesisOperator op);
+        TResult Visit(DecimalOperator op);
+        TResult Visit(BinaryOperator op);
+        TResult Visit(ConditionalOperator op);
+        TResult Visit(UserDefinedOperator op);
     }
 
-    public interface IOperatorVisitor<TNumber, TResult, TParam>
+    public interface IOperatorVisitor<TResult, TParam>
     {
-        TResult Visit(ZeroOperator<TNumber> op, TParam param);
-        TResult Visit(PreComputedOperator<TNumber> op, TParam param);
-        TResult Visit(ArgumentOperator<TNumber> op, TParam param);
-        TResult Visit(DefineOperator<TNumber> op, TParam param);
-        TResult Visit(ParenthesisOperator<TNumber> op, TParam param);
-        TResult Visit(DecimalOperator<TNumber> op, TParam param);
-        TResult Visit(BinaryOperator<TNumber> op, TParam param);
-        TResult Visit(ConditionalOperator<TNumber> op, TParam param);
-        TResult Visit(UserDefinedOperator<TNumber> op, TParam param);
+        TResult Visit(ZeroOperator op, TParam param);
+        TResult Visit(PreComputedOperator op, TParam param);
+        TResult Visit(ArgumentOperator op, TParam param);
+        TResult Visit(DefineOperator op, TParam param);
+        TResult Visit(ParenthesisOperator op, TParam param);
+        TResult Visit(DecimalOperator op, TParam param);
+        TResult Visit(BinaryOperator op, TParam param);
+        TResult Visit(ConditionalOperator op, TParam param);
+        TResult Visit(UserDefinedOperator op, TParam param);
     }
 }

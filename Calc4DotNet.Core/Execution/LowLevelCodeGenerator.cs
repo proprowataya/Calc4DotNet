@@ -9,7 +9,12 @@ namespace Calc4DotNet.Core.Execution
 {
     public static class LowLevelCodeGenerator
     {
-        public static LowLevelModule<TNumber> Generate<TNumber>(IOperator<TNumber> op, CompilationContext<TNumber> context)
+        internal static LowLevelModule<TNumber> Generate<TNumber>(IOperator op, CompilationContext context, TNumber dummy)
+        {
+            return Generate<TNumber>(op, context);
+        }
+
+        public static LowLevelModule<TNumber> Generate<TNumber>(IOperator op, CompilationContext context)
         {
             var constTable = new List<TNumber>();
             var userDefinedOperators = ImmutableArray.CreateBuilder<(OperatorDefinition Definition, ImmutableArray<LowLevelOperation> Operations)>();
@@ -43,11 +48,11 @@ namespace Calc4DotNet.Core.Execution
                                                userDefinedOperators.ToImmutable());
         }
 
-        private sealed class Visitor<TNumber> : IOperatorVisitor<TNumber>
+        private sealed class Visitor<TNumber> : IOperatorVisitor
         {
             private const int OperatorBeginLabel = 0;
 
-            private readonly CompilationContext<TNumber> context;
+            private readonly CompilationContext context;
             private readonly List<TNumber> constTable;
             private readonly Dictionary<OperatorDefinition, int> operatorLabels;
             private readonly OperatorDefinition definition;
@@ -57,7 +62,7 @@ namespace Calc4DotNet.Core.Execution
 
             public List<LowLevelOperation> Operations => list;
 
-            public Visitor(CompilationContext<TNumber> context, List<TNumber> constTable, Dictionary<OperatorDefinition, int> operatorLabels, OperatorDefinition definition)
+            public Visitor(CompilationContext context, List<TNumber> constTable, Dictionary<OperatorDefinition, int> operatorLabels, OperatorDefinition definition)
             {
                 this.context = context ?? throw new ArgumentNullException(nameof(context));
                 this.constTable = constTable ?? throw new ArgumentNullException(nameof(constTable));
@@ -65,7 +70,7 @@ namespace Calc4DotNet.Core.Execution
                 this.definition = definition;
             }
 
-            public void Generate(IOperator<TNumber> op)
+            public void Generate(IOperator op)
             {
                 // Add lavel at begin
                 Debug.Assert(nextLabel == OperatorBeginLabel);
@@ -131,12 +136,12 @@ namespace Calc4DotNet.Core.Execution
 
             /* ******************** */
 
-            public void Visit(ZeroOperator<TNumber> op)
+            public void Visit(ZeroOperator op)
             {
                 list.Add(new LowLevelOperation(Opcode.LoadConst, 0));
             }
 
-            public void Visit(PreComputedOperator<TNumber> op)
+            public void Visit(PreComputedOperator op)
             {
                 bool TryCastToShort(TNumber number, out short casted)
                 {
@@ -152,7 +157,7 @@ namespace Calc4DotNet.Core.Execution
                     }
                 }
 
-                if (TryCastToShort(op.Value, out var value))
+                if (TryCastToShort((TNumber)op.Value, out var value))
                 {
                     list.Add(new LowLevelOperation(Opcode.LoadConst, value));
                 }
@@ -162,24 +167,24 @@ namespace Calc4DotNet.Core.Execution
                     // because the constant value exceeds limit of 16-bit integer.
                     // So we use constTable.
                     int no = constTable.Count;
-                    constTable.Add(op.Value);
+                    constTable.Add((TNumber)op.Value);
                     list.Add(new LowLevelOperation(Opcode.LoadConstTable, no));
                 }
             }
 
-            public void Visit(ArgumentOperator<TNumber> op)
+            public void Visit(ArgumentOperator op)
             {
                 list.Add(new LowLevelOperation(Opcode.LoadArg, GetArgumentAddress(definition.NumOperands, op.Index)));
             }
 
-            public void Visit(DefineOperator<TNumber> op)
+            public void Visit(DefineOperator op)
             {
                 list.Add(new LowLevelOperation(Opcode.LoadConst, 0));
             }
 
-            public void Visit(ParenthesisOperator<TNumber> op)
+            public void Visit(ParenthesisOperator op)
             {
-                ImmutableArray<IOperator<TNumber>> operators = op.Operators;
+                ImmutableArray<IOperator> operators = op.Operators;
                 for (int i = 0; i < operators.Length; i++)
                 {
                     operators[i].Accept(this);
@@ -188,7 +193,7 @@ namespace Calc4DotNet.Core.Execution
                 }
             }
 
-            public void Visit(DecimalOperator<TNumber> op)
+            public void Visit(DecimalOperator op)
             {
                 op.Operand.Accept(this);
                 list.Add(new LowLevelOperation(Opcode.LoadConst, 10));
@@ -197,7 +202,7 @@ namespace Calc4DotNet.Core.Execution
                 list.Add(new LowLevelOperation(Opcode.Add));
             }
 
-            public void Visit(BinaryOperator<TNumber> op)
+            public void Visit(BinaryOperator op)
             {
                 void EmitComparisonBranch(Opcode opcode, bool reverse)
                 {
@@ -256,14 +261,14 @@ namespace Calc4DotNet.Core.Execution
                 }
             }
 
-            public void Visit(ConditionalOperator<TNumber> op)
+            public void Visit(ConditionalOperator op)
             {
                 int ifTrueLabel = nextLabel++, endLabel = nextLabel++;
 
-                if (op.Condition is BinaryOperator<TNumber> binary)
+                if (op.Condition is BinaryOperator binary)
                 {
                     // Special optimiztion for comparisons
-                    void Emit(Opcode opcode, IOperator<TNumber> ifTrue, IOperator<TNumber> ifFalse)
+                    void Emit(Opcode opcode, IOperator ifTrue, IOperator ifFalse)
                     {
                         binary.Left.Accept(this);
                         binary.Right.Accept(this);
@@ -322,7 +327,7 @@ namespace Calc4DotNet.Core.Execution
                 list.Add(new LowLevelOperation(Opcode.Lavel, endLabel));
             }
 
-            public void Visit(UserDefinedOperator<TNumber> op)
+            public void Visit(UserDefinedOperator op)
             {
                 for (int i = 0; i < op.Operands.Length; i++)
                 {
@@ -344,9 +349,9 @@ namespace Calc4DotNet.Core.Execution
                 }
             }
 
-            private bool OptimizableTailCall(IOperator<TNumber> op)
+            private bool OptimizableTailCall(IOperator op)
             {
-                return op is UserDefinedOperator<TNumber> userDefined
+                return op is UserDefinedOperator userDefined
                         && definition == userDefined.Definition
                         && (userDefined.IsTailCallable ?? false);
             }

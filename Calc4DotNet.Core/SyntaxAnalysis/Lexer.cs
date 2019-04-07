@@ -9,24 +9,24 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
 {
     public static class Lexer
     {
-        public static List<IToken> Lex<TNumber>(string text, ref CompilationContext<TNumber> context)
+        public static List<IToken> Lex(string text, ref CompilationContext context)
         {
-            var boxedContext = new CompilationContext<TNumber>.Boxed(context);
-            var implement = new Implement<TNumber>(boxedContext, text, new Dictionary<string, int>());
+            var boxedContext = new CompilationContext.Boxed(context);
+            var implement = new Implement(boxedContext, text, new Dictionary<string, int>());
             var tokens = implement.Lex();
 
             context = boxedContext.Value;
             return tokens;
         }
 
-        private struct Implement<TNumber>
+        private struct Implement
         {
-            private readonly CompilationContext<TNumber>.Boxed context;
+            private readonly CompilationContext.Boxed context;
             private readonly string text;
             private readonly Dictionary<string, int> argumentDictionary;
             private int index;
 
-            public Implement(CompilationContext<TNumber>.Boxed context, string text, Dictionary<string, int> argumentDictionary)
+            public Implement(CompilationContext.Boxed context, string text, Dictionary<string, int> argumentDictionary)
             {
                 this.context = context ?? throw new ArgumentNullException(nameof(context));
                 this.text = text ?? throw new ArgumentNullException(nameof(text));
@@ -90,11 +90,11 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 string content = elems[2];
 
                 var definition = new OperatorDefinition(name, arguments.Length);
-                context.Value = context.Value.WithAddOrUpdateOperatorImplement(new OperatorImplement<TNumber>(definition));
+                context.Value = context.Value.WithAddOrUpdateOperatorImplement(new OperatorImplement(definition));
 
                 var dictionary = arguments.Select((argumentName, argumentIndex) => (argumentName, argumentIndex))
                                           .ToDictionary(t => t.argumentName, t => t.argumentIndex);
-                var tokens = new Implement<TNumber>(context, content, dictionary).Lex();
+                var tokens = new Implement(context, content, dictionary).Lex();
 
                 return new DefineToken(name, arguments.ToImmutableArray(), tokens.ToImmutableArray(), supplementaryText);
             }
@@ -129,7 +129,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 Debug.Assert(text[index] == '(');
                 index++;
 
-                Implement<TNumber> implement = new Implement<TNumber>(context, text, argumentDictionary) { index = this.index };
+                Implement implement = new Implement(context, text, argumentDictionary) { index = this.index };
                 var tokens = implement.Lex();
 
                 index = implement.index;

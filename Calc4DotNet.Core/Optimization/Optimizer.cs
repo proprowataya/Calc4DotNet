@@ -6,31 +6,31 @@ namespace Calc4DotNet.Core.Optimization
     {
         private const int MaxPreEvaluationStep = 100;
 
-        public static void OptimizeUserDefinedOperators<TNumber>(ref CompilationContext<TNumber> context)
+        public static void OptimizeUserDefinedOperators<TNumber>(ref CompilationContext context)
         {
             foreach (var implement in context.OperatorImplements)
             {
-                OptimizeUserDefinedOperator(implement, ref context);
+                OptimizeUserDefinedOperator<TNumber>(implement, ref context);
             }
         }
 
-        public static void Optimize<TNumber>(ref IOperator<TNumber> op, ref CompilationContext<TNumber> context)
+        public static void Optimize<TNumber>(ref IOperator op, ref CompilationContext context)
         {
-            OptimizeUserDefinedOperators(ref context);
-            op = OptimizeCore(op, context);
+            OptimizeUserDefinedOperators<TNumber>(ref context);
+            op = OptimizeCore<TNumber>(op, context);
         }
 
-        private static void OptimizeUserDefinedOperator<TNumber>(OperatorImplement<TNumber> implement, ref CompilationContext<TNumber> context)
+        private static void OptimizeUserDefinedOperator<TNumber>(OperatorImplement implement, ref CompilationContext context)
         {
             var op = implement.Operator;
-            var newRoot = OptimizeCore(op, context);
+            var newRoot = OptimizeCore<TNumber>(op, context);
             context = context.WithAddOrUpdateOperatorImplement(implement.WithOperator(newRoot));
         }
 
-        private static IOperator<TNumber> OptimizeCore<TNumber>(IOperator<TNumber> op, CompilationContext<TNumber> context)
+        private static IOperator OptimizeCore<TNumber>(IOperator op, CompilationContext context)
         {
             op = op.Accept(new PreComputeVisitor<TNumber>(context, MaxPreEvaluationStep));
-            op = op.Accept(new TailCallVisitor<TNumber>(), /* isTailCallable */ true);
+            op = op.Accept(new TailCallVisitor(), /* isTailCallable */ true);
             return op;
         }
     }

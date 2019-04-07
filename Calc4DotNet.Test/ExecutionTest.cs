@@ -15,7 +15,7 @@ namespace Calc4DotNet.Test
     {
         #region Sources
 
-        private static readonly (string text, int expected, Type[] skipTypes)[] TestCases = new(string text, int expected, Type[] skipTypes)[]
+        private static readonly (string text, int expected, Type[] skipTypes)[] TestCases = new (string text, int expected, Type[] skipTypes)[]
         {
             ("1<2", 1, null),
             ("12345678", 12345678, null),
@@ -46,38 +46,22 @@ namespace Calc4DotNet.Test
 
         #region Helpers
 
-        private static void TestCore(string text, object expected, Type type, bool optimize, Func<object, object, object> executor)
+        private static void TestCore(string text, object expected, Type type, bool optimize,
+                                     Func<object, object, object> executor)
         {
-            if (type == typeof(Int32))
-            {
-                TestCoreGeneric<Int32>(text, (Int32)(dynamic)expected, type, optimize, executor);
-            }
-            else if (type == typeof(Int64))
-            {
-                TestCoreGeneric<Int64>(text, (Int64)(dynamic)expected, type, optimize, executor);
-            }
-            else if (type == typeof(Double))
-            {
-                TestCoreGeneric<Double>(text, (Double)(dynamic)expected, type, optimize, executor);
-            }
-            else if (type == typeof(BigInteger))
-            {
-                TestCoreGeneric<BigInteger>(text, (BigInteger)(dynamic)expected, type, optimize, executor);
-            }
-            else
-            {
-                throw new InvalidOperationException($"{type} is not suported.");
-            }
+            TestCoreGeneric(text, (dynamic)expected, type, optimize,
+                            executor, (dynamic)Activator.CreateInstance(type));
         }
 
-        private static void TestCoreGeneric<TNumber>(string text, TNumber expected, Type type, bool optimize, Func<object, object, object> executor)
+        private static void TestCoreGeneric<TNumber>(string text, TNumber expected, Type type, bool optimize,
+                                                     Func<object, object, object> executor, TNumber dummy)
         {
-            var context = CompilationContext<TNumber>.Empty;
+            var context = CompilationContext.Empty;
             var tokens = Lexer.Lex(text, ref context);
             var op = Parser.Parse(tokens, ref context);
             if (optimize)
             {
-                Optimizer.Optimize(ref op, ref context);
+                Optimizer.Optimize<TNumber>(ref op, ref context);
             }
 
             // TODO
@@ -91,7 +75,10 @@ namespace Calc4DotNet.Test
         {
             TestCore(text, expected, type, optimize, (op, context) =>
             {
-                return Evaluator.Evaluate((dynamic)op, (dynamic)context);
+                return Evaluator.Evaluate((dynamic)op,
+                                          (dynamic)context,
+                                          int.MaxValue,
+                                          (dynamic)Activator.CreateInstance(type));
             });
         }
 
@@ -100,7 +87,9 @@ namespace Calc4DotNet.Test
         {
             TestCore(text, expected, type, optimize, (op, context) =>
             {
-                var module = LowLevelCodeGenerator.Generate((dynamic)op, (dynamic)context);
+                var module = LowLevelCodeGenerator.Generate((dynamic)op,
+                                                            (dynamic)context,
+                                                            (dynamic)Activator.CreateInstance(type));
                 return LowLevelExecutor.Execute(module);
             });
         }
@@ -110,7 +99,9 @@ namespace Calc4DotNet.Test
         {
             TestCore(text, expected, type, optimize, (op, context) =>
             {
-                var module = LowLevelCodeGenerator.Generate((dynamic)op, (dynamic)context);
+                var module = LowLevelCodeGenerator.Generate((dynamic)op,
+                                                            (dynamic)context,
+                                                            (dynamic)Activator.CreateInstance(type));
                 var compiled = ILCompiler.Compile(module);
                 return compiled.Run();
             });

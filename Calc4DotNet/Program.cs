@@ -35,10 +35,10 @@ namespace Calc4DotNet
 
         private static void Execute(string text)
         {
-            void ExecuteCore(IOperator<NumberType> op, CompilationContext<NumberType> context)
+            void ExecuteCore(IOperator op, CompilationContext context)
             {
                 // Generate low-level operations
-                LowLevelModule<NumberType> module = LowLevelCodeGenerator.Generate(op, context);
+                LowLevelModule<NumberType> module = LowLevelCodeGenerator.Generate<NumberType>(op, context);
 
                 // Print input and user-defined operators as trees
                 Console.WriteLine("Main");
@@ -69,7 +69,7 @@ namespace Calc4DotNet
                 // Execute
                 {
                     Stopwatch sw = Stopwatch.StartNew();
-                    Console.WriteLine($"Evaluated (tree): {Evaluator.Evaluate(op, context)}");
+                    Console.WriteLine($"Evaluated (tree): {Evaluator.Evaluate<NumberType>(op, context)}");
                     sw.Stop();
                     Console.WriteLine($"Elapsed: {sw.Elapsed}");
                     Console.WriteLine();
@@ -98,7 +98,7 @@ namespace Calc4DotNet
 #endif
             {
                 // Compile
-                var context = CompilationContext<NumberType>.Empty;
+                var context = CompilationContext.Empty;
                 var tokens = Lexer.Lex(text, ref context);
                 var op = Parser.Parse(tokens, ref context);
 
@@ -107,7 +107,7 @@ namespace Calc4DotNet
                 ExecuteCore(op, context);
 
                 // Optimize
-                Optimizer.Optimize(ref op, ref context);
+                Optimizer.Optimize<NumberType>(ref op, ref context);
 
                 // Execute
                 Console.WriteLine("----- After optimized -----");
@@ -122,7 +122,7 @@ namespace Calc4DotNet
 #endif
         }
 
-        private static void PrintTree(IOperator<NumberType> op, int depth = 0)
+        private static void PrintTree(IOperator op, int depth = 0)
         {
             Console.WriteLine(new string(' ', Indent * depth) + op.ToDetailString());
             foreach (var item in op.Operands)

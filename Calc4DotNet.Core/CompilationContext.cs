@@ -6,15 +6,15 @@ using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core
 {
-    public sealed class CompilationContext<TNumber>
+    public sealed class CompilationContext
     {
         #region Class
 
         internal sealed class Boxed
         {
-            public CompilationContext<TNumber> Value { get; set; }
+            public CompilationContext Value { get; set; }
 
-            public Boxed(CompilationContext<TNumber> value)
+            public Boxed(CompilationContext value)
             {
                 Value = value ?? throw new ArgumentNullException(nameof(value));
             }
@@ -22,45 +22,45 @@ namespace Calc4DotNet.Core
 
         #endregion
 
-        public static readonly CompilationContext<TNumber> Empty = new CompilationContext<TNumber>();
+        public static readonly CompilationContext Empty = new CompilationContext();
 
-        private readonly ImmutableDictionary<string, OperatorImplement<TNumber>> userDefinedOperators;
+        private readonly ImmutableDictionary<string, OperatorImplement> userDefinedOperators;
 
         #region Constructors
 
         private CompilationContext()
         {
-            this.userDefinedOperators = ImmutableDictionary<string, OperatorImplement<TNumber>>.Empty;
+            this.userDefinedOperators = ImmutableDictionary<string, OperatorImplement>.Empty;
         }
 
-        internal CompilationContext(ImmutableDictionary<string, OperatorImplement<TNumber>> userDefinedOperators)
+        internal CompilationContext(ImmutableDictionary<string, OperatorImplement> userDefinedOperators)
         {
             this.userDefinedOperators = userDefinedOperators ?? throw new ArgumentNullException(nameof(userDefinedOperators));
         }
 
         #endregion
 
-        public IEnumerable<OperatorImplement<TNumber>> OperatorImplements => userDefinedOperators.Values;
+        public IEnumerable<OperatorImplement> OperatorImplements => userDefinedOperators.Values;
 
-        public OperatorImplement<TNumber> LookupOperatorImplement(string name)
+        public OperatorImplement LookupOperatorImplement(string name)
         {
             return this.userDefinedOperators[name];
         }
 
-        public bool TryLookupOperatorImplement(string name, out OperatorImplement<TNumber> value)
+        public bool TryLookupOperatorImplement(string name, out OperatorImplement value)
         {
             return this.userDefinedOperators.TryGetValue(name, out value);
         }
 
-        public CompilationContext<TNumber> WithAddOrUpdateOperatorImplement(OperatorImplement<TNumber> implement)
+        public CompilationContext WithAddOrUpdateOperatorImplement(OperatorImplement implement)
         {
-            return new CompilationContext<TNumber>(
+            return new CompilationContext(
                 this.userDefinedOperators.SetItem(implement.Definition.Name, implement));
         }
 
-        public CompilationContext<TNumber> WithAddOrUpdateOperatorImplements(IEnumerable<OperatorImplement<TNumber>> implements)
+        public CompilationContext WithAddOrUpdateOperatorImplements(IEnumerable<OperatorImplement> implements)
         {
-            return new CompilationContext<TNumber>(
+            return new CompilationContext(
                 this.userDefinedOperators.SetItems(implements.Select(implement => KeyValuePair.Create(implement.Definition.Name, implement))));
         }
     }

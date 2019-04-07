@@ -37,7 +37,7 @@ namespace Calc4DotNet.Core.ILCompilation
                                              typeof(ICompiledModule<TNumber>).GetMethod(nameof(ICompiledModule<TNumber>.Run)));
 
             // User defined methods
-            var methods = new(MethodBuilder Method, int NumOperands)[module.UserDefinedOperators.Length];
+            var methods = new (MethodBuilder Method, int NumOperands)[module.UserDefinedOperators.Length];
             for (int i = 0; i < module.UserDefinedOperators.Length; i++)
             {
                 var op = module.UserDefinedOperators[i];

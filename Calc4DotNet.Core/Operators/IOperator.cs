@@ -4,51 +4,43 @@ using System.Collections.Immutable;
 
 namespace Calc4DotNet.Core.Operators
 {
-    public interface IMinimalOperator
+    public interface IOperator
     {
-        string SupplementaryText { get; }
-        IReadOnlyList<IMinimalOperator> Operands { get; }
+        IReadOnlyList<IOperator> Operands { get; }
+
+        void Accept(IOperatorVisitor visitor);
+        TResult Accept<TResult>(IOperatorVisitor<TResult> visitor);
+        TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param);
     }
 
-    public interface IOperator<TNumber> : IMinimalOperator
-    {
-        new IReadOnlyList<IOperator<TNumber>> Operands { get; }
-
-        void Accept(IOperatorVisitor<TNumber> visitor);
-        TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor);
-        TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param);
-    }
-
-    public sealed class ZeroOperator<TNumber> : IOperator<TNumber>
+    public sealed class ZeroOperator : IOperator
     {
         public string SupplementaryText => null;
-        public IReadOnlyList<IOperator<TNumber>> Operands => Array.Empty<IOperator<TNumber>>();
-        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
+        public IReadOnlyList<IOperator> Operands => Array.Empty<IOperator>();
 
-        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 
-    public sealed class PreComputedOperator<TNumber> : IOperator<TNumber>
+    public sealed class PreComputedOperator : IOperator
     {
-        public TNumber Value { get; }
+        public object Value { get; }
 
-        public PreComputedOperator(TNumber value)
+        public PreComputedOperator(object value)
         {
-            Value = value;
+            Value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         public string SupplementaryText => null;
-        public IReadOnlyList<IOperator<TNumber>> Operands => Array.Empty<IOperator<TNumber>>();
-        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
+        public IReadOnlyList<IOperator> Operands => Array.Empty<IOperator>();
 
-        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 
-    public sealed class ArgumentOperator<TNumber> : IOperator<TNumber>
+    public sealed class ArgumentOperator : IOperator
     {
         public int Index { get; }
         public string SupplementaryText { get; }
@@ -59,15 +51,14 @@ namespace Calc4DotNet.Core.Operators
             SupplementaryText = supplementaryText;
         }
 
-        public IReadOnlyList<IOperator<TNumber>> Operands => Array.Empty<IOperator<TNumber>>();
-        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
+        public IReadOnlyList<IOperator> Operands => Array.Empty<IOperator>();
 
-        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 
-    public sealed class DefineOperator<TNumber> : IOperator<TNumber>
+    public sealed class DefineOperator : IOperator
     {
         public string SupplementaryText { get; }
 
@@ -76,40 +67,38 @@ namespace Calc4DotNet.Core.Operators
             SupplementaryText = supplementaryText;
         }
 
-        public IReadOnlyList<IOperator<TNumber>> Operands => Array.Empty<IOperator<TNumber>>();
-        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
+        public IReadOnlyList<IOperator> Operands => Array.Empty<IOperator>();
 
-        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 
-    public sealed class ParenthesisOperator<TNumber> : IOperator<TNumber>
+    public sealed class ParenthesisOperator : IOperator
     {
-        public ImmutableArray<IOperator<TNumber>> Operators { get; }
+        public ImmutableArray<IOperator> Operators { get; }
         public string SupplementaryText { get; }
 
-        public ParenthesisOperator(ImmutableArray<IOperator<TNumber>> operators, string supplementaryText = null)
+        public ParenthesisOperator(ImmutableArray<IOperator> operators, string supplementaryText = null)
         {
             Operators = operators;
             SupplementaryText = supplementaryText;
         }
 
-        public IReadOnlyList<IOperator<TNumber>> Operands => Array.Empty<IOperator<TNumber>>();
-        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
+        public IReadOnlyList<IOperator> Operands => Array.Empty<IOperator>();
 
-        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 
-    public sealed class DecimalOperator<TNumber> : IOperator<TNumber>
+    public sealed class DecimalOperator : IOperator
     {
-        public IOperator<TNumber> Operand { get; }
+        public IOperator Operand { get; }
         public int Value { get; }
         public string SupplementaryText { get; }
 
-        public DecimalOperator(IOperator<TNumber> operand, int value, string supplementaryText = null)
+        public DecimalOperator(IOperator operand, int value, string supplementaryText = null)
         {
             Operand = operand ?? throw new ArgumentNullException(nameof(operand));
             Value = value;
@@ -118,24 +107,23 @@ namespace Calc4DotNet.Core.Operators
                 throw new ArgumentException(nameof(value));
         }
 
-        public IReadOnlyList<IOperator<TNumber>> Operands => new[] { Operand };
-        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
+        public IReadOnlyList<IOperator> Operands => new[] { Operand };
 
-        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 
     public enum BinaryType { Add, Sub, Mult, Div, Mod, Equal, NotEqual, LessThan, LessThanOrEqual, GreaterThanOrEqual, GreaterThan }
 
-    public sealed class BinaryOperator<TNumber> : IOperator<TNumber>
+    public sealed class BinaryOperator : IOperator
     {
-        public IOperator<TNumber> Left { get; }
-        public IOperator<TNumber> Right { get; }
+        public IOperator Left { get; }
+        public IOperator Right { get; }
         public BinaryType Type { get; }
         public string SupplementaryText { get; }
 
-        public BinaryOperator(IOperator<TNumber> left, IOperator<TNumber> right, BinaryType type, string supplementaryText = null)
+        public BinaryOperator(IOperator left, IOperator right, BinaryType type, string supplementaryText = null)
         {
             Left = left ?? throw new ArgumentNullException(nameof(left));
             Right = right ?? throw new ArgumentNullException(nameof(right));
@@ -143,22 +131,21 @@ namespace Calc4DotNet.Core.Operators
             SupplementaryText = supplementaryText;
         }
 
-        public IReadOnlyList<IOperator<TNumber>> Operands => new[] { Left, Right };
-        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
+        public IReadOnlyList<IOperator> Operands => new[] { Left, Right };
 
-        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 
-    public sealed class ConditionalOperator<TNumber> : IOperator<TNumber>
+    public sealed class ConditionalOperator : IOperator
     {
-        public IOperator<TNumber> Condition { get; }
-        public IOperator<TNumber> IfTrue { get; }
-        public IOperator<TNumber> IfFalse { get; }
+        public IOperator Condition { get; }
+        public IOperator IfTrue { get; }
+        public IOperator IfFalse { get; }
         public string SupplementaryText { get; }
 
-        public ConditionalOperator(IOperator<TNumber> condition, IOperator<TNumber> ifTrue, IOperator<TNumber> ifFalse, string supplementaryText = null)
+        public ConditionalOperator(IOperator condition, IOperator ifTrue, IOperator ifFalse, string supplementaryText = null)
         {
             Condition = condition ?? throw new ArgumentNullException(nameof(condition));
             IfTrue = ifTrue ?? throw new ArgumentNullException(nameof(ifTrue));
@@ -166,22 +153,21 @@ namespace Calc4DotNet.Core.Operators
             SupplementaryText = supplementaryText;
         }
 
-        public IReadOnlyList<IOperator<TNumber>> Operands => new[] { Condition, IfTrue, IfFalse };
-        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
+        public IReadOnlyList<IOperator> Operands => new[] { Condition, IfTrue, IfFalse };
 
-        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 
-    public sealed class UserDefinedOperator<TNumber> : IOperator<TNumber>
+    public sealed class UserDefinedOperator : IOperator
     {
         public OperatorDefinition Definition { get; }
-        public ImmutableArray<IOperator<TNumber>> Operands { get; }
+        public ImmutableArray<IOperator> Operands { get; }
         public bool? IsTailCallable { get; }
         public string SupplementaryText { get; }
 
-        public UserDefinedOperator(OperatorDefinition definition, ImmutableArray<IOperator<TNumber>> operands, bool? isTailCallable = null, string supplementaryText = null)
+        public UserDefinedOperator(OperatorDefinition definition, ImmutableArray<IOperator> operands, bool? isTailCallable = null, string supplementaryText = null)
         {
             Definition = definition ?? throw new ArgumentNullException(nameof(definition));
             Operands = operands;
@@ -192,11 +178,10 @@ namespace Calc4DotNet.Core.Operators
                 throw new ArgumentException($"Number of operands does not match between {nameof(definition)} and {nameof(operands)}");
         }
 
-        IReadOnlyList<IOperator<TNumber>> IOperator<TNumber>.Operands => Operands;
-        IReadOnlyList<IMinimalOperator> IMinimalOperator.Operands => Operands;
+        IReadOnlyList<IOperator> IOperator.Operands => Operands;
 
-        public void Accept(IOperatorVisitor<TNumber> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult>(IOperatorVisitor<TNumber, TResult> visitor) => visitor.Visit(this);
-        public TResult Accept<TResult, TParam>(IOperatorVisitor<TNumber, TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+        public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+        public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+        public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
     }
 }
