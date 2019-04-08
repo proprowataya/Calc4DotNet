@@ -45,11 +45,11 @@ namespace Calc4DotNet.Core.Execution
             int[] ptrStack = new int[PtrStackSize];
             int top = 0, bottom = 0;
             int ptrIndex = 0;
+            ref LowLevelOperation op = ref firstOperation;
 
-            for (int programCounter = 0; ; programCounter++)
+            while (true)
             {
-                Debug.Assert((uint)programCounter < (uint)operations.Length);
-                LowLevelOperation op = Unsafe.Add(ref firstOperation, programCounter);
+                Debug.Assert((uint)Unsafe.ByteOffset(ref firstOperation, ref op) / (uint)Unsafe.SizeOf<LowLevelOperation>() < (uint)operations.Length);
 
                 switch (op.Opcode)
                 {
@@ -94,49 +94,49 @@ namespace Calc4DotNet.Core.Execution
                         stack[top - 1] = c.Modulo(stack[top - 1], stack[top]);
                         break;
                     case Opcode.Goto:
-                        programCounter = op.Value;
+                        op = ref Unsafe.Add(ref firstOperation, op.Value);
                         break;
                     case Opcode.GotoIfTrue:
                         if (c.NotEquals(stack[--top], c.Zero))
                         {
-                            programCounter = op.Value;
+                            op = ref Unsafe.Add(ref firstOperation, op.Value);
                         }
                         break;
                     case Opcode.GotoIfEqual:
                         top -= 2;
                         if (c.Equals(stack[top], stack[top + 1]))
                         {
-                            programCounter = op.Value;
+                            op = ref Unsafe.Add(ref firstOperation, op.Value);
                         }
                         break;
                     case Opcode.GotoIfLessThan:
                         top -= 2;
                         if (c.LessThan(stack[top], stack[top + 1]))
                         {
-                            programCounter = op.Value;
+                            op = ref Unsafe.Add(ref firstOperation, op.Value);
                         }
                         break;
                     case Opcode.GotoIfLessThanOrEqual:
                         top -= 2;
                         if (c.LessThanOrEquals(stack[top], stack[top + 1]))
                         {
-                            programCounter = op.Value;
+                            op = ref Unsafe.Add(ref firstOperation, op.Value);
                         }
                         break;
                     case Opcode.Call:
-                        ptrStack[ptrIndex++] = programCounter;  // Push current program counter
-                        ptrStack[ptrIndex++] = bottom;          // Push current stack bottom
-                        bottom = top;                           // Create new stack frame
-                        programCounter = op.Value;              // Branch
+                        ptrStack[ptrIndex++] = (int)Unsafe.ByteOffset(ref firstOperation, ref op);          // Push current program counter
+                        ptrStack[ptrIndex++] = bottom;                                                      // Push current stack bottom
+                        bottom = top;                                                                       // Create new stack frame
+                        op = ref Unsafe.Add(ref firstOperation, op.Value);                                  // Branch
                         break;
                     case Opcode.Return:
-                        TNumber returnValue = stack[top - 1];   // Restore previous stack top
-                        top = bottom - op.Value + 1;            // Restore previous stack top
-                                                                // while removing arguments from stack
-                                                                // (We ensure space of returning value)
-                        stack[top - 1] = returnValue;           // Store returning value on stack
-                        bottom = ptrStack[--ptrIndex];          // Pop previous stack bottom
-                        programCounter = ptrStack[--ptrIndex];  // Pop previous program counter
+                        TNumber returnValue = stack[top - 1];                                               // Restore previous stack top
+                        top = bottom - op.Value + 1;                                                        // Restore previous stack top
+                                                                                                            // while removing arguments from stack
+                                                                                                            // (We ensure space of returning value)
+                        stack[top - 1] = returnValue;                                                       // Store returning value on stack
+                        bottom = ptrStack[--ptrIndex];                                                      // Pop previous stack bottom
+                        op = ref Unsafe.AddByteOffset(ref firstOperation, (IntPtr)ptrStack[--ptrIndex]);    // Pop previous program counter
                         break;
                     case Opcode.Halt:
                         return stack[top - 1];
@@ -144,6 +144,8 @@ namespace Calc4DotNet.Core.Execution
                     default:
                         throw new InvalidOperationException();
                 }
+
+                op = ref Unsafe.Add(ref op, 1);
             }
         }
 
