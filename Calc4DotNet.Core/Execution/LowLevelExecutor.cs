@@ -35,7 +35,7 @@ namespace Calc4DotNet.Core.Execution
         {
             TNumberComputer c = default;
 
-            LowLevelOperation[] operationsArray = module.FlattenOperators();
+            LowLevelOperation[] operationsArray = module.FlattenOperations();
             Span<LowLevelOperation> operations = stackalloc LowLevelOperation[operationsArray.Length];
             operationsArray.AsSpan().CopyTo(operations);
             ref LowLevelOperation firstOperation = ref operations[0];
