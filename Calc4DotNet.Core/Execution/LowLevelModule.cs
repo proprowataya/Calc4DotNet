@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.Execution
@@ -80,13 +81,10 @@ namespace Calc4DotNet.Core.Execution
             return result;
         }
 
-        public unsafe void Serialize(Stream stream)
+        public void Serialize(Stream stream)
         {
             LowLevelOperation[] operations = FlattenOperations();
-            fixed (LowLevelOperation* operation = operations)
-            {
-                stream.Write(new ReadOnlySpan<byte>(operation, operations.Length * sizeof(LowLevelOperation)));
-            }
+            stream.Write(MemoryMarshal.AsBytes(operations.AsSpan()));
         }
     }
 }
