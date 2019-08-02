@@ -126,7 +126,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                     throw new TokenExpectedException("}");
                 }
 
-                string name = text.Substring(begin, end - begin);
+                string name = text[begin..end];
                 Index = end + 1;
 
                 if (context.Value.TryLookupOperatorImplement(name, out var implement))
@@ -236,7 +236,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 }
                 Index = end + 1;
 
-                return text.Substring(begin, end - begin);
+                return text[begin..end];
             }
         }
     }
