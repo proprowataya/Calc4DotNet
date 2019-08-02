@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Calc4DotNet.Core.Exceptions;
 using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.SyntaxAnalysis
@@ -60,7 +59,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                     {
                         if (lower.Count == 0)
                         {
-                            throw new SomeOperandsMissingException();
+                            throw new Calc4DotNet.Core.Exceptions.SomeOperandsMissingException();
                         }
 
                         operands.Add(new Implement(lower, context).Parse());
@@ -89,7 +88,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 switch (results.Count)
                 {
                     case 0:
-                        throw new CodeIsEmptyException();
+                        throw new Calc4DotNet.Core.Exceptions.CodeIsEmptyException();
                     case 1:
                         return results[0];
                     default:

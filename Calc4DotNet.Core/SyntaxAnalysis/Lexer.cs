@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using Calc4DotNet.Core.Exceptions;
 using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.SyntaxAnalysis
@@ -17,7 +16,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
             var tokens = implement.Lex();
             if (implement.Index < text.Length)
             {
-                throw new UnexpectedTokenException(text[implement.Index].ToString());
+                throw new Calc4DotNet.Core.Exceptions.UnexpectedTokenException(text[implement.Index].ToString());
             }
 
             context = boxedContext.Value;
@@ -92,7 +91,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 string[] elems = supplementaryText.Split("|");
                 if (elems.Length != 3)
                 {
-                    throw new DefinitionTextNotSplittedProperlyException(supplementaryText);
+                    throw new Calc4DotNet.Core.Exceptions.DefinitionTextNotSplittedProperlyException(supplementaryText);
                 }
 
                 string name = elems[0];
@@ -123,7 +122,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 (int begin, int end) = (Index, text.IndexOf('}', Index));
                 if (end < 0)
                 {
-                    throw new TokenExpectedException("}");
+                    throw new Calc4DotNet.Core.Exceptions.TokenExpectedException("}");
                 }
 
                 string name = text[begin..end];
@@ -134,7 +133,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 else if (argumentDictionary.TryGetValue(name, out var argumentIndex))
                     return new ArgumentToken(name, argumentIndex, LexSupplementaryText());
                 else
-                    throw new OperatorOrOperandNotDefinedException(name);
+                    throw new Calc4DotNet.Core.Exceptions.OperatorOrOperandNotDefinedException(name);
             }
 
             private ParenthesisToken LexParenthesisToken()
@@ -148,7 +147,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 Index = implement.Index;
                 if (Index >= text.Length || text[Index] != ')')
                 {
-                    throw new TokenExpectedException(")");
+                    throw new Calc4DotNet.Core.Exceptions.TokenExpectedException(")");
                 }
                 Index++;
 
@@ -220,7 +219,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                     return new ArgumentToken(name, argumentIndex, LexSupplementaryText());
                 }
 
-                throw new OperatorOrOperandNotDefinedException(text[Index].ToString());
+                throw new Calc4DotNet.Core.Exceptions.OperatorOrOperandNotDefinedException(text[Index].ToString());
             }
 
             private string LexSupplementaryText()
@@ -232,7 +231,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 (int begin, int end) = (Index, text.IndexOf(']', Index));
                 if (end < 0)
                 {
-                    throw new TokenExpectedException("]");
+                    throw new Calc4DotNet.Core.Exceptions.TokenExpectedException("]");
                 }
                 Index = end + 1;
 
