@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Evaluation;
+using Calc4DotNet.Core.Exceptions;
 using Calc4DotNet.Core.Execution;
 using Calc4DotNet.Core.ILCompilation;
 using Calc4DotNet.Core.Operators;
@@ -93,9 +94,7 @@ namespace Calc4DotNet
 
             /* ******************** */
 
-#if !DEBUG
             try
-#endif
             {
                 // Compile
                 var context = CompilationContext.Empty;
@@ -113,13 +112,11 @@ namespace Calc4DotNet
                 Console.WriteLine("----- After optimized -----");
                 ExecuteCore(op, context);
             }
-#if !DEBUG
-            catch (Exception e)
+            catch (Calc4Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Console.WriteLine($"Error: {e.Message}");
                 Console.WriteLine();
             }
-#endif
         }
 
         private static void PrintTree(IOperator op, int depth = 0)

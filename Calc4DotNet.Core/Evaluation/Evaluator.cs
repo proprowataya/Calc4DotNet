@@ -2,6 +2,7 @@
 using System.Collections.Immutable;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Calc4DotNet.Core.Exceptions;
 using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.Evaluation
@@ -43,7 +44,7 @@ namespace Calc4DotNet.Core.Evaluation
             }
             else
             {
-                throw new InvalidOperationException($"Type {typeof(TNumber)} is not supported.");
+                throw new TypeNotSupportedException(typeof(TNumber));
             }
         }
 

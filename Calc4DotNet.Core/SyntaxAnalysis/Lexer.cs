@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using Calc4DotNet.Core.Exceptions;
 using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.SyntaxAnalysis
@@ -14,6 +15,10 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
             var boxedContext = new CompilationContext.Boxed(context);
             var implement = new Implement(boxedContext, text, new Dictionary<string, int>());
             var tokens = implement.Lex();
+            if (implement.Index < text.Length)
+            {
+                throw new UnexpectedTokenException(text[implement.Index].ToString());
+            }
 
             context = boxedContext.Value;
             return tokens;
@@ -24,25 +29,25 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
             private readonly CompilationContext.Boxed context;
             private readonly string text;
             private readonly Dictionary<string, int> argumentDictionary;
-            private int index;
+            public int Index { get; private set; }
 
             public Implement(CompilationContext.Boxed context, string text, Dictionary<string, int> argumentDictionary)
             {
                 this.context = context ?? throw new ArgumentNullException(nameof(context));
                 this.text = text ?? throw new ArgumentNullException(nameof(text));
                 this.argumentDictionary = argumentDictionary ?? throw new ArgumentNullException(nameof(argumentDictionary));
-                this.index = 0;
+                this.Index = 0;
             }
 
             public List<IToken> Lex()
             {
                 var list = new List<IToken>();
 
-                while (index < text.Length && text[index] != ')')
+                while (Index < text.Length && text[Index] != ')')
                 {
-                    if (char.IsWhiteSpace(text[index]))
+                    if (char.IsWhiteSpace(text[Index]))
                     {
-                        index++;
+                        Index++;
                         continue;
                     }
 
@@ -54,7 +59,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
 
             private IToken NextToken()
             {
-                switch (text[index])
+                switch (text[Index])
                 {
                     case 'D':
                         return LexDefineToken();
@@ -80,11 +85,16 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
 
             private DefineToken LexDefineToken()
             {
-                Debug.Assert(text[index] == 'D');
-                index++;
+                Debug.Assert(text[Index] == 'D');
+                Index++;
 
                 string supplementaryText = LexSupplementaryText();
-                var elems = supplementaryText.Split("|");
+                string[] elems = supplementaryText.Split("|");
+                if (elems.Length != 3)
+                {
+                    throw new DefinitionTextNotSplittedProperlyException(supplementaryText);
+                }
+
                 string name = elems[0];
                 string[] arguments = elems[1].Length > 0 ? elems[1].Replace(" ", "").Split(",") : Array.Empty<string>();
                 string content = elems[2];
@@ -101,120 +111,130 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
 
             private DecimalToken LexDecimalToken()
             {
-                int value = text[index++] - '0';
+                int value = text[Index++] - '0';
                 return new DecimalToken(value, LexSupplementaryText());
             }
 
             private IToken LexUserDefinedOperatorOrArgumentToken()
             {
-                Debug.Assert(text[index] == '{');
-                index++;
+                Debug.Assert(text[Index] == '{');
+                Index++;
 
-                (int begin, int end) = (index, text.IndexOf('}', index));
+                (int begin, int end) = (Index, text.IndexOf('}', Index));
+                if (end < 0)
+                {
+                    throw new TokenExpectedException("}");
+                }
+
                 string name = text.Substring(begin, end - begin);
-
-                Debug.Assert(text[end] == '}');
-                index = end + 1;
+                Index = end + 1;
 
                 if (context.Value.TryLookupOperatorImplement(name, out var implement))
                     return new UserDefinedOperatorToken(implement.Definition, LexSupplementaryText());
                 else if (argumentDictionary.TryGetValue(name, out var argumentIndex))
                     return new ArgumentToken(name, argumentIndex, LexSupplementaryText());
                 else
-                    throw new InvalidOperationException();
+                    throw new OperatorOrOperandNotDefinedException(name);
             }
 
             private ParenthesisToken LexParenthesisToken()
             {
-                Debug.Assert(text[index] == '(');
-                index++;
+                Debug.Assert(text[Index] == '(');
+                Index++;
 
-                Implement implement = new Implement(context, text, argumentDictionary) { index = this.index };
+                Implement implement = new Implement(context, text, argumentDictionary) { Index = this.Index };
                 var tokens = implement.Lex();
 
-                index = implement.index;
-                Debug.Assert(text[index] == ')');
-                index++;
+                Index = implement.Index;
+                if (Index >= text.Length || text[Index] != ')')
+                {
+                    throw new TokenExpectedException(")");
+                }
+                Index++;
 
                 return new ParenthesisToken(tokens.ToImmutableArray(), LexSupplementaryText());
             }
 
             private IToken LexSymbolOrArgumentToken()
             {
-                if (index + 1 < text.Length)
+                if (Index + 1 < text.Length)
                 {
-                    switch (text.Substring(index, 2))
+                    switch (text.Substring(Index, 2))
                     {
                         case "==":
-                            index += 2;
+                            Index += 2;
                             return new BinaryOperatorToken(BinaryType.Equal, LexSupplementaryText());
                         case "!=":
-                            index += 2;
+                            Index += 2;
                             return new BinaryOperatorToken(BinaryType.NotEqual, LexSupplementaryText());
                         case ">=":
-                            index += 2;
+                            Index += 2;
                             return new BinaryOperatorToken(BinaryType.GreaterThanOrEqual, LexSupplementaryText());
                         case "<=":
-                            index += 2;
+                            Index += 2;
                             return new BinaryOperatorToken(BinaryType.LessThanOrEqual, LexSupplementaryText());
                         default:
                             break;
                     }
                 }
 
-                switch (text[index])
+                switch (text[Index])
                 {
                     case '+':
-                        index++;
+                        Index++;
                         return new BinaryOperatorToken(BinaryType.Add, LexSupplementaryText());
                     case '-':
-                        index++;
+                        Index++;
                         return new BinaryOperatorToken(BinaryType.Sub, LexSupplementaryText());
                     case '*':
-                        index++;
+                        Index++;
                         return new BinaryOperatorToken(BinaryType.Mult, LexSupplementaryText());
                     case '/':
-                        index++;
+                        Index++;
                         return new BinaryOperatorToken(BinaryType.Div, LexSupplementaryText());
                     case '%':
-                        index++;
+                        Index++;
                         return new BinaryOperatorToken(BinaryType.Mod, LexSupplementaryText());
                     case '<':
-                        index++;
+                        Index++;
                         return new BinaryOperatorToken(BinaryType.LessThan, LexSupplementaryText());
                     case '>':
-                        index++;
+                        Index++;
                         return new BinaryOperatorToken(BinaryType.GreaterThan, LexSupplementaryText());
                     case '?':
-                        index++;
+                        Index++;
                         return new ConditionalOperatorToken(LexSupplementaryText());
                     default:
                         break;
                 }
 
-                if (context.Value.TryLookupOperatorImplement(text[index].ToString(), out var implement))
+                if (context.Value.TryLookupOperatorImplement(text[Index].ToString(), out var implement))
                 {
-                    index++;
+                    Index++;
                     return new UserDefinedOperatorToken(implement.Definition, LexSupplementaryText());
                 }
-                else if (argumentDictionary.TryGetValue(text[index].ToString(), out var argumentIndex))
+                else if (argumentDictionary.TryGetValue(text[Index].ToString(), out var argumentIndex))
                 {
-                    string name = text[index].ToString();
-                    index++;
+                    string name = text[Index].ToString();
+                    Index++;
                     return new ArgumentToken(name, argumentIndex, LexSupplementaryText());
                 }
 
-                throw new InvalidOperationException();
+                throw new OperatorOrOperandNotDefinedException(text[Index].ToString());
             }
 
             private string LexSupplementaryText()
             {
-                if (index >= text.Length || text[index] != '[')
+                if (Index >= text.Length || text[Index] != '[')
                     return null;
 
-                index++;
-                (int begin, int end) = (index, text.IndexOf(']', index));
-                index = end + 1;
+                Index++;
+                (int begin, int end) = (Index, text.IndexOf(']', Index));
+                if (end < 0)
+                {
+                    throw new TokenExpectedException("]");
+                }
+                Index = end + 1;
 
                 return text.Substring(begin, end - begin);
             }
