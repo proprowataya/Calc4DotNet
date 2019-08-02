@@ -3,7 +3,6 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using Calc4DotNet.Core;
-using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Exceptions;
 using Calc4DotNet.Core.Execution;
 using Calc4DotNet.Core.ILCompilation;
@@ -68,55 +67,44 @@ namespace Calc4DotNet
                 Console.WriteLine();
 
                 // Execute
+                try
                 {
-                    Stopwatch sw = Stopwatch.StartNew();
-                    Console.WriteLine($"Evaluated (tree): {Evaluator.Evaluate<NumberType>(op, context)}");
-                    sw.Stop();
-                    Console.WriteLine($"Elapsed: {sw.Elapsed}");
-                    Console.WriteLine();
+                    static void Execute(string type, Func<NumberType> executor)
+                    {
+                        Stopwatch sw = Stopwatch.StartNew();
+                        Console.WriteLine($"Evaluated ({type}): {executor()}");
+                        sw.Stop();
+                        Console.WriteLine($"Elapsed: {sw.Elapsed}");
+                        Console.WriteLine();
+                    }
+
+                    Execute("Low Level Executor", () => LowLevelExecutor.Execute(module));
+                    Execute("JIT", () => ILCompiler.Compile(module).Run());
                 }
+                catch (Calc4Exception e)
                 {
-                    Stopwatch sw = Stopwatch.StartNew();
-                    Console.WriteLine($"Evaluated (low-level): {LowLevelExecutor.Execute(module)}");
-                    sw.Stop();
-                    Console.WriteLine($"Elapsed: {sw.Elapsed}");
-                    Console.WriteLine();
-                }
-                {
-                    Stopwatch sw = Stopwatch.StartNew();
-                    ICompiledModule<NumberType> compiledModule = ILCompiler.Compile(module);
-                    Console.WriteLine($"Evaluated (JIT): {compiledModule.Run()}");
-                    sw.Stop();
-                    Console.WriteLine($"Elapsed: {sw.Elapsed}");
+                    Console.WriteLine($"Error: {e.Message}");
                     Console.WriteLine();
                 }
             }
 
             /* ******************** */
 
-            try
-            {
-                // Compile
-                var context = CompilationContext.Empty;
-                var tokens = Lexer.Lex(text, ref context);
-                var op = Parser.Parse(tokens, ref context);
+            // Compile
+            var context = CompilationContext.Empty;
+            var tokens = Lexer.Lex(text, ref context);
+            var op = Parser.Parse(tokens, ref context);
 
-                // Execute
-                Console.WriteLine("----- Before optimized -----");
-                ExecuteCore(op, context);
+            // Execute
+            Console.WriteLine("----- Before optimized -----");
+            ExecuteCore(op, context);
 
-                // Optimize
-                Optimizer.Optimize<NumberType>(ref op, ref context);
+            // Optimize
+            Optimizer.Optimize<NumberType>(ref op, ref context);
 
-                // Execute
-                Console.WriteLine("----- After optimized -----");
-                ExecuteCore(op, context);
-            }
-            catch (Calc4Exception e)
-            {
-                Console.WriteLine($"Error: {e.Message}");
-                Console.WriteLine();
-            }
+            // Execute
+            Console.WriteLine("----- After optimized -----");
+            ExecuteCore(op, context);
         }
 
         private static void PrintTree(IOperator op, int depth = 0)
