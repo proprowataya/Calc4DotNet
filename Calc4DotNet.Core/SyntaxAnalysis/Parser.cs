@@ -72,7 +72,13 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
 
                         while (operands.Count < maxNumOperands)
                         {
-                            operands.Add(new Implement(ReadLower(), context).Parse());
+                            lower = ReadLower();
+                            if (lower.Count == 0)
+                            {
+                                throw new Calc4DotNet.Core.Exceptions.SomeOperandsMissingException();
+                            }
+
+                            operands.Add(new Implement(lower, context).Parse());
                             if (operands.Count < maxNumOperands)
                                 index++;
                         }

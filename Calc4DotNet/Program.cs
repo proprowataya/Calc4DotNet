@@ -69,19 +69,11 @@ namespace Calc4DotNet
                 // Execute
                 static void Execute(string type, Func<NumberType> executor)
                 {
-                    try
-                    {
-                        Stopwatch sw = Stopwatch.StartNew();
-                        Console.WriteLine($"Evaluated ({type}): {executor()}");
-                        sw.Stop();
-                        Console.WriteLine($"Elapsed: {sw.Elapsed}");
-                        Console.WriteLine();
-                    }
-                    catch (Calc4Exception e)
-                    {
-                        Console.WriteLine($"Error: {e.Message}");
-                        Console.WriteLine();
-                    }
+                    Stopwatch sw = Stopwatch.StartNew();
+                    Console.WriteLine($"Evaluated ({type}): {executor()}");
+                    sw.Stop();
+                    Console.WriteLine($"Elapsed: {sw.Elapsed}");
+                    Console.WriteLine();
                 }
 
                 Execute("Low Level Executor", () => LowLevelExecutor.Execute(module));
@@ -90,21 +82,29 @@ namespace Calc4DotNet
 
             /* ******************** */
 
-            // Compile
-            var context = CompilationContext.Empty;
-            var tokens = Lexer.Lex(text, ref context);
-            var op = Parser.Parse(tokens, ref context);
+            try
+            {
+                // Compile
+                var context = CompilationContext.Empty;
+                var tokens = Lexer.Lex(text, ref context);
+                var op = Parser.Parse(tokens, ref context);
 
-            // Execute
-            Console.WriteLine("----- Before optimized -----");
-            ExecuteCore(op, context);
+                // Execute
+                Console.WriteLine("----- Before optimized -----");
+                ExecuteCore(op, context);
 
-            // Optimize
-            Optimizer.Optimize<NumberType>(ref op, ref context);
+                // Optimize
+                Optimizer.Optimize<NumberType>(ref op, ref context);
 
-            // Execute
-            Console.WriteLine("----- After optimized -----");
-            ExecuteCore(op, context);
+                // Execute
+                Console.WriteLine("----- After optimized -----");
+                ExecuteCore(op, context);
+            }
+            catch (Calc4Exception e)
+            {
+                Console.WriteLine($"Error: {e.Message}");
+                Console.WriteLine();
+            }
         }
 
         private static void PrintTree(IOperator op, int depth = 0)
