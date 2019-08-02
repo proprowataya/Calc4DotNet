@@ -67,9 +67,9 @@ namespace Calc4DotNet
                 Console.WriteLine();
 
                 // Execute
-                try
+                static void Execute(string type, Func<NumberType> executor)
                 {
-                    static void Execute(string type, Func<NumberType> executor)
+                    try
                     {
                         Stopwatch sw = Stopwatch.StartNew();
                         Console.WriteLine($"Evaluated ({type}): {executor()}");
@@ -77,15 +77,15 @@ namespace Calc4DotNet
                         Console.WriteLine($"Elapsed: {sw.Elapsed}");
                         Console.WriteLine();
                     }
+                    catch (Calc4Exception e)
+                    {
+                        Console.WriteLine($"Error: {e.Message}");
+                        Console.WriteLine();
+                    }
+                }
 
-                    Execute("Low Level Executor", () => LowLevelExecutor.Execute(module));
-                    Execute("JIT", () => ILCompiler.Compile(module).Run());
-                }
-                catch (Calc4Exception e)
-                {
-                    Console.WriteLine($"Error: {e.Message}");
-                    Console.WriteLine();
-                }
+                Execute("Low Level Executor", () => LowLevelExecutor.Execute(module));
+                Execute("JIT", () => ILCompiler.Compile(module).Run());
             }
 
             /* ******************** */
