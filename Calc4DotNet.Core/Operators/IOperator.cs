@@ -107,7 +107,8 @@ namespace Calc4DotNet.Core.Operators
                 throw new ArgumentException(nameof(value));
         }
 
-        public IReadOnlyList<IOperator> Operands => new[] { Operand };
+        private IOperator[] operands = null;
+        public IReadOnlyList<IOperator> Operands => operands ??= new[] { Operand };
 
         public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
         public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
@@ -131,7 +132,8 @@ namespace Calc4DotNet.Core.Operators
             SupplementaryText = supplementaryText;
         }
 
-        public IReadOnlyList<IOperator> Operands => new[] { Left, Right };
+        private IOperator[] operands = null;
+        public IReadOnlyList<IOperator> Operands => operands ??= new[] { Left, Right };
 
         public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
         public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
@@ -153,7 +155,8 @@ namespace Calc4DotNet.Core.Operators
             SupplementaryText = supplementaryText;
         }
 
-        public IReadOnlyList<IOperator> Operands => new[] { Condition, IfTrue, IfFalse };
+        private IOperator[] operands = null;
+        public IReadOnlyList<IOperator> Operands => operands ??= new[] { Condition, IfTrue, IfFalse };
 
         public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
         public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
