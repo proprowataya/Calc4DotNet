@@ -6,6 +6,7 @@ namespace Calc4DotNet.Core.Operators
 {
     public interface IOperator
     {
+        string SupplementaryText { get; }
         IReadOnlyList<IOperator> Operands { get; }
 
         void Accept(IOperatorVisitor visitor);
