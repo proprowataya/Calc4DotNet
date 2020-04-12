@@ -162,7 +162,7 @@ namespace Calc4DotNet.Core.ILCompilation
                     case Opcode.GotoIfTrue:
                         if (typeof(TNumber) == typeof(BigInteger))
                         {
-                            temp = temp ?? il.DeclareLocal(typeof(TNumber));
+                            temp ??= il.DeclareLocal(typeof(TNumber));
                             Debug.Assert(temp.LocalIndex == 0); // Temp variable must be first variable in this method.
 
                             il.Emit(OpCodes.Stloc_0);

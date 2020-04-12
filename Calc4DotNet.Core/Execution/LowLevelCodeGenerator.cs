@@ -143,7 +143,7 @@ namespace Calc4DotNet.Core.Execution
 
             public void Visit(PreComputedOperator op)
             {
-                bool TryCastToShort(TNumber number, out short casted)
+                static bool TryCastToShort(TNumber number, out short casted)
                 {
                     try
                     {

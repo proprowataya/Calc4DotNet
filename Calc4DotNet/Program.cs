@@ -118,12 +118,12 @@ namespace Calc4DotNet
 
         private static void PrintLowLevelOperations(LowLevelModule<NumberType> module)
         {
-            void Print(ImmutableArray<LowLevelOperation> operations, string name)
+            static void Print(ImmutableArray<LowLevelOperation> operations, string name)
             {
                 Console.WriteLine($"Operator \"{name}\"");
                 for (int i = 0; i < operations.Length; i++)
                 {
-                    Console.WriteLine($"    {i.ToString().PadLeft(4)}: {operations[i].ToString()}");
+                    Console.WriteLine($"    {i,-4}: {operations[i]}");
                 }
             }
 
