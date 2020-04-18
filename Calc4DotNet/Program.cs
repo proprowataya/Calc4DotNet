@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Exceptions;
 using Calc4DotNet.Core.Execution;
@@ -12,99 +14,181 @@ using Calc4DotNet.Core.SyntaxAnalysis;
 
 namespace Calc4DotNet
 {
-    using NumberType = Int64;
-
     class Program
     {
         private const int Indent = 4;
+
+        private sealed class CommandLineArgsParseException : Exception
+        {
+            public CommandLineArgsParseException(string message) : base(message)
+            { }
+        }
 
         static void Main(string[] args)
         {
             Console.WriteLine("Calc4 Interpreter");
             Console.WriteLine();
 
+            Setting setting;
+            try
+            {
+                setting = ParseCommandLineArgs(args);
+            }
+            catch (CommandLineArgsParseException e)
+            {
+                Console.WriteLine($"Error: {e.Message}");
+                Environment.Exit(1);
+                return;
+            }
+
             while (true)
             {
                 Console.Write("> ");
                 string text = Console.ReadLine();
-
                 Console.WriteLine();
-                Execute(text);
+
+                if (setting.NumberType == typeof(Int32))
+                {
+                    ReplCore<Int32>(text, setting);
+                }
+                else if (setting.NumberType == typeof(Int64))
+                {
+                    ReplCore<Int64>(text, setting);
+                }
+                else if (setting.NumberType == typeof(Double))
+                {
+                    ReplCore<Double>(text, setting);
+                }
+                else if (setting.NumberType == typeof(BigInteger))
+                {
+                    ReplCore<BigInteger>(text, setting);
+                }
+                else
+                {
+                    Console.WriteLine($"Error: Type {setting.NumberType} is not supported.");
+                    Console.WriteLine();
+                }
             }
         }
 
-        private static void Execute(string text)
+        private static void ReplCore<TNumber>(string text, Setting setting)
         {
-            void ExecuteCore(IOperator op, CompilationContext context)
-            {
-                // Generate low-level operations
-                LowLevelModule<NumberType> module = LowLevelCodeGenerator.Generate<NumberType>(op, context);
-
-                // Print input and user-defined operators as trees
-                Console.WriteLine("Main");
-                Console.WriteLine("{");
-                PrintTree(op, 1);
-                Console.WriteLine("}");
-                Console.WriteLine();
-                foreach (var implement in context.OperatorImplements)
-                {
-                    Console.WriteLine($"Operator \"{implement.Definition.Name}\"");
-                    Console.WriteLine("{");
-                    PrintTree(implement.Operator, 1);
-                    Console.WriteLine("}");
-                    Console.WriteLine();
-                }
-
-                // Print low-level operations
-                Console.WriteLine("Low-level operation codes");
-                Console.WriteLine("{");
-                PrintLowLevelOperations(module);
-                if (!module.ConstTable.IsDefaultOrEmpty)
-                {
-                    Console.WriteLine("Constants: " + string.Join(", ", module.ConstTable.Select((num, i) => $"[{i}] = {num}")));
-                }
-                Console.WriteLine("}");
-                Console.WriteLine();
-
-                // Execute
-                static void Execute(string type, Func<NumberType> executor)
-                {
-                    Stopwatch sw = Stopwatch.StartNew();
-                    Console.WriteLine($"Evaluated ({type}): {executor()}");
-                    sw.Stop();
-                    Console.WriteLine($"Elapsed: {sw.Elapsed}");
-                    Console.WriteLine();
-                }
-
-                Execute("Low Level Executor", () => LowLevelExecutor.Execute(module));
-                Execute("JIT", () => ILCompiler.Compile(module).Run());
-            }
-
-            /* ******************** */
-
             try
             {
-                // Compile
-                var context = CompilationContext.Empty;
-                var tokens = Lexer.Lex(text, ref context);
-                var op = Parser.Parse(tokens, ref context);
+                // Create a Stopwatch instance
+                Stopwatch sw = Stopwatch.StartNew();
 
-                // Execute
-                Console.WriteLine("----- Before optimized -----");
-                ExecuteCore(op, context);
+                // Compile
+                CompilationContext context = CompilationContext.Empty;
+                List<IToken> tokens = Lexer.Lex(text, ref context);
+                IOperator op = Parser.Parse(tokens, ref context);
 
                 // Optimize
-                Optimizer.Optimize<NumberType>(ref op, ref context);
+                if (setting.Optimize)
+                {
+                    Optimizer.Optimize<TNumber>(ref op, ref context);
+                }
+
+                // Generate low-level code and IL module
+                LowLevelModule<TNumber> module = LowLevelCodeGenerator.Generate<TNumber>(op, context);
+                ICompiledModule<TNumber> ilModule = ILCompiler.Compile(module);
+
+                // Print detail information of operators and low-level module
+                if (setting.PrintDetailInformation)
+                {
+                    PrintDetailInformation<TNumber>(op, context, module);
+                }
 
                 // Execute
-                Console.WriteLine("----- After optimized -----");
-                ExecuteCore(op, context);
+                TNumber result = ilModule.Run();
+                TimeSpan elapsed = sw.Elapsed;
+
+                // Print
+                Console.WriteLine(result);
+                Console.WriteLine($"Elapsed: {elapsed}");
+                Console.WriteLine();
             }
             catch (Calc4Exception e)
             {
                 Console.WriteLine($"Error: {e.Message}");
                 Console.WriteLine();
             }
+        }
+
+        private static Setting ParseCommandLineArgs(string[] args)
+        {
+            Type numberType = typeof(Int64);
+            bool optimize = true;
+            bool printDetailInformation = false;
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                switch (args[i])
+                {
+                    case "--type":
+                    case "-t":
+                        // Specify number type
+                        if (i + 1 >= args.Length)
+                        {
+                            throw new CommandLineArgsParseException($"Option {args[i]} requires a parameter.");
+                        }
+
+                        numberType = (args[i + 1]) switch
+                        {
+                            "int32" => typeof(Int32),
+                            "int64" => typeof(Int64),
+                            "double" => typeof(Double),
+                            "bigint" => typeof(BigInteger),
+                            "biginteger" => typeof(BigInteger),
+                            _ => throw new CommandLineArgsParseException($"Type {args[i + 1]} is not supported."),
+                        };
+
+                        i++;
+                        break;
+                    case "-o":
+                        optimize = true;
+                        break;
+                    case "-od":
+                        optimize = false;
+                        break;
+                    case "--detail":
+                        printDetailInformation = true;
+                        break;
+                    default:
+                        throw new CommandLineArgsParseException($"Unknown option {args[i]}.");
+                }
+            }
+
+            return new Setting(numberType, optimize, printDetailInformation);
+        }
+
+        private static void PrintDetailInformation<TNumber>(IOperator op, CompilationContext context, LowLevelModule<TNumber> module)
+        {
+            // Print input and user-defined operators as trees
+            Console.WriteLine("Main");
+            Console.WriteLine("{");
+            PrintTree(op, 1);
+            Console.WriteLine("}");
+            Console.WriteLine();
+            foreach (var implement in context.OperatorImplements)
+            {
+                Console.WriteLine($"Operator \"{implement.Definition.Name}\"");
+                Console.WriteLine("{");
+                PrintTree(implement.Operator, 1);
+                Console.WriteLine("}");
+                Console.WriteLine();
+            }
+
+            // Print low-level operations
+            Console.WriteLine("Low-level operation codes");
+            Console.WriteLine("{");
+            PrintLowLevelOperations(module);
+            if (!module.ConstTable.IsDefaultOrEmpty)
+            {
+                Console.WriteLine("Constants: " + string.Join(", ", module.ConstTable.Select((num, i) => $"[{i}] = {num}")));
+            }
+            Console.WriteLine("}");
+            Console.WriteLine();
         }
 
         private static void PrintTree(IOperator op, int depth = 0)
@@ -116,7 +200,7 @@ namespace Calc4DotNet
             }
         }
 
-        private static void PrintLowLevelOperations(LowLevelModule<NumberType> module)
+        private static void PrintLowLevelOperations<TNumber>(LowLevelModule<TNumber> module)
         {
             static void Print(ImmutableArray<LowLevelOperation> operations, string name)
             {
