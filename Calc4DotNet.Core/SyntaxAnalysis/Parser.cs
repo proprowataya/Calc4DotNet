@@ -29,7 +29,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
             {
                 this.tokens = tokens ?? throw new ArgumentNullException(nameof(tokens));
                 this.context = context ?? throw new ArgumentNullException(nameof(context));
-                this.maxNumOperands = tokens.Max(t => t.NumOperands);
+                this.maxNumOperands = tokens.Count > 0 ? tokens.Max(t => t.NumOperands) : 0;
                 this.index = 0;
             }
 
