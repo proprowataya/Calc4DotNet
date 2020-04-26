@@ -49,8 +49,8 @@ namespace Calc4DotNet.Core.Execution
             ref TNumber bottom = ref stack[0];
             ref int ptrTop = ref ptrStack[0];
             ref TNumber stackBegin = ref stack[0];
-            ref TNumber stackEnd = ref Unsafe.Add(ref stack[0], stack.Length);
-            ref int ptrStackEnd = ref Unsafe.Add(ref ptrStack[0], ptrStack.Length);
+            ref TNumber stackEnd = ref stack[^1];
+            ref int ptrStackEnd = ref ptrStack[^1];
             ref LowLevelOperation op = ref firstOperation;
 
             while (true)
