@@ -34,9 +34,11 @@ namespace Calc4DotNet.Test
             ("D[tarai|x,y,z|x <= y ? y ? (((x - 1){tarai}y{tarai}z){tarai}((y - 1){tarai}z{tarai}x){tarai}((z - 1){tarai}x{tarai}y))] 10{tarai}5{tarai}5", 5, null),
         };
 
+        private static readonly Type[] TestTypes = new[] { typeof(Int32), typeof(Int64), typeof(Double), typeof(BigInteger) };
+
         public static readonly object[][] Source =
             (from test in TestCases
-             from type in new[] { typeof(Int32), typeof(Int64), typeof(Double), typeof(BigInteger) }
+             from type in TestTypes
              where !test.skipTypes?.Contains(type) ?? true
              from optimize in new[] { false, true }
              select new object[] { test.text, test.expected, type, optimize })
@@ -105,6 +107,23 @@ namespace Calc4DotNet.Test
                 var compiled = ILCompiler.Compile(module);
                 return compiled.Run();
             });
+        }
+
+        [Fact]
+        public static void TestStackOverflow()
+        {
+            const string text = "D[x||{x} + 1] {x}";
+
+            foreach (var type in TestTypes)
+            {
+                foreach (var optimize in new[] { true, false })
+                {
+                    Assert.Throws<Calc4DotNet.Core.Exceptions.StackOverflowException>(() =>
+                    {
+                        TestByLowLevelExecutor(text, Activator.CreateInstance(type) /* dummy */, type, optimize);
+                    });
+                }
+            }
         }
     }
 }

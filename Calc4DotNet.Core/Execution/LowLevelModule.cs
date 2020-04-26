@@ -20,10 +20,11 @@ namespace Calc4DotNet.Core.Execution
             UserDefinedOperators = userDefinedOperators;
         }
 
-        public LowLevelOperation[] FlattenOperations()
+        public (LowLevelOperation[] Operations, int[] MaxStackSizes) FlattenOperations()
         {
             int totalNumOperations = EntryPoint.Length + UserDefinedOperators.Sum(t => t.Operations.Length);
             LowLevelOperation[] result = new LowLevelOperation[totalNumOperations];
+            int[] maxStackSizes = new int[totalNumOperations];
             int[] startAddresses = new int[UserDefinedOperators.Length];
 
             int index = 0;
@@ -70,19 +71,21 @@ namespace Calc4DotNet.Core.Execution
                 switch (result[i].Opcode)
                 {
                     case Opcode.Call:
-                        result[i] = new LowLevelOperation(result[i].Opcode, startAddresses[result[i].Value] - 1);
+                        int operatorNo = result[i].Value;
+                        result[i] = new LowLevelOperation(result[i].Opcode, startAddresses[operatorNo] - 1);
+                        maxStackSizes[result[i].Value] = UserDefinedOperators[operatorNo].MaxStackSize;
                         break;
                     default:
                         break;
                 }
             }
 
-            return result;
+            return (result, maxStackSizes);
         }
 
         public void Serialize(Stream stream)
         {
-            LowLevelOperation[] operations = FlattenOperations();
+            LowLevelOperation[] operations = FlattenOperations().Operations;
             stream.Write(MemoryMarshal.AsBytes(operations.AsSpan()));
         }
     }

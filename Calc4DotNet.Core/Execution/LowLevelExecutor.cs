@@ -33,125 +33,209 @@ namespace Calc4DotNet.Core.Execution
         private static TNumber ExecuteCore<TNumber, TNumberComputer>(LowLevelModule<TNumber> module)
             where TNumberComputer : INumberComputer<TNumber>
         {
-            try
+            TNumberComputer c = default;
+
+            var (operationsArray, maxStackSizesArray) = module.FlattenOperations();
+            Span<LowLevelOperation> operations = stackalloc LowLevelOperation[operationsArray.Length];
+            Span<int> maxStackSizes = stackalloc int[maxStackSizesArray.Length];
+            operationsArray.AsSpan().CopyTo(operations);
+            maxStackSizesArray.AsSpan().CopyTo(maxStackSizes);
+            ref LowLevelOperation firstOperation = ref operations[0];
+            ref int firstStackSizes = ref maxStackSizes[0];
+
+            TNumber[] stack = new TNumber[StackSize];
+            int[] ptrStack = new int[PtrStackSize];
+            ref TNumber top = ref stack[0];
+            ref TNumber bottom = ref stack[0];
+            ref int ptrTop = ref ptrStack[0];
+            ref TNumber stackBegin = ref stack[0];
+            ref TNumber stackEnd = ref Unsafe.Add(ref stack[0], stack.Length);
+            ref int ptrStackEnd = ref Unsafe.Add(ref ptrStack[0], ptrStack.Length);
+            ref LowLevelOperation op = ref firstOperation;
+
+            while (true)
             {
-                TNumberComputer c = default;
+                VerifyRange(operations, ref op);
 
-                LowLevelOperation[] operationsArray = module.FlattenOperations();
-                Span<LowLevelOperation> operations = stackalloc LowLevelOperation[operationsArray.Length];
-                operationsArray.AsSpan().CopyTo(operations);
-                ref LowLevelOperation firstOperation = ref operations[0];
-
-                TNumber[] stack = new TNumber[StackSize];
-                int[] ptrStack = new int[PtrStackSize];
-                int top = 0, bottom = 0;
-                int ptrIndex = 0;
-                ref LowLevelOperation op = ref firstOperation;
-
-                while (true)
+                switch (op.Opcode)
                 {
-                    Debug.Assert((uint)Unsafe.ByteOffset(ref firstOperation, ref op) / (uint)Unsafe.SizeOf<LowLevelOperation>() < (uint)operations.Length);
-
-                    switch (op.Opcode)
-                    {
-                        case Opcode.Push:
-                            stack[top++] = c.Zero;
-                            break;
-                        case Opcode.Pop:
-                            top--;
-                            break;
-                        case Opcode.LoadConst:
-                            stack[top++] = c.FromInt(op.Value);
-                            break;
-                        case Opcode.LoadConstTable:
-                            stack[top++] = module.ConstTable[op.Value];
-                            break;
-                        case Opcode.LoadArg:
-                            stack[top++] = stack[bottom - op.Value];
-                            break;
-                        case Opcode.StoreArg:
-                            stack[bottom - op.Value] = stack[--top];
-                            break;
-                        case Opcode.Input:
-                            throw new NotImplementedException();
-                        case Opcode.Add:
-                            top--;
-                            stack[top - 1] = c.Add(stack[top - 1], stack[top]);
-                            break;
-                        case Opcode.Sub:
-                            top--;
-                            stack[top - 1] = c.Subtract(stack[top - 1], stack[top]);
-                            break;
-                        case Opcode.Mult:
-                            top--;
-                            stack[top - 1] = c.Multiply(stack[top - 1], stack[top]);
-                            break;
-                        case Opcode.Div:
-                            top--;
-                            stack[top - 1] = c.Divide(stack[top - 1], stack[top]);
-                            break;
-                        case Opcode.Mod:
-                            top--;
-                            stack[top - 1] = c.Modulo(stack[top - 1], stack[top]);
-                            break;
-                        case Opcode.Goto:
+                    case Opcode.Push:
+                        VerifyRange(stack, ref top);
+                        top = c.Zero;
+                        top = ref Unsafe.Add(ref top, 1);
+                        break;
+                    case Opcode.Pop:
+                        top = ref Unsafe.Add(ref top, -1);
+                        break;
+                    case Opcode.LoadConst:
+                        VerifyRange(stack, ref top);
+                        top = c.FromInt(op.Value);
+                        top = ref Unsafe.Add(ref top, 1);
+                        break;
+                    case Opcode.LoadConstTable:
+                        VerifyRange(stack, ref top);
+                        top = module.ConstTable[op.Value];
+                        top = ref Unsafe.Add(ref top, 1);
+                        break;
+                    case Opcode.LoadArg:
+                        VerifyRange(stack, ref top);
+                        top = Unsafe.Add(ref bottom, -op.Value);
+                        top = ref Unsafe.Add(ref top, 1);
+                        break;
+                    case Opcode.StoreArg:
+                        top = ref Unsafe.Add(ref top, -1);
+                        VerifyRange(stack, ref top);
+                        VerifyRange(stack, ref Unsafe.Add(ref bottom, -op.Value));
+                        Unsafe.Add(ref bottom, -op.Value) = top;
+                        break;
+                    case Opcode.Input:
+                        throw new NotImplementedException();
+                    case Opcode.Add:
+                        top = ref Unsafe.Add(ref top, -1);
+                        VerifyRange(stack, ref top);
+                        VerifyRange(stack, ref Unsafe.Add(ref top, -1));
+                        Unsafe.Add(ref top, -1) = c.Add(Unsafe.Add(ref top, -1), top);
+                        break;
+                    case Opcode.Sub:
+                        top = ref Unsafe.Add(ref top, -1);
+                        VerifyRange(stack, ref top);
+                        VerifyRange(stack, ref Unsafe.Add(ref top, -1));
+                        Unsafe.Add(ref top, -1) = c.Subtract(Unsafe.Add(ref top, -1), top);
+                        break;
+                    case Opcode.Mult:
+                        top = ref Unsafe.Add(ref top, -1);
+                        VerifyRange(stack, ref top);
+                        VerifyRange(stack, ref Unsafe.Add(ref top, -1));
+                        Unsafe.Add(ref top, -1) = c.Multiply(Unsafe.Add(ref top, -1), top);
+                        break;
+                    case Opcode.Div:
+                        top = ref Unsafe.Add(ref top, -1);
+                        VerifyRange(stack, ref top);
+                        VerifyRange(stack, ref Unsafe.Add(ref top, -1));
+                        Unsafe.Add(ref top, -1) = c.Divide(Unsafe.Add(ref top, -1), top);
+                        break;
+                    case Opcode.Mod:
+                        top = ref Unsafe.Add(ref top, -1);
+                        VerifyRange(stack, ref top);
+                        VerifyRange(stack, ref Unsafe.Add(ref top, -1));
+                        Unsafe.Add(ref top, -1) = c.Modulo(Unsafe.Add(ref top, -1), top);
+                        break;
+                    case Opcode.Goto:
+                        op = ref Unsafe.Add(ref firstOperation, op.Value);
+                        break;
+                    case Opcode.GotoIfTrue:
+                        top = ref Unsafe.Add(ref top, -1);
+                        VerifyRange(stack, ref top);
+                        if (c.NotEquals(top, c.Zero))
+                        {
                             op = ref Unsafe.Add(ref firstOperation, op.Value);
-                            break;
-                        case Opcode.GotoIfTrue:
-                            if (c.NotEquals(stack[--top], c.Zero))
-                            {
-                                op = ref Unsafe.Add(ref firstOperation, op.Value);
-                            }
-                            break;
-                        case Opcode.GotoIfEqual:
-                            top -= 2;
-                            if (c.Equals(stack[top], stack[top + 1]))
-                            {
-                                op = ref Unsafe.Add(ref firstOperation, op.Value);
-                            }
-                            break;
-                        case Opcode.GotoIfLessThan:
-                            top -= 2;
-                            if (c.LessThan(stack[top], stack[top + 1]))
-                            {
-                                op = ref Unsafe.Add(ref firstOperation, op.Value);
-                            }
-                            break;
-                        case Opcode.GotoIfLessThanOrEqual:
-                            top -= 2;
-                            if (c.LessThanOrEquals(stack[top], stack[top + 1]))
-                            {
-                                op = ref Unsafe.Add(ref firstOperation, op.Value);
-                            }
-                            break;
-                        case Opcode.Call:
-                            ptrStack[ptrIndex++] = (int)Unsafe.ByteOffset(ref firstOperation, ref op);          // Push current program counter
-                            ptrStack[ptrIndex++] = bottom;                                                      // Push current stack bottom
-                            bottom = top;                                                                       // Create new stack frame
-                            op = ref Unsafe.Add(ref firstOperation, op.Value);                                  // Branch
-                            break;
-                        case Opcode.Return:
-                            TNumber returnValue = stack[top - 1];                                               // Restore previous stack top
-                            top = bottom - op.Value + 1;                                                        // Restore previous stack top
-                                                                                                                // while removing arguments from stack
-                                                                                                                // (We ensure space of returning value)
-                            stack[top - 1] = returnValue;                                                       // Store returning value on stack
-                            bottom = ptrStack[--ptrIndex];                                                      // Pop previous stack bottom
-                            op = ref Unsafe.AddByteOffset(ref firstOperation, (IntPtr)ptrStack[--ptrIndex]);    // Pop previous program counter
-                            break;
-                        case Opcode.Halt:
-                            return stack[top - 1];
-                        case Opcode.Lavel:
-                        default:
-                            throw new InvalidOperationException();
-                    }
+                        }
+                        break;
+                    case Opcode.GotoIfEqual:
+                        top = ref Unsafe.Add(ref top, -2);
+                        VerifyRange(stack, ref top);
+                        VerifyRange(stack, ref Unsafe.Add(ref top, 1));
+                        if (c.Equals(top, Unsafe.Add(ref top, 1)))
+                        {
+                            op = ref Unsafe.Add(ref firstOperation, op.Value);
+                        }
+                        break;
+                    case Opcode.GotoIfLessThan:
+                        top = ref Unsafe.Add(ref top, -2);
+                        VerifyRange(stack, ref top);
+                        VerifyRange(stack, ref Unsafe.Add(ref top, 1));
+                        if (c.LessThan(top, Unsafe.Add(ref top, 1)))
+                        {
+                            op = ref Unsafe.Add(ref firstOperation, op.Value);
+                        }
+                        break;
+                    case Opcode.GotoIfLessThanOrEqual:
+                        top = ref Unsafe.Add(ref top, -2);
+                        VerifyRange(stack, ref top);
+                        VerifyRange(stack, ref Unsafe.Add(ref top, 1));
+                        if (c.LessThanOrEquals(top, Unsafe.Add(ref top, 1)))
+                        {
+                            op = ref Unsafe.Add(ref firstOperation, op.Value);
+                        }
+                        break;
+                    case Opcode.Call:
+                        // Check stack overflow
+                        VerifyRange(maxStackSizes, ref Unsafe.Add(ref firstStackSizes, op.Value));
+                        if (Unsafe.IsAddressGreaterThan(ref Unsafe.Add(ref top, Unsafe.Add(ref firstStackSizes, op.Value)),
+                                                        ref stackEnd))
+                        {
+                            ThrowStackOverflowException();
+                        }
 
-                    op = ref Unsafe.Add(ref op, 1);
+                        if (Unsafe.IsAddressGreaterThan(ref Unsafe.Add(ref ptrTop, 2), ref ptrStackEnd))
+                        {
+                            ThrowStackOverflowException();
+                        }
+
+                        // Push current program counter
+                        VerifyRange(ptrStack, ref ptrTop);
+                        ptrTop = (int)Unsafe.ByteOffset(ref firstOperation, ref op);
+                        ptrTop = ref Unsafe.Add(ref ptrTop, 1);
+
+                        // Push current stack bottom
+                        VerifyRange(ptrStack, ref ptrTop);
+                        ptrTop = (int)Unsafe.ByteOffset(ref stackBegin, ref bottom);
+                        ptrTop = ref Unsafe.Add(ref ptrTop, 1);
+
+                        // Create new stack frame
+                        bottom = ref top;
+
+                        // Branch
+                        op = ref Unsafe.Add(ref firstOperation, op.Value);
+                        break;
+                    case Opcode.Return:
+                        // Store returning value
+                        VerifyRange(stack, ref Unsafe.Add(ref top, -1));
+                        TNumber returnValue = Unsafe.Add(ref top, -1);
+
+                        // Restore previous stack top while removing arguments from stack
+                        // (We ensure space of returning value)
+                        top = ref Unsafe.Add(ref bottom, -op.Value + 1);
+
+                        // Store returning value on stack
+                        VerifyRange(stack, ref Unsafe.Add(ref top, -1));
+                        Unsafe.Add(ref top, -1) = returnValue;
+
+                        // Pop previous stack bottom
+                        ptrTop = ref Unsafe.Add(ref ptrTop, -1);
+                        VerifyRange(ptrStack, ref ptrTop);
+                        bottom = ref Unsafe.AddByteOffset(ref stackBegin, (IntPtr)ptrTop);
+
+                        // Pop previous program counter
+                        ptrTop = ref Unsafe.Add(ref ptrTop, -1);
+                        VerifyRange(ptrStack, ref ptrTop);
+                        op = ref Unsafe.AddByteOffset(ref firstOperation, (IntPtr)ptrTop);
+                        break;
+                    case Opcode.Halt:
+                        VerifyRange(stack, ref Unsafe.Add(ref top, -1));
+                        return Unsafe.Add(ref top, -1);
+                    case Opcode.Lavel:
+                    default:
+                        throw new InvalidOperationException();
                 }
+
+                op = ref Unsafe.Add(ref op, 1);
             }
-            catch (IndexOutOfRangeException)
+        }
+
+        private static void ThrowStackOverflowException()
+        {
+            throw new Calc4DotNet.Core.Exceptions.StackOverflowException();
+        }
+
+        [Conditional("DEBUG")]
+        private static void VerifyRange<T>(Span<T> array, ref T ptr)
+        {
+            ulong index = (ulong)Unsafe.ByteOffset(ref array[0], ref ptr) / (ulong)Unsafe.SizeOf<T>();
+
+            if (index >= (ulong)array.Length)
             {
-                throw new Calc4DotNet.Core.Exceptions.StackOverflowException();
+                throw new IndexOutOfRangeException();
             }
         }
     }
