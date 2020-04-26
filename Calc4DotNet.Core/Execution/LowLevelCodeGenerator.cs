@@ -32,7 +32,11 @@ namespace Calc4DotNet.Core.Execution
             {
                 var visitor = new Visitor<TNumber>(context, constTable, operatorLabels, implement.Definition);
                 visitor.Generate(implement.Operator);
-                userDefinedOperators.Add(new LowLevelUserDefinedOperator(implement.Definition, visitor.Operations.ToImmutableArray()));
+                if (visitor.StackSize != 0)
+                {
+                    throw new InvalidOperationException($"Stacksize is not zero: {visitor.StackSize}");
+                }
+                userDefinedOperators.Add(new LowLevelUserDefinedOperator(implement.Definition, visitor.Operations.ToImmutableArray(), visitor.MaxStackSize));
             }
 
             // Generate Main code
@@ -59,8 +63,27 @@ namespace Calc4DotNet.Core.Execution
 
             private List<LowLevelOperation> list = new List<LowLevelOperation>();
             private int nextLabel = OperatorBeginLabel;
+            private int stackSize = 0;
+            private int maxStackSize = 0;
 
             public List<LowLevelOperation> Operations => list;
+
+            public int StackSize
+            {
+                get => stackSize;
+
+                set
+                {
+                    if (value < 0)
+                    {
+                        throw new InvalidOperationException($"Stacksize is negative: {value}");
+                    }
+                    stackSize = value;
+                    maxStackSize = Math.Max(maxStackSize, value);
+                }
+            }
+
+            public int MaxStackSize => maxStackSize;
 
             public Visitor(CompilationContext context, List<TNumber> constTable, Dictionary<OperatorDefinition, int> operatorLabels, OperatorDefinition definition)
             {
@@ -74,19 +97,19 @@ namespace Calc4DotNet.Core.Execution
             {
                 // Add lavel at begin
                 Debug.Assert(nextLabel == OperatorBeginLabel);
-                list.Add(new LowLevelOperation(Opcode.Lavel, nextLabel++));
+                AddOperation(new LowLevelOperation(Opcode.Lavel, nextLabel++));
 
                 if (definition == null)
                 {
                     // Generate Main code
                     op.Accept(this);
-                    list.Add(new LowLevelOperation(Opcode.Halt));
+                    AddOperation(new LowLevelOperation(Opcode.Halt));
                 }
                 else
                 {
                     // Generate user-defined operators' codes
                     op.Accept(this);
-                    list.Add(new LowLevelOperation(Opcode.Return, definition.NumOperands));
+                    AddOperation(new LowLevelOperation(Opcode.Return, definition.NumOperands));
                 }
 
                 ResolveLavels();
@@ -134,11 +157,57 @@ namespace Calc4DotNet.Core.Execution
                 list = newList;
             }
 
+            private void AddOperation(LowLevelOperation operation)
+            {
+                list.Add(operation);
+
+                // Change stacksize
+                switch (operation.Opcode)
+                {
+                    case Opcode.Push:
+                    case Opcode.LoadConst:
+                    case Opcode.LoadConstTable:
+                    case Opcode.LoadArg:
+                    case Opcode.Input:
+                        StackSize++;
+                        break;
+                    case Opcode.Pop:
+                    case Opcode.StoreArg:
+                    case Opcode.Add:
+                    case Opcode.Sub:
+                    case Opcode.Mult:
+                    case Opcode.Div:
+                    case Opcode.Mod:
+                    case Opcode.GotoIfTrue:
+                    case Opcode.Return:
+                    case Opcode.Halt:
+                        StackSize--;
+                        break;
+                    case Opcode.Goto:
+                        // Stacksize will not change
+                        break;
+                    case Opcode.GotoIfEqual:
+                    case Opcode.GotoIfLessThan:
+                    case Opcode.GotoIfLessThanOrEqual:
+                        StackSize -= 2;
+                        break;
+                    case Opcode.Call:
+                        StackSize -= operatorLabels.Single(p => p.Value == operation.Value).Key.NumOperands - 1;
+                        break;
+                    case Opcode.Lavel:
+                        // Do nothing
+                        break;
+                    default:
+                        Debug.Assert(false);
+                        break;
+                }
+            }
+
             /* ******************** */
 
             public void Visit(ZeroOperator op)
             {
-                list.Add(new LowLevelOperation(Opcode.LoadConst, 0));
+                AddOperation(new LowLevelOperation(Opcode.LoadConst, 0));
             }
 
             public void Visit(PreComputedOperator op)
@@ -159,7 +228,7 @@ namespace Calc4DotNet.Core.Execution
 
                 if (TryCastToShort((TNumber)op.Value, out var value))
                 {
-                    list.Add(new LowLevelOperation(Opcode.LoadConst, value));
+                    AddOperation(new LowLevelOperation(Opcode.LoadConst, value));
                 }
                 else
                 {
@@ -168,18 +237,18 @@ namespace Calc4DotNet.Core.Execution
                     // So we use constTable.
                     int no = constTable.Count;
                     constTable.Add((TNumber)op.Value);
-                    list.Add(new LowLevelOperation(Opcode.LoadConstTable, no));
+                    AddOperation(new LowLevelOperation(Opcode.LoadConstTable, no));
                 }
             }
 
             public void Visit(ArgumentOperator op)
             {
-                list.Add(new LowLevelOperation(Opcode.LoadArg, GetArgumentAddress(definition.NumOperands, op.Index)));
+                AddOperation(new LowLevelOperation(Opcode.LoadArg, GetArgumentAddress(definition.NumOperands, op.Index)));
             }
 
             public void Visit(DefineOperator op)
             {
-                list.Add(new LowLevelOperation(Opcode.LoadConst, 0));
+                AddOperation(new LowLevelOperation(Opcode.LoadConst, 0));
             }
 
             public void Visit(ParenthesisOperator op)
@@ -189,17 +258,17 @@ namespace Calc4DotNet.Core.Execution
                 {
                     operators[i].Accept(this);
                     if (i < operators.Length - 1)
-                        list.Add(new LowLevelOperation(Opcode.Pop));
+                        AddOperation(new LowLevelOperation(Opcode.Pop));
                 }
             }
 
             public void Visit(DecimalOperator op)
             {
                 op.Operand.Accept(this);
-                list.Add(new LowLevelOperation(Opcode.LoadConst, 10));
-                list.Add(new LowLevelOperation(Opcode.Mult));
-                list.Add(new LowLevelOperation(Opcode.LoadConst, op.Value));
-                list.Add(new LowLevelOperation(Opcode.Add));
+                AddOperation(new LowLevelOperation(Opcode.LoadConst, 10));
+                AddOperation(new LowLevelOperation(Opcode.Mult));
+                AddOperation(new LowLevelOperation(Opcode.LoadConst, op.Value));
+                AddOperation(new LowLevelOperation(Opcode.Add));
             }
 
             public void Visit(BinaryOperator op)
@@ -208,12 +277,12 @@ namespace Calc4DotNet.Core.Execution
                 {
                     int ifFalse = nextLabel++, end = nextLabel++;
 
-                    list.Add(new LowLevelOperation(opcode, ifFalse));
-                    list.Add(new LowLevelOperation(Opcode.LoadConst, reverse ? 1 : 0));
-                    list.Add(new LowLevelOperation(Opcode.Goto, end));
-                    list.Add(new LowLevelOperation(Opcode.Lavel, ifFalse));
-                    list.Add(new LowLevelOperation(Opcode.LoadConst, reverse ? 0 : 1));
-                    list.Add(new LowLevelOperation(Opcode.Lavel, end));
+                    AddOperation(new LowLevelOperation(opcode, ifFalse));
+                    AddOperation(new LowLevelOperation(Opcode.LoadConst, reverse ? 1 : 0));
+                    AddOperation(new LowLevelOperation(Opcode.Goto, end));
+                    AddOperation(new LowLevelOperation(Opcode.Lavel, ifFalse));
+                    AddOperation(new LowLevelOperation(Opcode.LoadConst, reverse ? 0 : 1));
+                    AddOperation(new LowLevelOperation(Opcode.Lavel, end));
                 }
 
                 /* ******************** */
@@ -224,19 +293,19 @@ namespace Calc4DotNet.Core.Execution
                 switch (op.Type)
                 {
                     case BinaryType.Add:
-                        list.Add(new LowLevelOperation(Opcode.Add));
+                        AddOperation(new LowLevelOperation(Opcode.Add));
                         break;
                     case BinaryType.Sub:
-                        list.Add(new LowLevelOperation(Opcode.Sub));
+                        AddOperation(new LowLevelOperation(Opcode.Sub));
                         break;
                     case BinaryType.Mult:
-                        list.Add(new LowLevelOperation(Opcode.Mult));
+                        AddOperation(new LowLevelOperation(Opcode.Mult));
                         break;
                     case BinaryType.Div:
-                        list.Add(new LowLevelOperation(Opcode.Div));
+                        AddOperation(new LowLevelOperation(Opcode.Div));
                         break;
                     case BinaryType.Mod:
-                        list.Add(new LowLevelOperation(Opcode.Mod));
+                        AddOperation(new LowLevelOperation(Opcode.Mod));
                         break;
                     case BinaryType.Equal:
                         EmitComparisonBranch(Opcode.GotoIfEqual, reverse: false);
@@ -272,17 +341,20 @@ namespace Calc4DotNet.Core.Execution
                     {
                         binary.Left.Accept(this);
                         binary.Right.Accept(this);
-                        list.Add(new LowLevelOperation(opcode, ifTrueLabel));
+                        AddOperation(new LowLevelOperation(opcode, ifTrueLabel));
+
+                        int savedStackSize = StackSize;
                         ifFalse.Accept(this);
                         if (list.Last(x => x.Opcode != Opcode.Lavel).Opcode != Opcode.Goto)
                         {
                             // "list.Last().Opcode == Opcode.Goto" means
                             // elimination of "Call" (tail-call)
-                            list.Add(new LowLevelOperation(Opcode.Goto, endLabel));
+                            AddOperation(new LowLevelOperation(Opcode.Goto, endLabel));
                         }
-                        list.Add(new LowLevelOperation(Opcode.Lavel, ifTrueLabel));
+                        AddOperation(new LowLevelOperation(Opcode.Lavel, ifTrueLabel));
+                        StackSize = savedStackSize;
                         ifTrue.Accept(this);
-                        list.Add(new LowLevelOperation(Opcode.Lavel, endLabel));
+                        AddOperation(new LowLevelOperation(Opcode.Lavel, endLabel));
                     }
 
                     switch (binary.Type)
@@ -314,17 +386,20 @@ namespace Calc4DotNet.Core.Execution
                 }
 
                 op.Condition.Accept(this);
-                list.Add(new LowLevelOperation(Opcode.GotoIfTrue, ifTrueLabel));
+                AddOperation(new LowLevelOperation(Opcode.GotoIfTrue, ifTrueLabel));
+
+                int savedStackSize = StackSize;
                 op.IfFalse.Accept(this);
                 if (list.Last(x => x.Opcode != Opcode.Lavel).Opcode != Opcode.Goto)
                 {
                     // "list.Last().Opcode == Opcode.Goto" means
                     // elimination of "Call" (tail-call)
-                    list.Add(new LowLevelOperation(Opcode.Goto, endLabel));
+                    AddOperation(new LowLevelOperation(Opcode.Goto, endLabel));
                 }
-                list.Add(new LowLevelOperation(Opcode.Lavel, ifTrueLabel));
+                AddOperation(new LowLevelOperation(Opcode.Lavel, ifTrueLabel));
+                StackSize = savedStackSize;
                 op.IfTrue.Accept(this);
-                list.Add(new LowLevelOperation(Opcode.Lavel, endLabel));
+                AddOperation(new LowLevelOperation(Opcode.Lavel, endLabel));
             }
 
             public void Visit(UserDefinedOperator op)
@@ -338,14 +413,18 @@ namespace Calc4DotNet.Core.Execution
                 {
                     for (int i = op.Operands.Length - 1; i >= 0; i--)
                     {
-                        list.Add(new LowLevelOperation(Opcode.StoreArg, GetArgumentAddress(definition.NumOperands, i)));
+                        AddOperation(new LowLevelOperation(Opcode.StoreArg, GetArgumentAddress(definition.NumOperands, i)));
                     }
 
-                    list.Add(new LowLevelOperation(Opcode.Goto, OperatorBeginLabel));
+                    AddOperation(new LowLevelOperation(Opcode.Goto, OperatorBeginLabel));
+
+                    // If we eliminate tail-call, there are no values left in the stack.
+                    // We treat as if there are one returning value in the stack.
+                    StackSize++;
                 }
                 else
                 {
-                    list.Add(new LowLevelOperation(Opcode.Call, operatorLabels[op.Definition]));
+                    AddOperation(new LowLevelOperation(Opcode.Call, operatorLabels[op.Definition]));
                 }
             }
 
