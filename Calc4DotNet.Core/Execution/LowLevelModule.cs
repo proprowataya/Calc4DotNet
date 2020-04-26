@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.Execution
 {
@@ -12,9 +11,9 @@ namespace Calc4DotNet.Core.Execution
     {
         public ImmutableArray<LowLevelOperation> EntryPoint { get; }
         public ImmutableArray<TNumber> ConstTable { get; }
-        public ImmutableArray<(OperatorDefinition Definition, ImmutableArray<LowLevelOperation> Operations)> UserDefinedOperators { get; }
+        public ImmutableArray<LowLevelUserDefinedOperator> UserDefinedOperators { get; }
 
-        public LowLevelModule(ImmutableArray<LowLevelOperation> entryPoint, ImmutableArray<TNumber> constTable, ImmutableArray<(OperatorDefinition Definition, ImmutableArray<LowLevelOperation> Operations)> userDefinedOperators)
+        public LowLevelModule(ImmutableArray<LowLevelOperation> entryPoint, ImmutableArray<TNumber> constTable, ImmutableArray<LowLevelUserDefinedOperator> userDefinedOperators)
         {
             EntryPoint = entryPoint;
             ConstTable = constTable;

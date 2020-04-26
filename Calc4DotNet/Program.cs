@@ -229,9 +229,9 @@ namespace Calc4DotNet
             }
 
             Print(module.EntryPoint, "Main");
-            foreach (var (definition, operations) in module.UserDefinedOperators)
+            foreach (var userDefinedOperator in module.UserDefinedOperators)
             {
-                Print(operations, definition.Name);
+                Print(userDefinedOperator.Operations, userDefinedOperator.Definition.Name);
             }
         }
     }

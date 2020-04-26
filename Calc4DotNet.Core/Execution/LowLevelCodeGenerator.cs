@@ -17,7 +17,7 @@ namespace Calc4DotNet.Core.Execution
         public static LowLevelModule<TNumber> Generate<TNumber>(IOperator op, CompilationContext context)
         {
             var constTable = new List<TNumber>();
-            var userDefinedOperators = ImmutableArray.CreateBuilder<(OperatorDefinition Definition, ImmutableArray<LowLevelOperation> Operations)>();
+            var userDefinedOperators = ImmutableArray.CreateBuilder<LowLevelUserDefinedOperator>();
             var operatorLabels = new Dictionary<OperatorDefinition, int>();
 
             // Initialize operatorLabels
@@ -32,7 +32,7 @@ namespace Calc4DotNet.Core.Execution
             {
                 var visitor = new Visitor<TNumber>(context, constTable, operatorLabels, implement.Definition);
                 visitor.Generate(implement.Operator);
-                userDefinedOperators.Add((implement.Definition, visitor.Operations.ToImmutableArray()));
+                userDefinedOperators.Add(new LowLevelUserDefinedOperator(implement.Definition, visitor.Operations.ToImmutableArray()));
             }
 
             // Generate Main code
