@@ -91,7 +91,6 @@ namespace Calc4DotNet
 
                 // Generate low-level code and IL module
                 LowLevelModule<TNumber> module = LowLevelCodeGenerator.Generate<TNumber>(op, context);
-                ICompiledModule<TNumber> ilModule = ILCompiler.Compile(module);
 
                 // Print detail information of operators and low-level module
                 if (setting.PrintDetailInformation)
@@ -100,7 +99,21 @@ namespace Calc4DotNet
                 }
 
                 // Execute
-                TNumber result = ilModule.Run();
+                TNumber result;
+                if (setting.ExecutorType == ExecutorType.LowLevel)
+                {
+                    result = LowLevelExecutor.Execute((dynamic)module);
+                }
+                else if (setting.ExecutorType == ExecutorType.JIT)
+                {
+                    ICompiledModule<TNumber> ilModule = ILCompiler.Compile(module);
+                    result = ilModule.Run();
+                }
+                else
+                {
+                    throw new InvalidOperationException();
+                }
+
                 TimeSpan elapsed = sw.Elapsed;
 
                 // Print
@@ -118,6 +131,7 @@ namespace Calc4DotNet
         private static Setting ParseCommandLineArgs(string[] args)
         {
             Type numberType = typeof(Int64);
+            ExecutorType executorType = ExecutorType.JIT;
             bool optimize = true;
             bool printDetailInformation = false;
 
@@ -154,12 +168,15 @@ namespace Calc4DotNet
                     case "--detail":
                         printDetailInformation = true;
                         break;
+                    case "--low-level":
+                        executorType = ExecutorType.LowLevel;
+                        break;
                     default:
                         throw new CommandLineArgsParseException($"Unknown option {args[i]}.");
                 }
             }
 
-            return new Setting(numberType, optimize, printDetailInformation);
+            return new Setting(numberType, executorType, optimize, printDetailInformation);
         }
 
         private static void PrintDetailInformation<TNumber>(IOperator op, CompilationContext context, LowLevelModule<TNumber> module)
