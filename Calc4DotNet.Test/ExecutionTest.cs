@@ -5,6 +5,7 @@ using Calc4DotNet.Core;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Execution;
 using Calc4DotNet.Core.ILCompilation;
+using Calc4DotNet.Core.Operators;
 using Calc4DotNet.Core.Optimization;
 using Calc4DotNet.Core.SyntaxAnalysis;
 using Xunit;
@@ -48,6 +49,16 @@ namespace Calc4DotNet.Test
 
         #region Helpers
 
+        private static TNumber EvaluateDynamic<TNumber>(IOperator op, CompilationContext context, int maxStep, TNumber dummy)
+        {
+            return Evaluator.Evaluate<TNumber>(op, context, maxStep);
+        }
+
+        private static LowLevelModule<TNumber> GenerateLowLevelModuleDynamic<TNumber>(IOperator op, CompilationContext context, TNumber dummy)
+        {
+            return LowLevelCodeGenerator.Generate<TNumber>(op, context);
+        }
+
         private static void TestCore(string text, object expected, Type type, bool optimize,
                                      Func<object, object, object> executor)
         {
@@ -77,10 +88,10 @@ namespace Calc4DotNet.Test
         {
             TestCore(text, expected, type, optimize, (op, context) =>
             {
-                return Evaluator.Evaluate((dynamic)op,
-                                          (dynamic)context,
-                                          int.MaxValue,
-                                          (dynamic)Activator.CreateInstance(type));
+                return EvaluateDynamic((dynamic)op,
+                                       (dynamic)context,
+                                       int.MaxValue,
+                                       (dynamic)Activator.CreateInstance(type));
             });
         }
 
@@ -89,9 +100,9 @@ namespace Calc4DotNet.Test
         {
             TestCore(text, expected, type, optimize, (op, context) =>
             {
-                var module = LowLevelCodeGenerator.Generate((dynamic)op,
-                                                            (dynamic)context,
-                                                            (dynamic)Activator.CreateInstance(type));
+                var module = GenerateLowLevelModuleDynamic((dynamic)op,
+                                                           (dynamic)context,
+                                                           (dynamic)Activator.CreateInstance(type));
                 return LowLevelExecutor.Execute(module);
             });
         }
@@ -101,9 +112,9 @@ namespace Calc4DotNet.Test
         {
             TestCore(text, expected, type, optimize, (op, context) =>
             {
-                var module = LowLevelCodeGenerator.Generate((dynamic)op,
-                                                            (dynamic)context,
-                                                            (dynamic)Activator.CreateInstance(type));
+                var module = GenerateLowLevelModuleDynamic((dynamic)op,
+                                                           (dynamic)context,
+                                                           (dynamic)Activator.CreateInstance(type));
                 var compiled = ILCompiler.Compile(module);
                 return compiled.Run();
             });

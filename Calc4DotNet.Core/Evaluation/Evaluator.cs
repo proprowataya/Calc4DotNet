@@ -14,11 +14,6 @@ namespace Calc4DotNet.Core.Evaluation
 
     public static class Evaluator
     {
-        internal static TNumber Evaluate<TNumber>(IOperator op, CompilationContext context, int maxStep, TNumber dummy)
-        {
-            return Evaluate<TNumber>(op, context, maxStep);
-        }
-
         public static TNumber Evaluate<TNumber>(IOperator op, CompilationContext context, int maxStep = int.MaxValue)
         {
             if (typeof(TNumber) == typeof(Int32))

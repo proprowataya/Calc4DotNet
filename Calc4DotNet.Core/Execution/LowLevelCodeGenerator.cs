@@ -9,11 +9,6 @@ namespace Calc4DotNet.Core.Execution
 {
     public static class LowLevelCodeGenerator
     {
-        internal static LowLevelModule<TNumber> Generate<TNumber>(IOperator op, CompilationContext context, TNumber dummy)
-        {
-            return Generate<TNumber>(op, context);
-        }
-
         public static LowLevelModule<TNumber> Generate<TNumber>(IOperator op, CompilationContext context)
         {
             var constTable = new List<TNumber>();
