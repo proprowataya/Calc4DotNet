@@ -37,19 +37,19 @@ namespace Calc4DotNet.Core.Optimization
                     builder.Add(operators[i].Accept(this, i < operators.Length - 1 ? false : isTailCallable));
                 }
 
-                return new ParenthesisOperator(builder.MoveToImmutable(), op.SupplementaryText);
+                return op with { Operators = builder.MoveToImmutable() };
             }
 
             public IOperator Visit(DecimalOperator op, bool isTailCallable)
             {
-                return new DecimalOperator(op.Operand.Accept(this, false), op.Value, op.SupplementaryText);
+                return op with { Operand = op.Operand.Accept(this, false) };
             }
 
             public IOperator Visit(BinaryOperator op, bool isTailCallable)
             {
                 var left = op.Left.Accept(this, false);
                 var right = op.Right.Accept(this, false);
-                return new BinaryOperator(left, right, op.Type, op.SupplementaryText);
+                return op with { Left = left, Right = right };
             }
 
             public IOperator Visit(ConditionalOperator op, bool isTailCallable)
@@ -57,7 +57,7 @@ namespace Calc4DotNet.Core.Optimization
                 var condition = op.Condition.Accept(this, false);
                 var ifTrue = op.IfTrue.Accept(this, isTailCallable);
                 var ifFalse = op.IfFalse.Accept(this, isTailCallable);
-                return new ConditionalOperator(condition, ifTrue, ifFalse, op.SupplementaryText);
+                return op with { Condition = condition, IfTrue = ifTrue, IfFalse = ifFalse };
             }
 
             public IOperator Visit(UserDefinedOperator op, bool isTailCallable)
@@ -70,7 +70,7 @@ namespace Calc4DotNet.Core.Optimization
                     builder.Add(operands[i].Accept(this, false));
                 }
 
-                return new UserDefinedOperator(op.Definition, builder.MoveToImmutable(), isTailCallable, op.SupplementaryText);
+                return op with { Operands = builder.MoveToImmutable(), IsTailCallable = isTailCallable };
             }
         }
     }

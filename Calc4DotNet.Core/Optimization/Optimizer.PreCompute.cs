@@ -53,14 +53,14 @@ namespace Calc4DotNet.Core.Optimization
                     builder.Add(operators[i].Accept(this));
                 }
 
-                var newOp = new ParenthesisOperator(builder.MoveToImmutable(), op.SupplementaryText);
+                var newOp = op with { Operators = builder.MoveToImmutable() };
                 return PreComputeIfPossible(newOp);
             }
 
             public IOperator Visit(DecimalOperator op)
             {
                 var operand = op.Operand.Accept(this);
-                var newOp = new DecimalOperator(operand, op.Value, op.SupplementaryText);
+                var newOp = op with { Operand = operand };
                 return PreComputeIfPossible(newOp);
             }
 
@@ -68,7 +68,7 @@ namespace Calc4DotNet.Core.Optimization
             {
                 var left = op.Left.Accept(this);
                 var right = op.Right.Accept(this);
-                var newOp = new BinaryOperator(left, right, op.Type, op.SupplementaryText);
+                var newOp = op with { Left = left, Right = right };
                 return PreComputeIfPossible(newOp);
             }
 
@@ -77,7 +77,7 @@ namespace Calc4DotNet.Core.Optimization
                 var condition = op.Condition.Accept(this);
                 var ifTrue = op.IfTrue.Accept(this);
                 var ifFalse = op.IfFalse.Accept(this);
-                var newOp = new ConditionalOperator(condition, ifTrue, ifFalse, op.SupplementaryText);
+                var newOp = op with { Condition = condition, IfTrue = ifTrue, IfFalse = ifFalse };
 
                 if (PreComputeIfPossible(condition) is PreComputedOperator preComputed)
                 {
@@ -93,7 +93,7 @@ namespace Calc4DotNet.Core.Optimization
             public IOperator Visit(UserDefinedOperator op)
             {
                 var operands = op.Operands.Select(x => x.Accept(this)).ToImmutableArray();
-                var newOp = new UserDefinedOperator(op.Definition, operands, op.IsTailCallable, op.SupplementaryText);
+                var newOp = op with { Operands = operands };
                 return PreComputeIfPossible(newOp);
             }
         }

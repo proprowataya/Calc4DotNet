@@ -24,7 +24,7 @@ namespace Calc4DotNet.Core.Optimization
         {
             var op = implement.Operator;
             var newRoot = OptimizeCore<TNumber>(op, context);
-            context = context.WithAddOrUpdateOperatorImplement(implement.WithOperator(newRoot));
+            context = context.WithAddOrUpdateOperatorImplement(implement with { Operator = newRoot });
         }
 
         private static IOperator OptimizeCore<TNumber>(IOperator op, CompilationContext context)
