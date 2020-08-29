@@ -108,7 +108,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 {
                     IOperator op = new Implement(token.Tokens, context).Parse();
                     context.Value = context.Value.WithAddOrUpdateOperatorImplement(
-                                                    context.Value.LookupOperatorImplement(token.Name).WithOperator(op));
+                                                    context.Value.LookupOperatorImplement(token.Name) with { Operator = op });
                 }
             }
 
