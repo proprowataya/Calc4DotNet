@@ -152,9 +152,8 @@ namespace Calc4DotNet
                             "int32" => typeof(Int32),
                             "int64" => typeof(Int64),
                             "double" => typeof(Double),
-                            "bigint" => typeof(BigInteger),
-                            "biginteger" => typeof(BigInteger),
-                            _ => throw new CommandLineArgsParseException($"Type {args[i + 1]} is not supported."),
+                            "bigint" or "biginteger" => typeof(BigInteger),
+                            var arg => throw new CommandLineArgsParseException($"Type {arg} is not supported."),
                         };
 
                         i++;
