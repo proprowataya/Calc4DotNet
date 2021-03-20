@@ -218,17 +218,22 @@ namespace Calc4DotNet
 
         private static void PrintLowLevelOperations<TNumber>(LowLevelModule<TNumber> module)
         {
-            static void Print(ImmutableArray<LowLevelOperation> operations, string name, int maxStackSize)
+            static void Print(ImmutableArray<LowLevelOperation> operations, string name, int? maxStackSize)
             {
                 Console.WriteLine($"Operator \"{name}\"");
-                Console.WriteLine($"MaxStack: {maxStackSize}");
+
+                if (maxStackSize is not null)
+                {
+                    Console.WriteLine($"MaxStack: {maxStackSize.GetValueOrDefault()}");
+                }
+
                 for (int i = 0; i < operations.Length; i++)
                 {
                     Console.WriteLine($"    {i,-4}: {operations[i]}");
                 }
             }
 
-            Print(module.EntryPoint, "Main", -1 /* TODO */);
+            Print(module.EntryPoint, "Main", null);
             foreach (var userDefinedOperator in module.UserDefinedOperators)
             {
                 Print(userDefinedOperator.Operations, userDefinedOperator.Definition.Name, userDefinedOperator.MaxStackSize);
