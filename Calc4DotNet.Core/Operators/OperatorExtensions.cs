@@ -6,10 +6,7 @@ namespace Calc4DotNet.Core.Operators
 {
     public static class OperatorExtensions
     {
-        private static readonly HashSet<string> HiddenPropertyNames = new HashSet<string>()
-        {
-            nameof(IOperator.Operands),
-        };
+        private static readonly HashSet<string> HiddenPropertyNames = new HashSet<string>() { };
 
         public static string ToDetailString(this IOperator op)
         {

@@ -210,7 +210,7 @@ namespace Calc4DotNet
         private static void PrintTree(IOperator op, int depth = 0)
         {
             Console.WriteLine(new string(' ', Indent * depth) + op.ToDetailString());
-            foreach (var item in op.Operands)
+            foreach (var item in op.GetOperands())
             {
                 PrintTree(item, depth + 1);
             }
