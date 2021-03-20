@@ -91,15 +91,12 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                     results.AddRange(operands);
                 }
 
-                switch (results.Count)
+                return results.Count switch
                 {
-                    case 0:
-                        throw new Calc4DotNet.Core.Exceptions.CodeIsEmptyException();
-                    case 1:
-                        return results[0];
-                    default:
-                        return new ParenthesisOperator(results.ToImmutableArray());
-                }
+                    0 => throw new Calc4DotNet.Core.Exceptions.CodeIsEmptyException(),
+                    1 => results[0],
+                    _ => new ParenthesisOperator(results.ToImmutableArray()),
+                };
             }
 
             private void GenerateUserDefinedCode()
@@ -114,25 +111,17 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
 
             private IOperator CreateOperator(IToken token, IReadOnlyList<IOperator> operands)
             {
-                switch (token)
+                return token switch
                 {
-                    case ArgumentToken arg:
-                        return new ArgumentOperator(arg.Index, arg.SupplementaryText);
-                    case DefineToken def:
-                        return new DefineOperator(def.SupplementaryText);
-                    case ParenthesisToken parenthesis:
-                        return new Implement(parenthesis.Tokens, context).Parse();
-                    case DecimalToken dec:
-                        return new DecimalOperator(operands[0], dec.Value, dec.SupplementaryText);
-                    case BinaryOperatorToken binary:
-                        return new BinaryOperator(operands[0], operands[1], binary.Type, binary.SupplementaryText);
-                    case ConditionalOperatorToken conditional:
-                        return new ConditionalOperator(operands[0], operands[1], operands[2], conditional.SupplementaryText);
-                    case UserDefinedOperatorToken userDefined:
-                        return new UserDefinedOperator(userDefined.Definition, operands.ToImmutableArray(), null, userDefined.SupplementaryText);
-                    default:
-                        throw new InvalidOperationException();
-                }
+                    ArgumentToken arg => new ArgumentOperator(arg.Index, arg.SupplementaryText),
+                    DefineToken def => new DefineOperator(def.SupplementaryText),
+                    ParenthesisToken parenthesis => new Implement(parenthesis.Tokens, context).Parse(),
+                    DecimalToken dec => new DecimalOperator(operands[0], dec.Value, dec.SupplementaryText),
+                    BinaryOperatorToken binary => new BinaryOperator(operands[0], operands[1], binary.Type, binary.SupplementaryText),
+                    ConditionalOperatorToken conditional => new ConditionalOperator(operands[0], operands[1], operands[2], conditional.SupplementaryText),
+                    UserDefinedOperatorToken userDefined => new UserDefinedOperator(userDefined.Definition, operands.ToImmutableArray(), null, userDefined.SupplementaryText),
+                    _ => throw new InvalidOperationException(),
+                };
             }
 
             private IReadOnlyList<IToken> ReadLower()

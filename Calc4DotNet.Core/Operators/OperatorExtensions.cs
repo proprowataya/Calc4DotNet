@@ -19,19 +19,12 @@ namespace Calc4DotNet.Core.Operators
             return $"{type.Name} [{string.Join(", ", values.Select(t => $"{t.Property.Name} = {ObjectToString(t.Value)}"))}]";
         }
 
-        private static string ObjectToString(object obj)
+        private static string ObjectToString(object obj) => obj switch
         {
-            switch (obj)
-            {
-                case string str:
-                    return '"' + str + '"';
-                case IEnumerable enumerable:
-                    return $"{{{string.Join(", ", enumerable.Cast<object>().Select(x => ObjectToString(x)))}}}";
-                case IOperator op:
-                    return op.ToDetailString();
-                default:
-                    return obj.ToString();
-            }
-        }
+            string str => '"' + str + '"',
+            IEnumerable enumerable => $"{{{string.Join(", ", enumerable.Cast<object>().Select(x => ObjectToString(x)))}}}",
+            IOperator op => op.ToDetailString(),
+            _ => obj.ToString(),
+        };
     }
 }

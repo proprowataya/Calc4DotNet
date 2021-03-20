@@ -98,33 +98,21 @@ namespace Calc4DotNet.Core.Evaluation
                 TNumber left = op.Left.Accept(this, param);
                 TNumber right = op.Right.Accept(this, param);
 
-                switch (op.Type)
+                return op.Type switch
                 {
-                    case BinaryType.Add:
-                        return c.Add(left, right);
-                    case BinaryType.Sub:
-                        return c.Subtract(left, right);
-                    case BinaryType.Mult:
-                        return c.Multiply(left, right);
-                    case BinaryType.Div:
-                        return c.Divide(left, right);
-                    case BinaryType.Mod:
-                        return c.Modulo(left, right);
-                    case BinaryType.Equal:
-                        return c.Equals(left, right) ? c.One : c.Zero;
-                    case BinaryType.NotEqual:
-                        return c.NotEquals(left, right) ? c.One : c.Zero;
-                    case BinaryType.LessThan:
-                        return c.LessThan(left, right) ? c.One : c.Zero;
-                    case BinaryType.LessThanOrEqual:
-                        return c.LessThanOrEquals(left, right) ? c.One : c.Zero;
-                    case BinaryType.GreaterThanOrEqual:
-                        return c.GreaterThanOrEquals(left, right) ? c.One : c.Zero;
-                    case BinaryType.GreaterThan:
-                        return c.GreaterThan(left, right) ? c.One : c.Zero;
-                    default:
-                        throw new InvalidOperationException();
-                }
+                    BinaryType.Add => c.Add(left, right),
+                    BinaryType.Sub => c.Subtract(left, right),
+                    BinaryType.Mult => c.Multiply(left, right),
+                    BinaryType.Div => c.Divide(left, right),
+                    BinaryType.Mod => c.Modulo(left, right),
+                    BinaryType.Equal => c.Equals(left, right) ? c.One : c.Zero,
+                    BinaryType.NotEqual => c.NotEquals(left, right) ? c.One : c.Zero,
+                    BinaryType.LessThan => c.LessThan(left, right) ? c.One : c.Zero,
+                    BinaryType.LessThanOrEqual => c.LessThanOrEquals(left, right) ? c.One : c.Zero,
+                    BinaryType.GreaterThanOrEqual => c.GreaterThanOrEquals(left, right) ? c.One : c.Zero,
+                    BinaryType.GreaterThan => c.GreaterThan(left, right) ? c.One : c.Zero,
+                    _ => throw new InvalidOperationException(),
+                };
             }
 
             public TNumber Visit(ConditionalOperator op, (CompilationContext context, TNumber[] arguments) param)
