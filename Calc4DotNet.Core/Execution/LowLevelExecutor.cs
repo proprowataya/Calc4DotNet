@@ -231,9 +231,9 @@ namespace Calc4DotNet.Core.Execution
         [Conditional("DEBUG")]
         private static void VerifyRange<T>(Span<T> array, ref T ptr)
         {
-            ulong index = (ulong)Unsafe.ByteOffset(ref array[0], ref ptr) / (ulong)Unsafe.SizeOf<T>();
+            nuint index = (nuint)(nint)Unsafe.ByteOffset(ref array[0], ref ptr) / (nuint)Unsafe.SizeOf<T>();
 
-            if (index >= (ulong)array.Length)
+            if (index >= (nuint)array.Length)
             {
                 throw new IndexOutOfRangeException();
             }
