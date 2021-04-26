@@ -88,6 +88,11 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 Index++;
 
                 string supplementaryText = LexSupplementaryText();
+                if (string.IsNullOrEmpty(supplementaryText))
+                {
+                    throw new Calc4DotNet.Core.Exceptions.DefinitionTextIsEmptyException();
+                }
+
                 string[] elems = supplementaryText.Split("|");
                 if (elems.Length != 3)
                 {

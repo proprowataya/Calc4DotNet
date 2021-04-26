@@ -20,6 +20,13 @@ namespace Calc4DotNet.Core.Exceptions
         }
     }
 
+    public sealed class DefinitionTextIsEmptyException : Calc4Exception
+    {
+        public DefinitionTextIsEmptyException()
+            : base("The definition text is empty")
+        { }
+    }
+
     public sealed class DefinitionTextNotSplittedProperlyException : Calc4Exception
     {
         public string Text { get; }
