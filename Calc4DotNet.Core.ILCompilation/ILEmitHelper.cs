@@ -62,7 +62,7 @@ namespace Calc4DotNet.Core.ILCompilation
                     {
                         long i64 = (long)bigInteger;
                         il.EmitLdc(i64);
-                        il.Emit(OpCodes.Newobj, typeof(BigInteger).GetConstructor(new[] { typeof(long) }));
+                        il.Emit(OpCodes.Newobj, typeof(BigInteger).GetConstructor(new[] { typeof(long) })!);
                     }
                     catch (OverflowException)
                     {
@@ -78,7 +78,7 @@ namespace Calc4DotNet.Core.ILCompilation
                             il.Emit(OpCodes.Stelem_I1);
                         }
 
-                        il.Emit(OpCodes.Newobj, typeof(BigInteger).GetConstructor(new[] { typeof(byte[]) }));
+                        il.Emit(OpCodes.Newobj, typeof(BigInteger).GetConstructor(new[] { typeof(byte[]) })!);
                     }
                     break;
                 default:

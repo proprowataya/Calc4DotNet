@@ -10,6 +10,7 @@ namespace Calc4DotNet.Core.Execution
     public static class LowLevelCodeGenerator
     {
         public static LowLevelModule<TNumber> Generate<TNumber>(IOperator op, CompilationContext context)
+            where TNumber : notnull
         {
             var constTable = new List<TNumber>();
             var userDefinedOperators = ImmutableArray.CreateBuilder<LowLevelUserDefinedOperator>();
@@ -26,7 +27,10 @@ namespace Calc4DotNet.Core.Execution
             foreach (var implement in context.OperatorImplements)
             {
                 var visitor = new Visitor<TNumber>(context, constTable, operatorLabels, implement.Definition);
-                visitor.Generate(implement.Operator);
+
+                var operatorBody = implement.Operator;
+                Debug.Assert(operatorBody is not null);
+                visitor.Generate(operatorBody);
                 if (visitor.StackSize != 0)
                 {
                     throw new InvalidOperationException($"Stacksize is not zero: {visitor.StackSize}");
@@ -48,13 +52,14 @@ namespace Calc4DotNet.Core.Execution
         }
 
         private sealed class Visitor<TNumber> : IOperatorVisitor
+            where TNumber : notnull
         {
             private const int OperatorBeginLabel = 0;
 
             private readonly CompilationContext context;
             private readonly List<TNumber> constTable;
             private readonly Dictionary<OperatorDefinition, int> operatorLabels;
-            private readonly OperatorDefinition definition;
+            private readonly OperatorDefinition? definition;
 
             private List<LowLevelOperation> list = new List<LowLevelOperation>();
             private int nextLabel = OperatorBeginLabel;
@@ -80,7 +85,7 @@ namespace Calc4DotNet.Core.Execution
 
             public int MaxStackSize => maxStackSize;
 
-            public Visitor(CompilationContext context, List<TNumber> constTable, Dictionary<OperatorDefinition, int> operatorLabels, OperatorDefinition definition)
+            public Visitor(CompilationContext context, List<TNumber> constTable, Dictionary<OperatorDefinition, int> operatorLabels, OperatorDefinition? definition)
             {
                 this.context = context ?? throw new ArgumentNullException(nameof(context));
                 this.constTable = constTable ?? throw new ArgumentNullException(nameof(constTable));
@@ -238,6 +243,7 @@ namespace Calc4DotNet.Core.Execution
 
             public void Visit(ArgumentOperator op)
             {
+                Debug.Assert(definition is not null);
                 AddOperation(new LowLevelOperation(Opcode.LoadArg, GetArgumentAddress(definition.NumOperands, op.Index)));
             }
 
@@ -408,6 +414,7 @@ namespace Calc4DotNet.Core.Execution
                 {
                     for (int i = op.Operands.Length - 1; i >= 0; i--)
                     {
+                        Debug.Assert(definition is not null);
                         AddOperation(new LowLevelOperation(Opcode.StoreArg, GetArgumentAddress(definition.NumOperands, i)));
                     }
 

@@ -87,7 +87,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 Debug.Assert(text[Index] == 'D');
                 Index++;
 
-                string supplementaryText = LexSupplementaryText();
+                string? supplementaryText = LexSupplementaryText();
                 if (string.IsNullOrEmpty(supplementaryText))
                 {
                     throw new Calc4DotNet.Core.Exceptions.DefinitionTextIsEmptyException();
@@ -227,7 +227,7 @@ namespace Calc4DotNet.Core.SyntaxAnalysis
                 throw new Calc4DotNet.Core.Exceptions.OperatorOrOperandNotDefinedException(text[Index].ToString());
             }
 
-            private string LexSupplementaryText()
+            private string? LexSupplementaryText()
             {
                 if (Index >= text.Length || text[Index] != '[')
                     return null;
