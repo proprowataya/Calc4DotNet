@@ -16,7 +16,7 @@ namespace Calc4DotNet.Test
     {
         #region Sources
 
-        private static readonly (string text, int expected, Type[] skipTypes)[] TestCases = new (string text, int expected, Type[] skipTypes)[]
+        private static readonly (string text, int expected, Type[]? skipTypes)[] TestCases = new (string text, int expected, Type[]? skipTypes)[]
         {
             ("1<2", 1, null),
             ("12345678", 12345678, null),
@@ -50,11 +50,13 @@ namespace Calc4DotNet.Test
         #region Helpers
 
         private static TNumber EvaluateDynamic<TNumber>(IOperator op, CompilationContext context, int maxStep, TNumber dummy)
+            where TNumber : notnull
         {
             return Evaluator.Evaluate<TNumber>(op, context, maxStep);
         }
 
         private static LowLevelModule<TNumber> GenerateLowLevelModuleDynamic<TNumber>(IOperator op, CompilationContext context, TNumber dummy)
+            where TNumber : notnull
         {
             return LowLevelCodeGenerator.Generate<TNumber>(op, context);
         }
@@ -63,11 +65,12 @@ namespace Calc4DotNet.Test
                                      Func<object, object, object> executor)
         {
             TestCoreGeneric(text, (dynamic)expected, type, optimize,
-                            executor, (dynamic)Activator.CreateInstance(type));
+                            executor, (dynamic)Activator.CreateInstance(type)!);
         }
 
         private static void TestCoreGeneric<TNumber>(string text, TNumber expected, Type type, bool optimize,
                                                      Func<object, object, object> executor, TNumber dummy)
+            where TNumber : notnull
         {
             var context = CompilationContext.Empty;
             var tokens = Lexer.Lex(text, ref context);
@@ -91,7 +94,7 @@ namespace Calc4DotNet.Test
                 return EvaluateDynamic((dynamic)op,
                                        (dynamic)context,
                                        int.MaxValue,
-                                       (dynamic)Activator.CreateInstance(type));
+                                       (dynamic)Activator.CreateInstance(type)!);
             });
         }
 
@@ -102,7 +105,7 @@ namespace Calc4DotNet.Test
             {
                 var module = GenerateLowLevelModuleDynamic((dynamic)op,
                                                            (dynamic)context,
-                                                           (dynamic)Activator.CreateInstance(type));
+                                                           (dynamic)Activator.CreateInstance(type)!);
                 return LowLevelExecutor.Execute(module);
             });
         }
@@ -114,7 +117,7 @@ namespace Calc4DotNet.Test
             {
                 var module = GenerateLowLevelModuleDynamic((dynamic)op,
                                                            (dynamic)context,
-                                                           (dynamic)Activator.CreateInstance(type));
+                                                           (dynamic)Activator.CreateInstance(type)!);
                 var compiled = ILCompiler.Compile(module);
                 return compiled.Run();
             });
@@ -131,7 +134,7 @@ namespace Calc4DotNet.Test
                 {
                     Assert.Throws<Calc4DotNet.Core.Exceptions.StackOverflowException>(() =>
                     {
-                        TestByLowLevelExecutor(text, Activator.CreateInstance(type) /* dummy */, type, optimize);
+                        TestByLowLevelExecutor(text, Activator.CreateInstance(type)! /* dummy */, type, optimize);
                     });
                 }
             }

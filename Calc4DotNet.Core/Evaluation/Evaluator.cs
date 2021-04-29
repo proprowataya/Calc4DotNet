@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Calc4DotNet.Core.Operators;
@@ -15,6 +16,7 @@ namespace Calc4DotNet.Core.Evaluation
     public static class Evaluator
     {
         public static TNumber Evaluate<TNumber>(IOperator op, CompilationContext context, int maxStep = int.MaxValue)
+            where TNumber : notnull
         {
             if (typeof(TNumber) == typeof(Int32))
             {
@@ -43,8 +45,9 @@ namespace Calc4DotNet.Core.Evaluation
         }
 
         private sealed class Visitor<TNumber, TNumberComputer>
-            : IOperatorVisitor<TNumber, (CompilationContext context, TNumber[] arguments)>
-            where TNumberComputer : INumberComputer<TNumber>
+            : IOperatorVisitor<TNumber, (CompilationContext context, TNumber[]? arguments)>
+            where TNumber : notnull
+            where TNumberComputer : struct, INumberComputer<TNumber>
         {
             private readonly int maxStep = 0;
             private int step;
@@ -56,23 +59,23 @@ namespace Calc4DotNet.Core.Evaluation
 
             /* ******************** */
 
-            public TNumber Visit(ZeroOperator op, (CompilationContext context, TNumber[] arguments) param)
+            public TNumber Visit(ZeroOperator op, (CompilationContext context, TNumber[]? arguments) param)
                 => default(TNumberComputer).Zero;
 
-            public TNumber Visit(PreComputedOperator op, (CompilationContext context, TNumber[] arguments) param)
+            public TNumber Visit(PreComputedOperator op, (CompilationContext context, TNumber[]? arguments) param)
                 => (TNumber)op.Value;
 
-            public TNumber Visit(ArgumentOperator op, (CompilationContext context, TNumber[] arguments) param)
+            public TNumber Visit(ArgumentOperator op, (CompilationContext context, TNumber[]? arguments) param)
             {
                 if (param.arguments is null)
                     throw new EvaluationArgumentNotSetException();
                 return param.arguments[op.Index];
             }
 
-            public TNumber Visit(DefineOperator op, (CompilationContext context, TNumber[] arguments) param)
+            public TNumber Visit(DefineOperator op, (CompilationContext context, TNumber[]? arguments) param)
                 => default(TNumberComputer).Zero;
 
-            public TNumber Visit(ParenthesisOperator op, (CompilationContext context, TNumber[] arguments) param)
+            public TNumber Visit(ParenthesisOperator op, (CompilationContext context, TNumber[]? arguments) param)
             {
                 TNumber result = default(TNumberComputer).Zero;
                 ImmutableArray<IOperator> operators = op.Operators;
@@ -85,14 +88,14 @@ namespace Calc4DotNet.Core.Evaluation
                 return result;
             }
 
-            public TNumber Visit(DecimalOperator op, (CompilationContext context, TNumber[] arguments) param)
+            public TNumber Visit(DecimalOperator op, (CompilationContext context, TNumber[]? arguments) param)
             {
                 var c = default(TNumberComputer);
                 TNumber operand = op.Operand.Accept(this, param);
                 return c.Add(c.Multiply(operand, c.Ten), c.FromInt(op.Value));
             }
 
-            public TNumber Visit(BinaryOperator op, (CompilationContext context, TNumber[] arguments) param)
+            public TNumber Visit(BinaryOperator op, (CompilationContext context, TNumber[]? arguments) param)
             {
                 var c = default(TNumberComputer);
                 TNumber left = op.Left.Accept(this, param);
@@ -115,28 +118,30 @@ namespace Calc4DotNet.Core.Evaluation
                 };
             }
 
-            public TNumber Visit(ConditionalOperator op, (CompilationContext context, TNumber[] arguments) param)
+            public TNumber Visit(ConditionalOperator op, (CompilationContext context, TNumber[]? arguments) param)
             {
                 var c = default(TNumberComputer);
                 TNumber condition = op.Condition.Accept(this, param);
                 return c.NotEquals(condition, c.Zero) ? op.IfTrue.Accept(this, param) : op.IfFalse.Accept(this, param);
             }
 
-            public TNumber Visit(UserDefinedOperator op, (CompilationContext context, TNumber[] arguments) param)
+            public TNumber Visit(UserDefinedOperator op, (CompilationContext context, TNumber[]? arguments) param)
             {
                 if (++step > maxStep)
                 {
                     throw new EvaluationStepLimitExceedException();
                 }
 
-                TNumber[] stack = new TNumber[op.Operands.Length];
+                TNumber[]? stack = new TNumber[op.Operands.Length];
 
                 for (int i = 0; i < op.Operands.Length; i++)
                 {
                     stack[i] = op.Operands[i].Accept(this, param);
                 }
 
-                return param.context.LookupOperatorImplement(op.Definition.Name).Operator.Accept(this, (param.context, stack));
+                var userDefinedOperatorBody = param.context.LookupOperatorImplement(op.Definition.Name).Operator;
+                Debug.Assert(userDefinedOperatorBody is not null);
+                return userDefinedOperatorBody.Accept(this, (param.context, stack));
             }
         }
     }

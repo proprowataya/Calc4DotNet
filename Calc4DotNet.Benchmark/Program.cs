@@ -21,7 +21,7 @@ namespace Calc4DotNet.Benchmark
         };
 
         [ParamsSource(nameof(Sources))]
-        public string Source { get; set; }
+        public string? Source { get; set; }
 
         static void Main(string[] args)
         {
@@ -33,7 +33,7 @@ namespace Calc4DotNet.Benchmark
         {
             // Compile
             CompilationContext context = CompilationContext.Empty;
-            List<IToken> tokens = Lexer.Lex(Source, ref context);
+            List<IToken> tokens = Lexer.Lex(Source!, ref context);
             IOperator op = Parser.Parse(tokens, ref context);
             Optimizer.Optimize<NumberType>(ref op, ref context);
             LowLevelModule<NumberType> module = LowLevelCodeGenerator.Generate<NumberType>(op, context);

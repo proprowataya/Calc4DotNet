@@ -9,6 +9,7 @@ namespace Calc4DotNet.Core.Optimization
     public static partial class Optimizer
     {
         private sealed class PreComputeVisitor<TNumber> : IOperatorVisitor<IOperator>
+            where TNumber : notnull
         {
             private readonly CompilationContext context;
             private readonly int maxStep;

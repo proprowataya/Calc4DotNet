@@ -17,11 +17,12 @@ namespace Calc4DotNet.Core.ILCompilation
         private const string RunMethodName = nameof(ICompiledModule<object>.Run);
 
         public static ICompiledModule<TNumber> Compile<TNumber>(LowLevelModule<TNumber> module)
+            where TNumber : notnull
         {
             AssemblyBuilder assemblyBuilder
                 = AssemblyBuilder.DefineDynamicAssembly(AsmName, AssemblyBuilderAccess.Run);
             ModuleBuilder moduleBuilder
-                = assemblyBuilder.DefineDynamicModule(AsmName.Name);
+                = assemblyBuilder.DefineDynamicModule(AsmName.Name!);
             TypeBuilder typeBuilder
                 = moduleBuilder.DefineType(ClassName,
                                            TypeAttributes.Class | TypeAttributes.Public,
@@ -34,7 +35,7 @@ namespace Calc4DotNet.Core.ILCompilation
                                            typeof(TNumber),
                                            Type.EmptyTypes);
             typeBuilder.DefineMethodOverride(runMethod,
-                                             typeof(ICompiledModule<TNumber>).GetMethod(nameof(ICompiledModule<TNumber>.Run)));
+                                             typeof(ICompiledModule<TNumber>).GetMethod(nameof(ICompiledModule<TNumber>.Run))!);
 
             // User defined methods
             var methods = new (MethodBuilder Method, int NumOperands)[module.UserDefinedOperators.Length];
@@ -50,11 +51,12 @@ namespace Calc4DotNet.Core.ILCompilation
             }
 
             EmitIL(module, runMethod, methods);
-            Type type = typeBuilder.CreateType();
-            return (ICompiledModule<TNumber>)Activator.CreateInstance(type);
+            Type type = typeBuilder.CreateType()!;
+            return (ICompiledModule<TNumber>)Activator.CreateInstance(type)!;
         }
 
         private static void EmitIL<TNumber>(LowLevelModule<TNumber> module, MethodBuilder runMethod, (MethodBuilder Method, int NumOperands)[] methods)
+            where TNumber : notnull
         {
             // Emit Main(Run) operator
             EmitILCore(module, module.EntryPoint, runMethod, 0, methods);
@@ -67,13 +69,14 @@ namespace Calc4DotNet.Core.ILCompilation
         }
 
         private static void EmitILCore<TNumber>(LowLevelModule<TNumber> module, ImmutableArray<LowLevelOperation> operations, MethodBuilder method, int numOperands, (MethodBuilder Method, int NumOperands)[] methods)
+            where TNumber : notnull
         {
             /* Local method */
             int RestoreMethodParameterIndex(int value) => numOperands - value;
 
             ILGenerator il = method.GetILGenerator();
             Dictionary<int, Label> labels = new Dictionary<int, Label>();
-            LocalBuilder temp = null;
+            LocalBuilder? temp = null;
             for (int i = 0; i < operations.Length; i++)
             {
                 labels[i] = il.DefineLabel();
@@ -109,7 +112,7 @@ namespace Calc4DotNet.Core.ILCompilation
                     case Opcode.Add:
                         if (typeof(TNumber) == typeof(BigInteger))
                         {
-                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Addition", new[] { typeof(BigInteger), typeof(BigInteger) }));
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Addition", new[] { typeof(BigInteger), typeof(BigInteger) })!);
                         }
                         else
                         {
@@ -119,7 +122,7 @@ namespace Calc4DotNet.Core.ILCompilation
                     case Opcode.Sub:
                         if (typeof(TNumber) == typeof(BigInteger))
                         {
-                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Subtraction", new[] { typeof(BigInteger), typeof(BigInteger) }));
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Subtraction", new[] { typeof(BigInteger), typeof(BigInteger) })!);
                         }
                         else
                         {
@@ -129,7 +132,7 @@ namespace Calc4DotNet.Core.ILCompilation
                     case Opcode.Mult:
                         if (typeof(TNumber) == typeof(BigInteger))
                         {
-                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Multiply", new[] { typeof(BigInteger), typeof(BigInteger) }));
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Multiply", new[] { typeof(BigInteger), typeof(BigInteger) })!);
                         }
                         else
                         {
@@ -139,7 +142,7 @@ namespace Calc4DotNet.Core.ILCompilation
                     case Opcode.Div:
                         if (typeof(TNumber) == typeof(BigInteger))
                         {
-                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Division", new[] { typeof(BigInteger), typeof(BigInteger) }));
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Division", new[] { typeof(BigInteger), typeof(BigInteger) })!);
                         }
                         else
                         {
@@ -149,7 +152,7 @@ namespace Calc4DotNet.Core.ILCompilation
                     case Opcode.Mod:
                         if (typeof(TNumber) == typeof(BigInteger))
                         {
-                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Modulus", new[] { typeof(BigInteger), typeof(BigInteger) }));
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Modulus", new[] { typeof(BigInteger), typeof(BigInteger) })!);
                         }
                         else
                         {
@@ -167,7 +170,7 @@ namespace Calc4DotNet.Core.ILCompilation
 
                             il.Emit(OpCodes.Stloc_0);
                             il.Emit(OpCodes.Ldloca_S, 0);
-                            il.Emit(OpCodes.Call, typeof(BigInteger).GetProperty(nameof(BigInteger.IsZero)).GetMethod);
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetProperty(nameof(BigInteger.IsZero))!.GetMethod!);
                             il.Emit(OpCodes.Brfalse, labels[op.Value + 1]);
                         }
                         else
@@ -178,7 +181,7 @@ namespace Calc4DotNet.Core.ILCompilation
                     case Opcode.GotoIfEqual:
                         if (typeof(TNumber) == typeof(BigInteger))
                         {
-                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Equality", new[] { typeof(BigInteger), typeof(BigInteger) }));
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Equality", new[] { typeof(BigInteger), typeof(BigInteger) })!);
                             il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
                         }
                         else
@@ -189,7 +192,7 @@ namespace Calc4DotNet.Core.ILCompilation
                     case Opcode.GotoIfLessThan:
                         if (typeof(TNumber) == typeof(BigInteger))
                         {
-                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_LessThan", new[] { typeof(BigInteger), typeof(BigInteger) }));
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_LessThan", new[] { typeof(BigInteger), typeof(BigInteger) })!);
                             il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
                         }
                         else
@@ -200,7 +203,7 @@ namespace Calc4DotNet.Core.ILCompilation
                     case Opcode.GotoIfLessThanOrEqual:
                         if (typeof(TNumber) == typeof(BigInteger))
                         {
-                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_LessThanOrEqual", new[] { typeof(BigInteger), typeof(BigInteger) }));
+                            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_LessThanOrEqual", new[] { typeof(BigInteger), typeof(BigInteger) })!);
                             il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
                         }
                         else

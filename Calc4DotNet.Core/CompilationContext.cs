@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Calc4DotNet.Core.Operators;
 
@@ -47,7 +48,7 @@ namespace Calc4DotNet.Core
             return this.userDefinedOperators[name];
         }
 
-        public bool TryLookupOperatorImplement(string name, out OperatorImplement value)
+        public bool TryLookupOperatorImplement(string name, [MaybeNullWhen(false)] out OperatorImplement value)
         {
             return this.userDefinedOperators.TryGetValue(name, out value);
         }

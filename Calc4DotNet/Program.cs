@@ -44,7 +44,12 @@ namespace Calc4DotNet
             while (true)
             {
                 Console.Write("> ");
-                string text = Console.ReadLine();
+                string? text = Console.ReadLine();
+                if (text is null)
+                {
+                    break;
+                }
+
                 Console.WriteLine();
 
                 if (setting.NumberType == typeof(Int32))
@@ -72,6 +77,7 @@ namespace Calc4DotNet
         }
 
         private static void ReplCore<TNumber>(string text, Setting setting)
+            where TNumber : notnull
         {
             try
             {
@@ -179,6 +185,7 @@ namespace Calc4DotNet
         }
 
         private static void PrintDetailInformation<TNumber>(IOperator op, CompilationContext context, LowLevelModule<TNumber> module)
+            where TNumber : notnull
         {
             // Print input and user-defined operators as trees
             Console.WriteLine("Main");
@@ -190,6 +197,7 @@ namespace Calc4DotNet
             {
                 Console.WriteLine($"Operator \"{implement.Definition.Name}\"");
                 Console.WriteLine("{");
+                Debug.Assert(implement.Operator is not null);
                 PrintTree(implement.Operator, 1);
                 Console.WriteLine("}");
                 Console.WriteLine();
@@ -217,6 +225,7 @@ namespace Calc4DotNet
         }
 
         private static void PrintLowLevelOperations<TNumber>(LowLevelModule<TNumber> module)
+            where TNumber : notnull
         {
             static void Print(ImmutableArray<LowLevelOperation> operations, string name, int? maxStackSize)
             {

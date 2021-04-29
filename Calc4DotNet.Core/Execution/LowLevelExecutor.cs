@@ -31,7 +31,8 @@ namespace Calc4DotNet.Core.Execution
         }
 
         private static TNumber ExecuteCore<TNumber, TNumberComputer>(LowLevelModule<TNumber> module)
-            where TNumberComputer : INumberComputer<TNumber>
+            where TNumber : notnull
+            where TNumberComputer : struct, INumberComputer<TNumber>
         {
             TNumberComputer c = default;
 
