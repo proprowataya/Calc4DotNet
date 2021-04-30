@@ -132,7 +132,7 @@ namespace Calc4DotNet.Core.Evaluation
                     throw new EvaluationStepLimitExceedException();
                 }
 
-                TNumber[]? stack = new TNumber[op.Operands.Length];
+                TNumber[] stack = new TNumber[op.Operands.Length];
 
                 for (int i = 0; i < op.Operands.Length; i++)
                 {
