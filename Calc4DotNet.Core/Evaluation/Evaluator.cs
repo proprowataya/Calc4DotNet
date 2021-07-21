@@ -18,25 +18,29 @@ namespace Calc4DotNet.Core.Evaluation
         public static TNumber Evaluate<TNumber>(IOperator op, CompilationContext context, int maxStep = int.MaxValue)
             where TNumber : notnull
         {
+            // TODO:
+            // The following casts by Unsafe.As assume that the TNumber and TNumberOperatable have
+            // the same memory layout.
+
             if (typeof(TNumber) == typeof(Int32))
             {
-                var result = op.Accept(new Visitor<Int32, Int32Computer>(maxStep), (context, null));
-                return Unsafe.As<Int32, TNumber>(ref result);
+                var result = op.Accept(new Visitor<Int32, Int32Operatable>(maxStep), (context, null));
+                return Unsafe.As<Int32Operatable, TNumber>(ref result);
             }
             else if (typeof(TNumber) == typeof(Int64))
             {
-                var result = op.Accept(new Visitor<Int64, Int64Computer>(maxStep), (context, null));
-                return Unsafe.As<Int64, TNumber>(ref result);
+                var result = op.Accept(new Visitor<Int64, Int64Operatable>(maxStep), (context, null));
+                return Unsafe.As<Int64Operatable, TNumber>(ref result);
             }
             else if (typeof(TNumber) == typeof(Double))
             {
-                var result = op.Accept(new Visitor<Double, DoubleComputer>(maxStep), (context, null));
-                return Unsafe.As<Double, TNumber>(ref result);
+                var result = op.Accept(new Visitor<Double, DoubleOperatable>(maxStep), (context, null));
+                return Unsafe.As<DoubleOperatable, TNumber>(ref result);
             }
             else if (typeof(TNumber) == typeof(BigInteger))
             {
-                var result = op.Accept(new Visitor<BigInteger, BigIntegerComputer>(maxStep), (context, null));
-                return Unsafe.As<BigInteger, TNumber>(ref result);
+                var result = op.Accept(new Visitor<BigInteger, BigIntegerOperatable>(maxStep), (context, null));
+                return Unsafe.As<BigIntegerOperatable, TNumber>(ref result);
             }
             else
             {
@@ -44,10 +48,10 @@ namespace Calc4DotNet.Core.Evaluation
             }
         }
 
-        private sealed class Visitor<TNumber, TNumberComputer>
-            : IOperatorVisitor<TNumber, (CompilationContext context, TNumber[]? arguments)>
-            where TNumber : notnull
-            where TNumberComputer : struct, INumberComputer<TNumber>
+        private sealed class Visitor<TNumberOriginal, TNumberOperatable>
+            : IOperatorVisitor<TNumberOperatable, (CompilationContext context, TNumberOperatable[]? arguments)>
+            where TNumberOriginal : struct
+            where TNumberOperatable : struct, IOperatableNumber<TNumberOperatable>
         {
             private readonly int maxStep = 0;
             private int step;
@@ -59,25 +63,25 @@ namespace Calc4DotNet.Core.Evaluation
 
             /* ******************** */
 
-            public TNumber Visit(ZeroOperator op, (CompilationContext context, TNumber[]? arguments) param)
-                => default(TNumberComputer).Zero;
+            public TNumberOperatable Visit(ZeroOperator op, (CompilationContext context, TNumberOperatable[]? arguments) param)
+                => TNumberOperatable.Zero;
 
-            public TNumber Visit(PreComputedOperator op, (CompilationContext context, TNumber[]? arguments) param)
-                => (TNumber)op.Value;
+            public TNumberOperatable Visit(PreComputedOperator op, (CompilationContext context, TNumberOperatable[]? arguments) param)
+                => Unsafe.As<TNumberOriginal, TNumberOperatable>(ref Unsafe.Unbox<TNumberOriginal>(op.Value));
 
-            public TNumber Visit(ArgumentOperator op, (CompilationContext context, TNumber[]? arguments) param)
+            public TNumberOperatable Visit(ArgumentOperator op, (CompilationContext context, TNumberOperatable[]? arguments) param)
             {
                 if (param.arguments is null)
                     throw new EvaluationArgumentNotSetException();
                 return param.arguments[op.Index];
             }
 
-            public TNumber Visit(DefineOperator op, (CompilationContext context, TNumber[]? arguments) param)
-                => default(TNumberComputer).Zero;
+            public TNumberOperatable Visit(DefineOperator op, (CompilationContext context, TNumberOperatable[]? arguments) param)
+                => TNumberOperatable.Zero;
 
-            public TNumber Visit(ParenthesisOperator op, (CompilationContext context, TNumber[]? arguments) param)
+            public TNumberOperatable Visit(ParenthesisOperator op, (CompilationContext context, TNumberOperatable[]? arguments) param)
             {
-                TNumber result = default(TNumberComputer).Zero;
+                TNumberOperatable result = TNumberOperatable.Zero;
                 ImmutableArray<IOperator> operators = op.Operators;
 
                 for (int i = 0; i < operators.Length; i++)
@@ -88,51 +92,48 @@ namespace Calc4DotNet.Core.Evaluation
                 return result;
             }
 
-            public TNumber Visit(DecimalOperator op, (CompilationContext context, TNumber[]? arguments) param)
+            public TNumberOperatable Visit(DecimalOperator op, (CompilationContext context, TNumberOperatable[]? arguments) param)
             {
-                var c = default(TNumberComputer);
-                TNumber operand = op.Operand.Accept(this, param);
-                return c.Add(c.Multiply(operand, c.Ten), c.FromInt(op.Value));
+                TNumberOperatable operand = op.Operand.Accept(this, param);
+                return operand * TNumberOperatable.Ten + TNumberOperatable.FromInt(op.Value);
             }
 
-            public TNumber Visit(BinaryOperator op, (CompilationContext context, TNumber[]? arguments) param)
+            public TNumberOperatable Visit(BinaryOperator op, (CompilationContext context, TNumberOperatable[]? arguments) param)
             {
-                var c = default(TNumberComputer);
-                TNumber left = op.Left.Accept(this, param);
-                TNumber right = op.Right.Accept(this, param);
+                TNumberOperatable left = op.Left.Accept(this, param);
+                TNumberOperatable right = op.Right.Accept(this, param);
 
                 return op.Type switch
                 {
-                    BinaryType.Add => c.Add(left, right),
-                    BinaryType.Sub => c.Subtract(left, right),
-                    BinaryType.Mult => c.Multiply(left, right),
-                    BinaryType.Div => c.Divide(left, right),
-                    BinaryType.Mod => c.Modulo(left, right),
-                    BinaryType.Equal => c.Equals(left, right) ? c.One : c.Zero,
-                    BinaryType.NotEqual => c.NotEquals(left, right) ? c.One : c.Zero,
-                    BinaryType.LessThan => c.LessThan(left, right) ? c.One : c.Zero,
-                    BinaryType.LessThanOrEqual => c.LessThanOrEquals(left, right) ? c.One : c.Zero,
-                    BinaryType.GreaterThanOrEqual => c.GreaterThanOrEquals(left, right) ? c.One : c.Zero,
-                    BinaryType.GreaterThan => c.GreaterThan(left, right) ? c.One : c.Zero,
+                    BinaryType.Add => left + right,
+                    BinaryType.Sub => left - right,
+                    BinaryType.Mult => left * right,
+                    BinaryType.Div => left / right,
+                    BinaryType.Mod => left % right,
+                    BinaryType.Equal => left == right ? TNumberOperatable.One : TNumberOperatable.Zero,
+                    BinaryType.NotEqual => left != right ? TNumberOperatable.One : TNumberOperatable.Zero,
+                    BinaryType.LessThan => left < right ? TNumberOperatable.One : TNumberOperatable.Zero,
+                    BinaryType.LessThanOrEqual => left <= right ? TNumberOperatable.One : TNumberOperatable.Zero,
+                    BinaryType.GreaterThanOrEqual => left <= right ? TNumberOperatable.One : TNumberOperatable.Zero,
+                    BinaryType.GreaterThan => left < right ? TNumberOperatable.One : TNumberOperatable.Zero,
                     _ => throw new InvalidOperationException(),
                 };
             }
 
-            public TNumber Visit(ConditionalOperator op, (CompilationContext context, TNumber[]? arguments) param)
+            public TNumberOperatable Visit(ConditionalOperator op, (CompilationContext context, TNumberOperatable[]? arguments) param)
             {
-                var c = default(TNumberComputer);
-                TNumber condition = op.Condition.Accept(this, param);
-                return c.NotEquals(condition, c.Zero) ? op.IfTrue.Accept(this, param) : op.IfFalse.Accept(this, param);
+                TNumberOperatable condition = op.Condition.Accept(this, param);
+                return condition != TNumberOperatable.Zero ? op.IfTrue.Accept(this, param) : op.IfFalse.Accept(this, param);
             }
 
-            public TNumber Visit(UserDefinedOperator op, (CompilationContext context, TNumber[]? arguments) param)
+            public TNumberOperatable Visit(UserDefinedOperator op, (CompilationContext context, TNumberOperatable[]? arguments) param)
             {
                 if (++step > maxStep)
                 {
                     throw new EvaluationStepLimitExceedException();
                 }
 
-                TNumber[] stack = new TNumber[op.Operands.Length];
+                TNumberOperatable[] stack = new TNumberOperatable[op.Operands.Length];
 
                 for (int i = 0; i < op.Operands.Length; i++)
                 {
