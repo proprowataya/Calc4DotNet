@@ -31,7 +31,7 @@ std::pair<ExecutionState, TNumber> ExecuteCore(const LowLevelOperation *operatio
     TNumber *top = &*stack.begin(), *bottom = &*stack.begin();
     void **ptrTop = &*ptrStack.begin();
     TNumber *stackEnd = &*stack.begin() + stack.size();
-    void **ptrStackEnd = &*ptrStack.begin() + ptrStack.size();
+    void **ptrStackEndMinusTwo = &*ptrStack.begin() + ptrStack.size() - 2;
     const LowLevelOperation *op = operations;
 
     while (true)
@@ -124,7 +124,7 @@ std::pair<ExecutionState, TNumber> ExecuteCore(const LowLevelOperation *operatio
                     return std::make_pair(ExecutionState::StackOverflow, 0);
                 }
 
-                if (ptrTop + 2 >= ptrStackEnd)
+                if (ptrTop >= ptrStackEndMinusTwo)
                 {
                     return std::make_pair(ExecutionState::StackOverflow, 0);
                 }
