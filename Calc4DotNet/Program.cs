@@ -64,7 +64,7 @@ namespace Calc4DotNet
                 {
                     ReplCore<Double>(text, setting);
                 }
-                else if (setting.NumberType == typeof(BigInteger))
+                else if (setting.ExecutorType != ExecutorType.LowLevelCpp && setting.NumberType == typeof(BigInteger))
                 {
                     ReplCore<BigInteger>(text, setting);
                 }
@@ -114,6 +114,10 @@ namespace Calc4DotNet
                 {
                     ICompiledModule<TNumber> ilModule = ILCompiler.Compile(module);
                     result = ilModule.Run();
+                }
+                else if (setting.ExecutorType == ExecutorType.LowLevelCpp)
+                {
+                    result = CppLowLevelExecutor.Execute((dynamic)module);
                 }
                 else
                 {
@@ -176,9 +180,17 @@ namespace Calc4DotNet
                     case "--low-level":
                         executorType = ExecutorType.LowLevel;
                         break;
+                    case "--low-level-cpp":
+                        executorType = ExecutorType.LowLevelCpp;
+                        break;
                     default:
                         throw new CommandLineArgsParseException($"Unknown option {args[i]}.");
                 }
+            }
+
+            if ((numberType, executorType) == (typeof(BigInteger), ExecutorType.LowLevelCpp))
+            {
+                throw new CommandLineArgsParseException("Low level executor by C++ does not support BigInteger.");
             }
 
             return new Setting(numberType, executorType, optimize, printDetailInformation);

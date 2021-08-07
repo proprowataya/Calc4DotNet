@@ -6,6 +6,6 @@ namespace Calc4DotNet
 
     internal enum ExecutorType
     {
-        LowLevel, JIT,
+        LowLevel, JIT, LowLevelCpp,
     }
 }
