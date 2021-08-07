@@ -149,7 +149,7 @@ std::pair<ExecutionState, TNumber> ExecuteCore(const LowLevelOperation *operatio
                 break;
             case Opcode::Lavel:
             default:
-                //throw std::runtime_error("Assertion failed");
+                __assume(false);
                 break;
         }
 
