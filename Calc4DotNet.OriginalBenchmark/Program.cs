@@ -80,7 +80,7 @@ namespace Calc4DotNet.OriginalBenchmark
                                          g.Key.Type,
                                          ElapsedTimes: g.Select(item => (item.ExecutorType, item.AverageElapsed))))
             {
-                Console.WriteLine($"Source = \"{item.Source}, Type = {item.Type}");
+                Console.WriteLine($"Source = \"{item.Source}\", Type = {item.Type}");
                 TimeSpan jitElapsedTime = item.ElapsedTimes.Single(result => result.ExecutorType == ExecutorType.Jit).AverageElapsed;
 
                 foreach (var elapsed in item.ElapsedTimes)
