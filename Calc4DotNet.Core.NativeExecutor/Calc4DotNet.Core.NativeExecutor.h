@@ -27,11 +27,11 @@ template<typename TNumber>
 std::pair<ExecutionState, TNumber> ExecuteCore(const LowLevelOperation *operations, const int32_t *maxStackSizes, int numOperations, const TNumber *constTable, int numConstants)
 {
     std::vector<TNumber> stack(StackSize);
-    std::vector<int> ptrStack(PtrStackSize);
+    std::vector<void *> ptrStack(PtrStackSize);
     TNumber *top = &*stack.begin(), *bottom = &*stack.begin();
-    int *ptrTop = &*ptrStack.begin();
+    void **ptrTop = &*ptrStack.begin();
     TNumber *stackEnd = &*stack.begin() + stack.size();
-    int *ptrStackEnd = &*ptrStack.begin() + ptrStack.size();
+    void **ptrStackEnd = &*ptrStack.begin() + ptrStack.size();
     const LowLevelOperation *op = operations;
 
     while (true)
@@ -129,8 +129,8 @@ std::pair<ExecutionState, TNumber> ExecuteCore(const LowLevelOperation *operatio
                     return std::make_pair(ExecutionState::StackOverflow, 0);
                 }
 
-                *(ptrTop++) = static_cast<int>(op - operations);
-                *(ptrTop++) = static_cast<int>(bottom - &*stack.begin());
+                *(ptrTop++) = const_cast<void *>(reinterpret_cast<const void *>(op));
+                *(ptrTop++) = reinterpret_cast<void *>(bottom);
                 bottom = top;
                 op = operations + op->value;
                 break;
@@ -140,8 +140,8 @@ std::pair<ExecutionState, TNumber> ExecuteCore(const LowLevelOperation *operatio
                 TNumber returnValue = top[-1];
                 top = bottom - op->value + 1;
                 top[-1] = returnValue;
-                bottom = &*stack.begin() + *(--ptrTop);
-                op = operations + *(--ptrTop);
+                bottom = reinterpret_cast<TNumber *>(*(--ptrTop));
+                op = reinterpret_cast<const LowLevelOperation *>(*(--ptrTop));
                 break;
             }
             case Opcode::Halt:
