@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Calc4DotNet.Core.ILCompilation\Calc4DotNet.Core.ILCompilation.csproj" />
-    <ProjectReference Include="..\Calc4DotNet\Calc4DotNet.csproj" />
+    <ProjectReference Include="..\Calc4DotNet.Core\Calc4DotNet.Core.csproj" />
   </ItemGroup>
 
 </Project>
