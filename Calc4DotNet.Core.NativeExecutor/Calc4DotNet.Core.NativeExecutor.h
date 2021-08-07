@@ -28,8 +28,10 @@ std::pair<ExecutionState, TNumber> ExecuteCore(const LowLevelOperation *operatio
 {
     std::vector<TNumber> stack(StackSize);
     std::vector<int> ptrStack(PtrStackSize);
-    int top = 0, bottom = 0;
-    int ptrIndex = 0;
+    TNumber *top = &*stack.begin(), *bottom = &*stack.begin();
+    int *ptrTop = &*ptrStack.begin();
+    TNumber *stackEnd = &*stack.begin() + stack.size();
+    int *ptrStackEnd = &*ptrStack.begin() + ptrStack.size();
     const LowLevelOperation *op = operations;
 
     while (true)
@@ -37,113 +39,113 @@ std::pair<ExecutionState, TNumber> ExecuteCore(const LowLevelOperation *operatio
         switch (op->opcode)
         {
             case Opcode::Push:
-                stack[top++] = 0;
+                *(top++) = 0;
                 break;
             case Opcode::Pop:
                 top--;
                 break;
             case Opcode::LoadConst:
-                stack[top++] = op->value;
+                *(top++) = op->value;
                 break;
             case Opcode::LoadConstTable:
-                stack[top++] = constTable[op->value];
+                *(top++) = constTable[op->value];
                 break;
             case Opcode::LoadArg:
-                stack[top++] = stack[bottom - op->value];
+                *(top++) = bottom[-op->value];
                 break;
             case Opcode::StoreArg:
-                stack[bottom - op->value] = stack[--top];
+                bottom[-op->value] = *(--top);
                 break;
             case Opcode::Input:
-                //std::cin >> stack[top++];
+                //std::cin >> *(top++);
                 // Not implemented
                 break;
             case Opcode::Add:
                 top--;
-                stack[top - 1] = stack[top - 1] + stack[top];
+                top[-1] = top[-1] + *top;
                 break;
             case Opcode::Sub:
                 top--;
-                stack[top - 1] = stack[top - 1] - stack[top];
+                top[-1] = top[-1] - *top;
                 break;
             case Opcode::Mult:
                 top--;
-                stack[top - 1] = stack[top - 1] * stack[top];
+                top[-1] = top[-1] * *top;
                 break;
             case Opcode::Div:
                 top--;
-                stack[top - 1] = stack[top - 1] / stack[top];
+                top[-1] = top[-1] / *top;
                 break;
             case Opcode::Mod:
                 top--;
                 if constexpr (std::is_same_v<TNumber, double>)
                 {
-                    stack[top - 1] = std::fmod(stack[top - 1], stack[top]);
+                    top[-1] = std::fmod(top[-1], *top);
                 }
                 else
                 {
-                    stack[top - 1] = stack[top - 1] % stack[top];
+                    top[-1] = top[-1] % *top;
                 }
                 break;
             case Opcode::Goto:
                 op = operations + op->value;
                 break;
             case Opcode::GotoIfTrue:
-                if (stack[--top] != 0)
+                if (*(--top) != 0)
                 {
                     op = operations + op->value;
                 }
                 break;
             case Opcode::GotoIfEqual:
                 top -= 2;
-                if (stack[top] == stack[top + 1])
+                if (*top == top[1])
                 {
                     op = operations + op->value;
                 }
                 break;
             case Opcode::GotoIfLessThan:
                 top -= 2;
-                if (stack[top] < stack[top + 1])
+                if (*top < top[1])
                 {
                     op = operations + op->value;
                 }
                 break;
             case Opcode::GotoIfLessThanOrEqual:
                 top -= 2;
-                if (stack[top] <= stack[top + 1])
+                if (*top <= top[1])
                 {
                     op = operations + op->value;
                 }
                 break;
             case Opcode::Call:
             {
-                if (top + maxStackSizes[op->value] >= static_cast<int>(stack.size()))
+                if (top + maxStackSizes[op->value] >= stackEnd)
                 {
                     return std::make_pair(ExecutionState::StackOverflow, 0);
                 }
 
-                if (ptrIndex + 2 >= static_cast<int>(ptrStack.size()))
+                if (ptrTop + 2 >= ptrStackEnd)
                 {
                     return std::make_pair(ExecutionState::StackOverflow, 0);
                 }
 
-                ptrStack[ptrIndex++] = static_cast<int>(op - operations);
-                ptrStack[ptrIndex++] = bottom;
+                *(ptrTop++) = static_cast<int>(op - operations);
+                *(ptrTop++) = static_cast<int>(bottom - &*stack.begin());
                 bottom = top;
                 op = operations + op->value;
                 break;
             }
             case Opcode::Return:
             {
-                TNumber returnValue = stack[top - 1];
+                TNumber returnValue = top[-1];
                 top = bottom - op->value + 1;
-                stack[top - 1] = returnValue;
-                bottom = ptrStack[--ptrIndex];
-                op = operations + ptrStack[--ptrIndex];
+                top[-1] = returnValue;
+                bottom = &*stack.begin() + *(--ptrTop);
+                op = operations + *(--ptrTop);
                 break;
             }
             case Opcode::Halt:
-                return std::make_pair(ExecutionState::Success, stack[top - 1]);
+                return std::make_pair(ExecutionState::Success, top[-1]);
                 break;
             case Opcode::Lavel:
             default:
