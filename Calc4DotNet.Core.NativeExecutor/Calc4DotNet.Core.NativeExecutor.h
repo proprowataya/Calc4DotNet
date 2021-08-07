@@ -13,6 +13,8 @@ public ref class NativeStackOverflowException : Exception
 {};
 }
 
+#pragma unmanaged
+
 namespace
 {
 constexpr int StackSize = 1 << 20;
@@ -156,6 +158,8 @@ std::pair<ExecutionState, TNumber> ExecuteCore(const LowLevelOperation *operatio
         op++;
     }
 }
+
+#pragma managed
 
 template<typename TNumber>
 static TNumber ExecuteInternal(const void *operations, const int32_t *maxStackSizes, int numOperations, const TNumber *constTable, int numConstants)
