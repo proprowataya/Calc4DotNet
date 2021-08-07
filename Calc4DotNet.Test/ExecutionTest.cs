@@ -111,6 +111,24 @@ namespace Calc4DotNet.Test
         }
 
         [Theory, MemberData(nameof(Source))]
+        public static void TestByCppLowLevelExecutor(string text, object expected, Type type, bool optimize)
+        {
+            if (type == typeof(BigInteger))
+            {
+                // Skip this test
+                return;
+            }
+
+            TestCore(text, expected, type, optimize, (op, context) =>
+            {
+                var module = GenerateLowLevelModuleDynamic((dynamic)op,
+                                                           (dynamic)context,
+                                                           (dynamic)Activator.CreateInstance(type)!);
+                return CppLowLevelExecutor.Execute(module);
+            });
+        }
+
+        [Theory, MemberData(nameof(Source))]
         public static void TestByJIT(string text, object expected, Type type, bool optimize)
         {
             TestCore(text, expected, type, optimize, (op, context) =>
@@ -135,6 +153,23 @@ namespace Calc4DotNet.Test
                     Assert.Throws<Calc4DotNet.Core.Exceptions.StackOverflowException>(() =>
                     {
                         TestByLowLevelExecutor(text, Activator.CreateInstance(type)! /* dummy */, type, optimize);
+                    });
+                }
+            }
+        }
+
+        [Fact]
+        public static void TestStackOverflowCpp()
+        {
+            const string text = "D[x||{x} + 1] {x}";
+
+            foreach (var type in TestTypes.Except(new[] { typeof(BigInteger) }))
+            {
+                foreach (var optimize in new[] { true, false })
+                {
+                    Assert.Throws<Calc4DotNet.Core.Exceptions.StackOverflowException>(() =>
+                    {
+                        TestByCppLowLevelExecutor(text, Activator.CreateInstance(type)! /* dummy */, type, optimize);
                     });
                 }
             }

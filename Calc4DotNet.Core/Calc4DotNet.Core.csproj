@@ -5,6 +5,12 @@
     <PublishTrimmed>true</PublishTrimmed>
     <PublishReadyToRun>true</PublishReadyToRun>
     <Nullable>enable</Nullable>
+    <Platforms>x64;x86</Platforms>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Calc4DotNet.Core.NativeExecutor\Calc4DotNet.Core.NativeExecutor.vcxproj" />
+  </ItemGroup>
 
 </Project>
