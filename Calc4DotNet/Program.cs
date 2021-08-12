@@ -1,6 +1,5 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Numerics;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Exceptions;
 using Calc4DotNet.Core.Execution;
@@ -61,10 +60,12 @@ namespace Calc4DotNet
                 {
                     ReplCore<Double>(text, setting);
                 }
+#if false
                 else if (setting.NumberType == typeof(BigInteger))
                 {
                     ReplCore<BigInteger>(text, setting);
                 }
+#endif
                 else
                 {
                     Console.WriteLine($"Error: Type {setting.NumberType} is not supported.");
@@ -155,7 +156,9 @@ namespace Calc4DotNet
                             "int32" => typeof(Int32),
                             "int64" => typeof(Int64),
                             "double" => typeof(Double),
+#if false
                             "bigint" or "biginteger" => typeof(BigInteger),
+#endif
                             var arg => throw new CommandLineArgsParseException($"Type {arg} is not supported."),
                         };
 

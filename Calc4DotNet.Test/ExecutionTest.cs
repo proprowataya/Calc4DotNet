@@ -1,4 +1,3 @@
-using System.Numerics;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Execution;
@@ -33,7 +32,13 @@ namespace Calc4DotNet.Test
             ("D[tarai|x,y,z|x <= y ? y ? (((x - 1){tarai}y{tarai}z){tarai}((y - 1){tarai}z{tarai}x){tarai}((z - 1){tarai}x{tarai}y))] 10{tarai}5{tarai}5", 5, null),
         };
 
-        private static readonly Type[] TestTypes = new[] { typeof(Int32), typeof(Int64), typeof(Double), typeof(BigInteger) };
+        private static readonly Type[] TestTypes = new[]
+        {
+            typeof(Int32), typeof(Int64), typeof(Double),
+#if false
+            typeof(BigInteger)
+#endif
+        };
 
         public static readonly object[][] Source =
             (from test in TestCases

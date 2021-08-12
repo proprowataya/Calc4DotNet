@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Calc4DotNet.Core.Execution
@@ -24,10 +23,12 @@ namespace Calc4DotNet.Core.Execution
             return ExecuteCore<Double>(module);
         }
 
+#if false
         public static BigInteger Execute(LowLevelModule<BigInteger> module)
         {
             return ExecuteCore<BigInteger>(module);
         }
+#endif
 
         private static TNumber ExecuteCore<TNumber>(LowLevelModule<TNumber> module)
             where TNumber : INumber<TNumber>

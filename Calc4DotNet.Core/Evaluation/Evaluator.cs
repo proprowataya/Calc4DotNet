@@ -1,6 +1,5 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using Calc4DotNet.Core.Operators;
 
@@ -32,11 +31,13 @@ namespace Calc4DotNet.Core.Evaluation
                 var result = op.Accept(new Visitor<Double>(maxStep), (context, null));
                 return Unsafe.As<Double, TNumber>(ref result);
             }
+#if false
             else if (typeof(TNumber) == typeof(BigInteger))
             {
                 var result = op.Accept(new Visitor<BigInteger>(maxStep), (context, null));
                 return Unsafe.As<BigInteger, TNumber>(ref result);
             }
+#endif
             else
             {
                 throw new Calc4DotNet.Core.Exceptions.TypeNotSupportedException(typeof(TNumber));
