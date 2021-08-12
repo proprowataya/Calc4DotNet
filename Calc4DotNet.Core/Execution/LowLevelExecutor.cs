@@ -67,7 +67,7 @@ namespace Calc4DotNet.Core.Execution
                         break;
                     case Opcode.LoadConst:
                         VerifyRange(stack, ref top);
-                        top = TNumber.Create(op.Value);
+                        top = TNumber.CreateTruncating(op.Value);
                         top = ref Unsafe.Add(ref top, 1);
                         break;
                     case Opcode.LoadConstTable:

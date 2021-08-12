@@ -90,7 +90,7 @@ namespace Calc4DotNet.Core.Evaluation
             public TNumber Visit(DecimalOperator op, (CompilationContext context, TNumber[]? arguments) param)
             {
                 TNumber operand = op.Operand.Accept(this, param);
-                return operand * TNumber.Create(10) + TNumber.Create(op.Value);
+                return operand * TNumber.CreateTruncating(10) + TNumber.CreateTruncating(op.Value);
             }
 
             public TNumber Visit(BinaryOperator op, (CompilationContext context, TNumber[]? arguments) param)

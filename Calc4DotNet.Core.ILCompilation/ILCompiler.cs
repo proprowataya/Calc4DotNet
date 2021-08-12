@@ -93,10 +93,10 @@ namespace Calc4DotNet.Core.ILCompilation
                         il.Emit(OpCodes.Pop);
                         break;
                     case Opcode.LoadConst:
-                        il.EmitLdc(TNumber.Create(op.Value));
+                        il.EmitLdc(TNumber.CreateTruncating(op.Value));
                         break;
                     case Opcode.LoadConstTable:
-                        il.EmitLdc(TNumber.Create(module.ConstTable[op.Value]));
+                        il.EmitLdc(TNumber.CreateTruncating(module.ConstTable[op.Value]));
                         break;
                     case Opcode.LoadArg:
                         il.EmitLdarg(RestoreMethodParameterIndex(op.Value));
