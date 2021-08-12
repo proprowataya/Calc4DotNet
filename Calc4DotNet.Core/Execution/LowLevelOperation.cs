@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace Calc4DotNet.Core.Execution
+﻿namespace Calc4DotNet.Core.Execution
 {
     public readonly struct LowLevelOperation
     {

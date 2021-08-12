@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Reflection.Emit;
 
 namespace Calc4DotNet.Core.ILCompilation

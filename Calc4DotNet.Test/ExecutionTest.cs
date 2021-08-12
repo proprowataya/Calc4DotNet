@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Numerics;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Evaluation;

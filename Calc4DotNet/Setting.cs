@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Calc4DotNet
+﻿namespace Calc4DotNet
 {
     internal sealed record Setting(Type NumberType, ExecutorType ExecutorType, bool Optimize, bool PrintDetailInformation);
 

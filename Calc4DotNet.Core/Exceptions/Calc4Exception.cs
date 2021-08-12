@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Calc4DotNet.Core.Exceptions
+﻿namespace Calc4DotNet.Core.Exceptions
 {
     public abstract class Calc4Exception : Exception
     {
