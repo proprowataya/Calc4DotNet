@@ -1,6 +1,5 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.Evaluation
@@ -16,32 +15,7 @@ namespace Calc4DotNet.Core.Evaluation
         public static TNumber Evaluate<TNumber>(IOperator op, CompilationContext context, int maxStep = int.MaxValue)
             where TNumber : INumber<TNumber>
         {
-            if (typeof(TNumber) == typeof(Int32))
-            {
-                var result = op.Accept(new Visitor<Int32>(maxStep), (context, null));
-                return Unsafe.As<Int32, TNumber>(ref result);
-            }
-            else if (typeof(TNumber) == typeof(Int64))
-            {
-                var result = op.Accept(new Visitor<Int64>(maxStep), (context, null));
-                return Unsafe.As<Int64, TNumber>(ref result);
-            }
-            else if (typeof(TNumber) == typeof(Double))
-            {
-                var result = op.Accept(new Visitor<Double>(maxStep), (context, null));
-                return Unsafe.As<Double, TNumber>(ref result);
-            }
-#if false
-            else if (typeof(TNumber) == typeof(BigInteger))
-            {
-                var result = op.Accept(new Visitor<BigInteger>(maxStep), (context, null));
-                return Unsafe.As<BigInteger, TNumber>(ref result);
-            }
-#endif
-            else
-            {
-                throw new Calc4DotNet.Core.Exceptions.TypeNotSupportedException(typeof(TNumber));
-            }
+            return op.Accept(new Visitor<TNumber>(maxStep), (context, null));
         }
 
         private sealed class Visitor<TNumber>

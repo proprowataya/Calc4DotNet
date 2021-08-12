@@ -106,7 +106,7 @@ namespace Calc4DotNet
                 TNumber result;
                 if (setting.ExecutorType == ExecutorType.LowLevel)
                 {
-                    result = LowLevelExecutor.Execute((dynamic)module);
+                    result = LowLevelExecutor.Execute(module);
                 }
                 else if (setting.ExecutorType == ExecutorType.JIT)
                 {

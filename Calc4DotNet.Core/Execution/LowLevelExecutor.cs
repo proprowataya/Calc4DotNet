@@ -8,29 +8,7 @@ namespace Calc4DotNet.Core.Execution
         private const int StackSize = 1 << 20;
         private const int PtrStackSize = 1 << 20;
 
-        public static Int32 Execute(LowLevelModule<Int32> module)
-        {
-            return ExecuteCore<Int32>(module);
-        }
-
-        public static Int64 Execute(LowLevelModule<Int64> module)
-        {
-            return ExecuteCore<Int64>(module);
-        }
-
-        public static Double Execute(LowLevelModule<Double> module)
-        {
-            return ExecuteCore<Double>(module);
-        }
-
-#if false
-        public static BigInteger Execute(LowLevelModule<BigInteger> module)
-        {
-            return ExecuteCore<BigInteger>(module);
-        }
-#endif
-
-        private static TNumber ExecuteCore<TNumber>(LowLevelModule<TNumber> module)
+        public static TNumber Execute<TNumber>(LowLevelModule<TNumber> module)
             where TNumber : INumber<TNumber>
         {
             var (operationsArray, maxStackSizesArray) = module.FlattenOperations();
