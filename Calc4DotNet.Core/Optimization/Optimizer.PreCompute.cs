@@ -80,8 +80,7 @@ namespace Calc4DotNet.Core.Optimization
 
                 if (PreComputeIfPossible(condition) is PreComputedOperator preComputed)
                 {
-                    // TODO: More wise determination method of whether the value is zero or not
-                    return (dynamic)preComputed.Value != 0 ? ifTrue : ifFalse;
+                    return (TNumber)preComputed.Value != TNumber.Zero ? ifTrue : ifFalse;
                 }
                 else
                 {

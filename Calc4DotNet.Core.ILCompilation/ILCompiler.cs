@@ -87,16 +87,16 @@ namespace Calc4DotNet.Core.ILCompilation
                 switch (op.Opcode)
                 {
                     case Opcode.Push:
-                        il.EmitLdc((TNumber)(dynamic)0);
+                        il.EmitLdc(TNumber.Zero);
                         break;
                     case Opcode.Pop:
                         il.Emit(OpCodes.Pop);
                         break;
                     case Opcode.LoadConst:
-                        il.EmitLdc((TNumber)(dynamic)op.Value);
+                        il.EmitLdc(TNumber.Create(op.Value));
                         break;
                     case Opcode.LoadConstTable:
-                        il.EmitLdc((TNumber)(dynamic)module.ConstTable[op.Value]);
+                        il.EmitLdc(TNumber.Create(module.ConstTable[op.Value]));
                         break;
                     case Opcode.LoadArg:
                         il.EmitLdarg(RestoreMethodParameterIndex(op.Value));
