@@ -7,7 +7,7 @@ namespace Calc4DotNet.Core.Execution
     public static class LowLevelCodeGenerator
     {
         public static LowLevelModule<TNumber> Generate<TNumber>(IOperator op, CompilationContext context)
-            where TNumber : notnull
+            where TNumber : INumber<TNumber>
         {
             var constTable = new List<TNumber>();
             var userDefinedOperators = ImmutableArray.CreateBuilder<LowLevelUserDefinedOperator>();
@@ -49,7 +49,7 @@ namespace Calc4DotNet.Core.Execution
         }
 
         private sealed class Visitor<TNumber> : IOperatorVisitor
-            where TNumber : notnull
+            where TNumber : INumber<TNumber>
         {
             private const int OperatorBeginLabel = 0;
 

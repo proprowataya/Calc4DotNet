@@ -5,6 +5,12 @@
     <PublishTrimmed>true</PublishTrimmed>
     <PublishReadyToRun>true</PublishReadyToRun>
     <Nullable>enable</Nullable>
+	<LangVersion>preview</LangVersion>
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Runtime.Experimental" Version="6.0.0-preview.7.21377.19" />
+  </ItemGroup>
 
 </Project>

@@ -14,7 +14,7 @@ namespace Calc4DotNet.Core.ILCompilation
         private const string RunMethodName = nameof(ICompiledModule<object>.Run);
 
         public static ICompiledModule<TNumber> Compile<TNumber>(LowLevelModule<TNumber> module)
-            where TNumber : notnull
+            where TNumber : INumber<TNumber>
         {
             AssemblyBuilder assemblyBuilder
                 = AssemblyBuilder.DefineDynamicAssembly(AsmName, AssemblyBuilderAccess.Run);
@@ -53,7 +53,7 @@ namespace Calc4DotNet.Core.ILCompilation
         }
 
         private static void EmitIL<TNumber>(LowLevelModule<TNumber> module, MethodBuilder runMethod, (MethodBuilder Method, int NumOperands)[] methods)
-            where TNumber : notnull
+            where TNumber : INumber<TNumber>
         {
             // Emit Main(Run) operator
             EmitILCore(module, module.EntryPoint, runMethod, 0, methods);
@@ -66,7 +66,7 @@ namespace Calc4DotNet.Core.ILCompilation
         }
 
         private static void EmitILCore<TNumber>(LowLevelModule<TNumber> module, ImmutableArray<LowLevelOperation> operations, MethodBuilder method, int numOperands, (MethodBuilder Method, int NumOperands)[] methods)
-            where TNumber : notnull
+            where TNumber : INumber<TNumber>
         {
             /* Local method */
             int RestoreMethodParameterIndex(int value) => numOperands - value;

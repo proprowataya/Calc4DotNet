@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
+    <PackageReference Include="System.Runtime.Experimental" Version="6.0.0-preview.7.21377.19" />
   </ItemGroup>
 
   <ItemGroup>

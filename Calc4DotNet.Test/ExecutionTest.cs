@@ -48,13 +48,13 @@ namespace Calc4DotNet.Test
         #region Helpers
 
         private static TNumber EvaluateDynamic<TNumber>(IOperator op, CompilationContext context, int maxStep, TNumber dummy)
-            where TNumber : notnull
+            where TNumber : INumber<TNumber>
         {
             return Evaluator.Evaluate<TNumber>(op, context, maxStep);
         }
 
         private static LowLevelModule<TNumber> GenerateLowLevelModuleDynamic<TNumber>(IOperator op, CompilationContext context, TNumber dummy)
-            where TNumber : notnull
+            where TNumber : INumber<TNumber>
         {
             return LowLevelCodeGenerator.Generate<TNumber>(op, context);
         }
@@ -68,7 +68,7 @@ namespace Calc4DotNet.Test
 
         private static void TestCoreGeneric<TNumber>(string text, TNumber expected, Type type, bool optimize,
                                                      Func<object, object, object> executor, TNumber dummy)
-            where TNumber : notnull
+            where TNumber : INumber<TNumber>
         {
             var context = CompilationContext.Empty;
             var tokens = Lexer.Lex(text, ref context);

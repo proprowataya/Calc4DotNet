@@ -11,30 +11,27 @@ namespace Calc4DotNet.Core.Execution
 
         public static Int32 Execute(LowLevelModule<Int32> module)
         {
-            return ExecuteCore<Int32, Int32Computer>(module);
+            return ExecuteCore<Int32>(module);
         }
 
         public static Int64 Execute(LowLevelModule<Int64> module)
         {
-            return ExecuteCore<Int64, Int64Computer>(module);
+            return ExecuteCore<Int64>(module);
         }
 
         public static Double Execute(LowLevelModule<Double> module)
         {
-            return ExecuteCore<Double, DoubleComputer>(module);
+            return ExecuteCore<Double>(module);
         }
 
         public static BigInteger Execute(LowLevelModule<BigInteger> module)
         {
-            return ExecuteCore<BigInteger, BigIntegerComputer>(module);
+            return ExecuteCore<BigInteger>(module);
         }
 
-        private static TNumber ExecuteCore<TNumber, TNumberComputer>(LowLevelModule<TNumber> module)
-            where TNumber : notnull
-            where TNumberComputer : struct, INumberComputer<TNumber>
+        private static TNumber ExecuteCore<TNumber>(LowLevelModule<TNumber> module)
+            where TNumber : INumber<TNumber>
         {
-            TNumberComputer c = default;
-
             var (operationsArray, maxStackSizesArray) = module.FlattenOperations();
             Span<LowLevelOperation> operations = stackalloc LowLevelOperation[operationsArray.Length];
             Span<int> maxStackSizes = stackalloc int[maxStackSizesArray.Length];
@@ -61,7 +58,7 @@ namespace Calc4DotNet.Core.Execution
                 {
                     case Opcode.Push:
                         VerifyRange(stack, ref top);
-                        top = c.Zero;
+                        top = TNumber.Zero;
                         top = ref Unsafe.Add(ref top, 1);
                         break;
                     case Opcode.Pop:
@@ -69,7 +66,7 @@ namespace Calc4DotNet.Core.Execution
                         break;
                     case Opcode.LoadConst:
                         VerifyRange(stack, ref top);
-                        top = c.FromInt(op.Value);
+                        top = TNumber.Create(op.Value);
                         top = ref Unsafe.Add(ref top, 1);
                         break;
                     case Opcode.LoadConstTable:
@@ -94,31 +91,31 @@ namespace Calc4DotNet.Core.Execution
                         top = ref Unsafe.Add(ref top, -1);
                         VerifyRange(stack, ref top);
                         VerifyRange(stack, ref Unsafe.Add(ref top, -1));
-                        Unsafe.Add(ref top, -1) = c.Add(Unsafe.Add(ref top, -1), top);
+                        Unsafe.Add(ref top, -1) = Unsafe.Add(ref top, -1) + top;
                         break;
                     case Opcode.Sub:
                         top = ref Unsafe.Add(ref top, -1);
                         VerifyRange(stack, ref top);
                         VerifyRange(stack, ref Unsafe.Add(ref top, -1));
-                        Unsafe.Add(ref top, -1) = c.Subtract(Unsafe.Add(ref top, -1), top);
+                        Unsafe.Add(ref top, -1) = Unsafe.Add(ref top, -1) - top;
                         break;
                     case Opcode.Mult:
                         top = ref Unsafe.Add(ref top, -1);
                         VerifyRange(stack, ref top);
                         VerifyRange(stack, ref Unsafe.Add(ref top, -1));
-                        Unsafe.Add(ref top, -1) = c.Multiply(Unsafe.Add(ref top, -1), top);
+                        Unsafe.Add(ref top, -1) = Unsafe.Add(ref top, -1) * top;
                         break;
                     case Opcode.Div:
                         top = ref Unsafe.Add(ref top, -1);
                         VerifyRange(stack, ref top);
                         VerifyRange(stack, ref Unsafe.Add(ref top, -1));
-                        Unsafe.Add(ref top, -1) = c.Divide(Unsafe.Add(ref top, -1), top);
+                        Unsafe.Add(ref top, -1) = Unsafe.Add(ref top, -1) / top;
                         break;
                     case Opcode.Mod:
                         top = ref Unsafe.Add(ref top, -1);
                         VerifyRange(stack, ref top);
                         VerifyRange(stack, ref Unsafe.Add(ref top, -1));
-                        Unsafe.Add(ref top, -1) = c.Modulo(Unsafe.Add(ref top, -1), top);
+                        Unsafe.Add(ref top, -1) = Unsafe.Add(ref top, -1) % top;
                         break;
                     case Opcode.Goto:
                         op = ref Unsafe.Add(ref firstOperation, op.Value);
@@ -126,7 +123,7 @@ namespace Calc4DotNet.Core.Execution
                     case Opcode.GotoIfTrue:
                         top = ref Unsafe.Add(ref top, -1);
                         VerifyRange(stack, ref top);
-                        if (c.NotEquals(top, c.Zero))
+                        if (top != TNumber.Zero)
                         {
                             op = ref Unsafe.Add(ref firstOperation, op.Value);
                         }
@@ -135,7 +132,7 @@ namespace Calc4DotNet.Core.Execution
                         top = ref Unsafe.Add(ref top, -2);
                         VerifyRange(stack, ref top);
                         VerifyRange(stack, ref Unsafe.Add(ref top, 1));
-                        if (c.Equals(top, Unsafe.Add(ref top, 1)))
+                        if (top == Unsafe.Add(ref top, 1))
                         {
                             op = ref Unsafe.Add(ref firstOperation, op.Value);
                         }
@@ -144,7 +141,7 @@ namespace Calc4DotNet.Core.Execution
                         top = ref Unsafe.Add(ref top, -2);
                         VerifyRange(stack, ref top);
                         VerifyRange(stack, ref Unsafe.Add(ref top, 1));
-                        if (c.LessThan(top, Unsafe.Add(ref top, 1)))
+                        if (top < Unsafe.Add(ref top, 1))
                         {
                             op = ref Unsafe.Add(ref firstOperation, op.Value);
                         }
@@ -153,7 +150,7 @@ namespace Calc4DotNet.Core.Execution
                         top = ref Unsafe.Add(ref top, -2);
                         VerifyRange(stack, ref top);
                         VerifyRange(stack, ref Unsafe.Add(ref top, 1));
-                        if (c.LessThanOrEquals(top, Unsafe.Add(ref top, 1)))
+                        if (top <= Unsafe.Add(ref top, 1))
                         {
                             op = ref Unsafe.Add(ref firstOperation, op.Value);
                         }
