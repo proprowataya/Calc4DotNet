@@ -1,5 +1,8 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using Calc4DotNet.Core.Numbers;
 using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.Evaluation
@@ -13,9 +16,29 @@ namespace Calc4DotNet.Core.Evaluation
     public static class Evaluator
     {
         public static TNumber Evaluate<TNumber>(IOperator op, CompilationContext context, int maxStep = int.MaxValue)
+            where TNumber : notnull
+        {
+            if (typeof(TNumber) == typeof(BigInteger))
+            {
+                BigInteger result = op.Accept(CreateVisitor(maxStep, default(WrappedBigInteger)), (context, null)).Value;
+                return Unsafe.As<BigInteger, TNumber>(ref result);
+            }
+
+            try
+            {
+                return op.Accept(CreateVisitor(maxStep, (dynamic)default(TNumber)!), (context, (TNumber[]?)null));
+            }
+            catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException)
+            {
+                // TNumber does not implement INumber<TNumber>
+                throw new Calc4DotNet.Core.Exceptions.TypeNotSupportedException(typeof(TNumber));
+            }
+        }
+
+        private static Visitor<TNumber> CreateVisitor<TNumber>(int maxStep, TNumber dummy)
             where TNumber : INumber<TNumber>
         {
-            return op.Accept(new Visitor<TNumber>(maxStep), (context, null));
+            return new Visitor<TNumber>(maxStep);
         }
 
         private sealed class Visitor<TNumber>
@@ -36,7 +59,20 @@ namespace Calc4DotNet.Core.Evaluation
                 => TNumber.Zero;
 
             public TNumber Visit(PreComputedOperator op, (CompilationContext context, TNumber[]? arguments) param)
-                => (TNumber)op.Value;
+            {
+                if (typeof(TNumber) == typeof(WrappedBigInteger))
+                {
+                    // TODO:
+                    // This code is for special case when using BigInteger.
+                    // We need more sophisticated solution to handle this case.
+                    WrappedBigInteger casted = (WrappedBigInteger)(BigInteger)op.Value;
+                    return Unsafe.As<WrappedBigInteger, TNumber>(ref casted);
+                }
+                else
+                {
+                    return (TNumber)op.Value;
+                }
+            }
 
             public TNumber Visit(ArgumentOperator op, (CompilationContext context, TNumber[]? arguments) param)
             {

@@ -7,7 +7,7 @@ namespace Calc4DotNet.Core.Execution
     public static class LowLevelCodeGenerator
     {
         public static LowLevelModule<TNumber> Generate<TNumber>(IOperator op, CompilationContext context)
-            where TNumber : INumber<TNumber>
+            where TNumber : notnull
         {
             var constTable = new List<TNumber>();
             var userDefinedOperators = ImmutableArray.CreateBuilder<LowLevelUserDefinedOperator>();
@@ -49,7 +49,7 @@ namespace Calc4DotNet.Core.Execution
         }
 
         private sealed class Visitor<TNumber> : IOperatorVisitor
-            where TNumber : INumber<TNumber>
+            where TNumber : notnull
         {
             private const int OperatorBeginLabel = 0;
 
@@ -209,18 +209,11 @@ namespace Calc4DotNet.Core.Execution
 
             public void Visit(PreComputedOperator op)
             {
-                static TTo CastChecked<TFrom, TTo>(TFrom value)
-                    where TFrom : INumber<TFrom>
-                    where TTo : INumber<TTo>
-                {
-                    return TTo.Create(value);
-                }
-
                 static bool TryCastToShort(TNumber number, out short casted)
                 {
                     try
                     {
-                        casted = CastChecked<TNumber, short>(number);
+                        casted = checked((short)(dynamic)number);
                         return true;
                     }
                     catch (OverflowException)

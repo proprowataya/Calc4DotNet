@@ -14,7 +14,7 @@ namespace Calc4DotNet.Core.ILCompilation
         private const string RunMethodName = nameof(ICompiledModule<object>.Run);
 
         public static ICompiledModule<TNumber> Compile<TNumber>(LowLevelModule<TNumber> module)
-            where TNumber : INumber<TNumber>
+            where TNumber : notnull
         {
             AssemblyBuilder assemblyBuilder
                 = AssemblyBuilder.DefineDynamicAssembly(AsmName, AssemblyBuilderAccess.Run);
@@ -53,7 +53,7 @@ namespace Calc4DotNet.Core.ILCompilation
         }
 
         private static void EmitIL<TNumber>(LowLevelModule<TNumber> module, MethodBuilder runMethod, (MethodBuilder Method, int NumOperands)[] methods)
-            where TNumber : INumber<TNumber>
+            where TNumber : notnull
         {
             // Emit Main(Run) operator
             EmitILCore(module, module.EntryPoint, runMethod, 0, methods);
@@ -66,7 +66,7 @@ namespace Calc4DotNet.Core.ILCompilation
         }
 
         private static void EmitILCore<TNumber>(LowLevelModule<TNumber> module, ImmutableArray<LowLevelOperation> operations, MethodBuilder method, int numOperands, (MethodBuilder Method, int NumOperands)[] methods)
-            where TNumber : INumber<TNumber>
+            where TNumber : notnull
         {
             /* Local method */
             int RestoreMethodParameterIndex(int value) => numOperands - value;
@@ -87,16 +87,16 @@ namespace Calc4DotNet.Core.ILCompilation
                 switch (op.Opcode)
                 {
                     case Opcode.Push:
-                        il.EmitLdc(TNumber.Zero);
+                        il.EmitLdc((TNumber)(dynamic)0);
                         break;
                     case Opcode.Pop:
                         il.Emit(OpCodes.Pop);
                         break;
                     case Opcode.LoadConst:
-                        il.EmitLdc(TNumber.CreateTruncating(op.Value));
+                        il.EmitLdc((TNumber)(dynamic)op.Value);
                         break;
                     case Opcode.LoadConstTable:
-                        il.EmitLdc(TNumber.CreateTruncating(module.ConstTable[op.Value]));
+                        il.EmitLdc((TNumber)(dynamic)module.ConstTable[op.Value]);
                         break;
                     case Opcode.LoadArg:
                         il.EmitLdarg(RestoreMethodParameterIndex(op.Value));

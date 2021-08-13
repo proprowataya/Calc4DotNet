@@ -1,5 +1,8 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
+using Calc4DotNet.Core.Numbers;
 
 namespace Calc4DotNet.Core.Execution
 {
@@ -9,6 +12,32 @@ namespace Calc4DotNet.Core.Execution
         private const int PtrStackSize = 1 << 20;
 
         public static TNumber Execute<TNumber>(LowLevelModule<TNumber> module)
+            where TNumber : notnull
+        {
+            if (typeof(TNumber) == typeof(BigInteger))
+            {
+                LowLevelModule<WrappedBigInteger> castedModule =
+                    new(module.EntryPoint,
+                        module.ConstTable.Select(value => new WrappedBigInteger(Unsafe.As<TNumber, BigInteger>(ref value)))
+                                         .ToImmutableArray(),
+                        module.UserDefinedOperators);
+
+                BigInteger result = ExecuteCore(castedModule).Value;
+                return Unsafe.As<BigInteger, TNumber>(ref result);
+            }
+
+            try
+            {
+                return ExecuteCore((dynamic)module);
+            }
+            catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException)
+            {
+                // TNumber does not implement INumber<TNumber>
+                throw new Calc4DotNet.Core.Exceptions.TypeNotSupportedException(typeof(TNumber));
+            }
+        }
+
+        private static TNumber ExecuteCore<TNumber>(LowLevelModule<TNumber> module)
             where TNumber : INumber<TNumber>
         {
             var (operationsArray, maxStackSizesArray) = module.FlattenOperations();

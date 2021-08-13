@@ -7,7 +7,7 @@ namespace Calc4DotNet.Core.Optimization
     public static partial class Optimizer
     {
         private sealed class PreComputeVisitor<TNumber> : IOperatorVisitor<IOperator>
-            where TNumber : INumber<TNumber>
+            where TNumber : notnull
         {
             private readonly CompilationContext context;
             private readonly int maxStep;
@@ -80,7 +80,7 @@ namespace Calc4DotNet.Core.Optimization
 
                 if (PreComputeIfPossible(condition) is PreComputedOperator preComputed)
                 {
-                    return (TNumber)preComputed.Value != TNumber.Zero ? ifTrue : ifFalse;
+                    return (dynamic)(TNumber)preComputed.Value != 0 ? ifTrue : ifFalse;
                 }
                 else
                 {

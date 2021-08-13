@@ -1,3 +1,4 @@
+using System.Numerics;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Execution;
@@ -32,13 +33,7 @@ namespace Calc4DotNet.Test
             ("D[tarai|x,y,z|x <= y ? y ? (((x - 1){tarai}y{tarai}z){tarai}((y - 1){tarai}z{tarai}x){tarai}((z - 1){tarai}x{tarai}y))] 10{tarai}5{tarai}5", 5, null),
         };
 
-        private static readonly Type[] TestTypes = new[]
-        {
-            typeof(Int32), typeof(Int64), typeof(Double),
-#if false
-            typeof(BigInteger)
-#endif
-        };
+        private static readonly Type[] TestTypes = new[] { typeof(Int32), typeof(Int64), typeof(Double), typeof(BigInteger) };
 
         public static readonly object[][] Source =
             (from test in TestCases
@@ -53,13 +48,13 @@ namespace Calc4DotNet.Test
         #region Helpers
 
         private static TNumber EvaluateDynamic<TNumber>(IOperator op, CompilationContext context, int maxStep, TNumber dummy)
-            where TNumber : INumber<TNumber>
+            where TNumber : notnull
         {
             return Evaluator.Evaluate<TNumber>(op, context, maxStep);
         }
 
         private static LowLevelModule<TNumber> GenerateLowLevelModuleDynamic<TNumber>(IOperator op, CompilationContext context, TNumber dummy)
-            where TNumber : INumber<TNumber>
+            where TNumber : notnull
         {
             return LowLevelCodeGenerator.Generate<TNumber>(op, context);
         }
@@ -73,7 +68,7 @@ namespace Calc4DotNet.Test
 
         private static void TestCoreGeneric<TNumber>(string text, TNumber expected, Type type, bool optimize,
                                                      Func<object, object, object> executor, TNumber dummy)
-            where TNumber : INumber<TNumber>
+            where TNumber : notnull
         {
             var context = CompilationContext.Empty;
             var tokens = Lexer.Lex(text, ref context);

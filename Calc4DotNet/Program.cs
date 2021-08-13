@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Numerics;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Exceptions;
 using Calc4DotNet.Core.Execution;
@@ -60,12 +61,10 @@ namespace Calc4DotNet
                 {
                     ReplCore<Double>(text, setting);
                 }
-#if false
                 else if (setting.NumberType == typeof(BigInteger))
                 {
                     ReplCore<BigInteger>(text, setting);
                 }
-#endif
                 else
                 {
                     Console.WriteLine($"Error: Type {setting.NumberType} is not supported.");
@@ -75,7 +74,7 @@ namespace Calc4DotNet
         }
 
         private static void ReplCore<TNumber>(string text, Setting setting)
-            where TNumber : INumber<TNumber>
+            where TNumber : notnull
         {
             try
             {
@@ -156,9 +155,7 @@ namespace Calc4DotNet
                             "int32" => typeof(Int32),
                             "int64" => typeof(Int64),
                             "double" => typeof(Double),
-#if false
                             "bigint" or "biginteger" => typeof(BigInteger),
-#endif
                             var arg => throw new CommandLineArgsParseException($"Type {arg} is not supported."),
                         };
 
@@ -185,7 +182,7 @@ namespace Calc4DotNet
         }
 
         private static void PrintDetailInformation<TNumber>(IOperator op, CompilationContext context, LowLevelModule<TNumber> module)
-            where TNumber : INumber<TNumber>
+            where TNumber : notnull
         {
             // Print input and user-defined operators as trees
             Console.WriteLine("Main");
@@ -225,7 +222,7 @@ namespace Calc4DotNet
         }
 
         private static void PrintLowLevelOperations<TNumber>(LowLevelModule<TNumber> module)
-            where TNumber : INumber<TNumber>
+            where TNumber : notnull
         {
             static void Print(ImmutableArray<LowLevelOperation> operations, string name, int? maxStackSize)
             {
