@@ -18,12 +18,12 @@ namespace Calc4DotNet.Core.Execution
             {
                 LowLevelModule<WrappedBigInteger> castedModule =
                     new(module.EntryPoint,
-                        module.ConstTable.Select(value => new WrappedBigInteger(Unsafe.As<TNumber, BigInteger>(ref value)))
+                        module.ConstTable.Select(value => new WrappedBigInteger((BigInteger)(object)value))
                                          .ToImmutableArray(),
                         module.UserDefinedOperators);
 
                 BigInteger result = ExecuteCore(castedModule).Value;
-                return Unsafe.As<BigInteger, TNumber>(ref result);
+                return (TNumber)(object)result;
             }
 
             try

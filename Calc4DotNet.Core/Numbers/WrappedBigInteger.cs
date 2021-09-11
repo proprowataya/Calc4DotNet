@@ -31,23 +31,23 @@ namespace Calc4DotNet.Core.Numbers
         {
             if (typeof(TOther) == typeof(Int16))
             {
-                return new WrappedBigInteger(new BigInteger(Unsafe.As<TOther, Int16>(ref value)));
+                return new WrappedBigInteger(new BigInteger((Int16)(object)value));
             }
             else if (typeof(TOther) == typeof(Int32))
             {
-                return new WrappedBigInteger(new BigInteger(Unsafe.As<TOther, Int32>(ref value)));
+                return new WrappedBigInteger(new BigInteger((Int32)(object)value));
             }
             else if (typeof(TOther) == typeof(Int64))
             {
-                return new WrappedBigInteger(new BigInteger(Unsafe.As<TOther, Int64>(ref value)));
+                return new WrappedBigInteger(new BigInteger((Int64)(object)value));
             }
             else if (typeof(TOther) == typeof(Double))
             {
-                return new WrappedBigInteger(new BigInteger(Unsafe.As<TOther, Double>(ref value)));
+                return new WrappedBigInteger(new BigInteger((Double)(object)value));
             }
             else if (typeof(TOther) == typeof(BigInteger))
             {
-                return new WrappedBigInteger(Unsafe.As<TOther, BigInteger>(ref value));
+                return new WrappedBigInteger((BigInteger)(object)value);
             }
             else
             {

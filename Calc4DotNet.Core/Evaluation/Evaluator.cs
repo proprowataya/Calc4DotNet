@@ -1,7 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using Calc4DotNet.Core.Numbers;
 using Calc4DotNet.Core.Operators;
 
@@ -21,7 +20,7 @@ namespace Calc4DotNet.Core.Evaluation
             if (typeof(TNumber) == typeof(BigInteger))
             {
                 BigInteger result = op.Accept(CreateVisitor(maxStep, default(WrappedBigInteger)), (context, null)).Value;
-                return Unsafe.As<BigInteger, TNumber>(ref result);
+                return (TNumber)(object)result;
             }
 
             try
@@ -66,7 +65,7 @@ namespace Calc4DotNet.Core.Evaluation
                     // This code is for special case when using BigInteger.
                     // We need more sophisticated solution to handle this case.
                     WrappedBigInteger casted = (WrappedBigInteger)(BigInteger)op.Value;
-                    return Unsafe.As<WrappedBigInteger, TNumber>(ref casted);
+                    return (TNumber)(object)casted;
                 }
                 else
                 {
