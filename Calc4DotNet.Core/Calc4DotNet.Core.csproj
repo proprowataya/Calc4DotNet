@@ -6,7 +6,7 @@
     <PublishTrimmed>true</PublishTrimmed>
     <PublishReadyToRun>true</PublishReadyToRun>
     <Nullable>enable</Nullable>
-	<LangVersion>preview</LangVersion>
+    <LangVersion>preview</LangVersion>
     <EnablePreviewFeatures>true</EnablePreviewFeatures>
   </PropertyGroup>
 
