@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.Linq;
+﻿using System.Collections.Immutable;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Operators;
 
