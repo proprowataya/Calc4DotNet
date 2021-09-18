@@ -1,4 +1,4 @@
-using System.Numerics;
+﻿using System.Numerics;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Execution;
@@ -17,8 +17,19 @@ namespace Calc4DotNet.Test
         private static readonly (string text, int expected, Type[]? skipTypes)[] TestCases = new (string text, int expected, Type[]? skipTypes)[]
         {
             ("1<2", 1, null),
+            ("1<=2", 1, null),
+            ("1>=2", 0, null),
+            ("1>2", 0, null),
+            ("2<1", 0, null),
+            ("2<=1", 0, null),
+            ("2>=1", 1, null),
+            ("2>1", 1, null),
+            ("1<1", 0, null),
+            ("1<=1", 1, null),
+            ("1>=1", 1, null),
+            ("1>1", 0, null),
             ("12345678", 12345678, null),
-            ("1+2*3", (1 + 2) * 3, null),
+            ("1+2*3-10", (1 + 2) * 3 - 10, null),
             ("0?1?2?3?4", 3, null),
             ("D[add|x,y|x+y] 12{add}23", 12 + 23, null),
             ("D[get12345||12345] {get12345}+{get12345}", 12345 + 12345, null),
