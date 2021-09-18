@@ -118,8 +118,8 @@ namespace Calc4DotNet.Core.Evaluation
                     BinaryType.NotEqual => left != right ? TNumber.One : TNumber.Zero,
                     BinaryType.LessThan => left < right ? TNumber.One : TNumber.Zero,
                     BinaryType.LessThanOrEqual => left <= right ? TNumber.One : TNumber.Zero,
-                    BinaryType.GreaterThanOrEqual => left <= right ? TNumber.One : TNumber.Zero,
-                    BinaryType.GreaterThan => left < right ? TNumber.One : TNumber.Zero,
+                    BinaryType.GreaterThanOrEqual => left >= right ? TNumber.One : TNumber.Zero,
+                    BinaryType.GreaterThan => left > right ? TNumber.One : TNumber.Zero,
                     _ => throw new InvalidOperationException(),
                 };
             }
