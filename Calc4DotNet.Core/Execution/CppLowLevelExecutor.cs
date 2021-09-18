@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using Calc4DotNetCoreNativeExecutor;
+﻿using Calc4DotNetCoreNativeExecutor;
 
 namespace Calc4DotNet.Core.Execution
 {
