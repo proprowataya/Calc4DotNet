@@ -2,64 +2,63 @@
 using System.Diagnostics.CodeAnalysis;
 using Calc4DotNet.Core.Operators;
 
-namespace Calc4DotNet.Core
+namespace Calc4DotNet.Core;
+
+public sealed class CompilationContext
 {
-    public sealed class CompilationContext
+    #region Class
+
+    internal sealed class Boxed
     {
-        #region Class
+        public CompilationContext Value { get; set; }
 
-        internal sealed class Boxed
+        public Boxed(CompilationContext value)
         {
-            public CompilationContext Value { get; set; }
-
-            public Boxed(CompilationContext value)
-            {
-                Value = value ?? throw new ArgumentNullException(nameof(value));
-            }
+            Value = value ?? throw new ArgumentNullException(nameof(value));
         }
+    }
 
-        #endregion
+    #endregion
 
-        public static readonly CompilationContext Empty = new CompilationContext();
+    public static readonly CompilationContext Empty = new CompilationContext();
 
-        private readonly ImmutableDictionary<string, OperatorImplement> userDefinedOperators;
+    private readonly ImmutableDictionary<string, OperatorImplement> userDefinedOperators;
 
-        #region Constructors
+    #region Constructors
 
-        private CompilationContext()
-        {
-            this.userDefinedOperators = ImmutableDictionary<string, OperatorImplement>.Empty;
-        }
+    private CompilationContext()
+    {
+        this.userDefinedOperators = ImmutableDictionary<string, OperatorImplement>.Empty;
+    }
 
-        internal CompilationContext(ImmutableDictionary<string, OperatorImplement> userDefinedOperators)
-        {
-            this.userDefinedOperators = userDefinedOperators ?? throw new ArgumentNullException(nameof(userDefinedOperators));
-        }
+    internal CompilationContext(ImmutableDictionary<string, OperatorImplement> userDefinedOperators)
+    {
+        this.userDefinedOperators = userDefinedOperators ?? throw new ArgumentNullException(nameof(userDefinedOperators));
+    }
 
-        #endregion
+    #endregion
 
-        public IEnumerable<OperatorImplement> OperatorImplements => userDefinedOperators.Values;
+    public IEnumerable<OperatorImplement> OperatorImplements => userDefinedOperators.Values;
 
-        public OperatorImplement LookupOperatorImplement(string name)
-        {
-            return this.userDefinedOperators[name];
-        }
+    public OperatorImplement LookupOperatorImplement(string name)
+    {
+        return this.userDefinedOperators[name];
+    }
 
-        public bool TryLookupOperatorImplement(string name, [MaybeNullWhen(false)] out OperatorImplement value)
-        {
-            return this.userDefinedOperators.TryGetValue(name, out value);
-        }
+    public bool TryLookupOperatorImplement(string name, [MaybeNullWhen(false)] out OperatorImplement value)
+    {
+        return this.userDefinedOperators.TryGetValue(name, out value);
+    }
 
-        public CompilationContext WithAddOrUpdateOperatorImplement(OperatorImplement implement)
-        {
-            return new CompilationContext(
-                this.userDefinedOperators.SetItem(implement.Definition.Name, implement));
-        }
+    public CompilationContext WithAddOrUpdateOperatorImplement(OperatorImplement implement)
+    {
+        return new CompilationContext(
+            this.userDefinedOperators.SetItem(implement.Definition.Name, implement));
+    }
 
-        public CompilationContext WithAddOrUpdateOperatorImplements(IEnumerable<OperatorImplement> implements)
-        {
-            return new CompilationContext(
-                this.userDefinedOperators.SetItems(implements.Select(implement => KeyValuePair.Create(implement.Definition.Name, implement))));
-        }
+    public CompilationContext WithAddOrUpdateOperatorImplements(IEnumerable<OperatorImplement> implements)
+    {
+        return new CompilationContext(
+            this.userDefinedOperators.SetItems(implements.Select(implement => KeyValuePair.Create(implement.Definition.Name, implement))));
     }
 }
