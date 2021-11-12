@@ -14,8 +14,8 @@ public class Program
 {
     public static string[] Sources => new string[]
     {
-            "D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}] 38{fib}",
-            "D[tarai|x,y,z|x <= y ? y ? (((x - 1){tarai}y{tarai}z){tarai}((y - 1){tarai}z{tarai}x){tarai}((z - 1){tarai}x{tarai}y))] 18{tarai}12{tarai}5"
+        "D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}] 38{fib}",
+        "D[tarai|x,y,z|x <= y ? y ? (((x - 1){tarai}y{tarai}z){tarai}((y - 1){tarai}z{tarai}x){tarai}((z - 1){tarai}x{tarai}y))] 18{tarai}12{tarai}5"
     };
 
     [ParamsSource(nameof(Sources))]
