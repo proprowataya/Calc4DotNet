@@ -73,11 +73,10 @@ public class ExecutionTest
     private static void TestCore(string text, object expected, Type type, bool optimize,
                                  Func<object, object, object> executor)
     {
-        TestCoreGeneric(text, (dynamic)expected, type, optimize,
-                        executor, (dynamic)Activator.CreateInstance(type)!);
+        TestCoreGeneric(text, (dynamic)expected, optimize, executor, (dynamic)Activator.CreateInstance(type)!);
     }
 
-    private static void TestCoreGeneric<TNumber>(string text, TNumber expected, Type type, bool optimize,
+    private static void TestCoreGeneric<TNumber>(string text, TNumber expected, bool optimize,
                                                  Func<object, object, object> executor, TNumber dummy)
         where TNumber : notnull
     {
