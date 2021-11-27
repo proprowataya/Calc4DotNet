@@ -1,7 +1,6 @@
-﻿namespace Calc4DotNet.Core.ILCompilation
+﻿namespace Calc4DotNet.Core.ILCompilation;
+
+public interface ICompiledModule<TNumber>
 {
-    public interface ICompiledModule<TNumber>
-    {
-        TNumber Run();
-    }
+    TNumber Run();
 }

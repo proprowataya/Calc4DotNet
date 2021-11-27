@@ -1,79 +1,78 @@
 ﻿using Calc4DotNetCoreNativeExecutor;
 
-namespace Calc4DotNet.Core.Execution
+namespace Calc4DotNet.Core.Execution;
+
+public static class CppLowLevelExecutor
 {
-    public static class CppLowLevelExecutor
+    public unsafe static Int32 Execute(LowLevelModule<Int32> module)
     {
-        public unsafe static Int32 Execute(LowLevelModule<Int32> module)
+        try
         {
-            try
-            {
-                var (operations, maxStackSizes) = module.FlattenOperations();
-                var constTable = module.ConstTable.ToArray();
+            var (operations, maxStackSizes) = module.FlattenOperations();
+            var constTable = module.ConstTable.ToArray();
 
-                fixed (LowLevelOperation* operationsPtr = operations)
-                fixed (int* maxStackSizesPtr = maxStackSizes)
-                fixed (Int32* constTablePtr = constTable)
-                {
-                    return NativeLowLevelExecutor.Execute(operationsPtr,
-                                                          maxStackSizesPtr,
-                                                          operations.Length,
-                                                          constTablePtr,
-                                                          constTable.Length);
-                }
-            }
-            catch (NativeStackOverflowException)
+            fixed (LowLevelOperation* operationsPtr = operations)
+            fixed (int* maxStackSizesPtr = maxStackSizes)
+            fixed (Int32* constTablePtr = constTable)
             {
-                throw new Calc4DotNet.Core.Exceptions.StackOverflowException();
+                return NativeLowLevelExecutor.Execute(operationsPtr,
+                                                      maxStackSizesPtr,
+                                                      operations.Length,
+                                                      constTablePtr,
+                                                      constTable.Length);
             }
         }
-
-        public unsafe static Int64 Execute(LowLevelModule<Int64> module)
+        catch (NativeStackOverflowException)
         {
-            try
-            {
-                var (operations, maxStackSizes) = module.FlattenOperations();
-                var constTable = module.ConstTable.ToArray();
+            throw new Calc4DotNet.Core.Exceptions.StackOverflowException();
+        }
+    }
 
-                fixed (LowLevelOperation* operationsPtr = operations)
-                fixed (int* maxStackSizesPtr = maxStackSizes)
-                fixed (Int64* constTablePtr = constTable)
-                {
-                    return NativeLowLevelExecutor.Execute(operationsPtr,
-                                                          maxStackSizesPtr,
-                                                          operations.Length,
-                                                          constTablePtr,
-                                                          constTable.Length);
-                }
-            }
-            catch (NativeStackOverflowException)
+    public unsafe static Int64 Execute(LowLevelModule<Int64> module)
+    {
+        try
+        {
+            var (operations, maxStackSizes) = module.FlattenOperations();
+            var constTable = module.ConstTable.ToArray();
+
+            fixed (LowLevelOperation* operationsPtr = operations)
+            fixed (int* maxStackSizesPtr = maxStackSizes)
+            fixed (Int64* constTablePtr = constTable)
             {
-                throw new Calc4DotNet.Core.Exceptions.StackOverflowException();
+                return NativeLowLevelExecutor.Execute(operationsPtr,
+                                                      maxStackSizesPtr,
+                                                      operations.Length,
+                                                      constTablePtr,
+                                                      constTable.Length);
             }
         }
-
-        public unsafe static Double Execute(LowLevelModule<Double> module)
+        catch (NativeStackOverflowException)
         {
-            try
-            {
-                var (operations, maxStackSizes) = module.FlattenOperations();
-                var constTable = module.ConstTable.ToArray();
+            throw new Calc4DotNet.Core.Exceptions.StackOverflowException();
+        }
+    }
 
-                fixed (LowLevelOperation* operationsPtr = operations)
-                fixed (int* maxStackSizesPtr = maxStackSizes)
-                fixed (Double* constTablePtr = constTable)
-                {
-                    return NativeLowLevelExecutor.Execute(operationsPtr,
-                                                          maxStackSizesPtr,
-                                                          operations.Length,
-                                                          constTablePtr,
-                                                          constTable.Length);
-                }
-            }
-            catch (NativeStackOverflowException)
+    public unsafe static Double Execute(LowLevelModule<Double> module)
+    {
+        try
+        {
+            var (operations, maxStackSizes) = module.FlattenOperations();
+            var constTable = module.ConstTable.ToArray();
+
+            fixed (LowLevelOperation* operationsPtr = operations)
+            fixed (int* maxStackSizesPtr = maxStackSizes)
+            fixed (Double* constTablePtr = constTable)
             {
-                throw new Calc4DotNet.Core.Exceptions.StackOverflowException();
+                return NativeLowLevelExecutor.Execute(operationsPtr,
+                                                      maxStackSizesPtr,
+                                                      operations.Length,
+                                                      constTablePtr,
+                                                      constTable.Length);
             }
+        }
+        catch (NativeStackOverflowException)
+        {
+            throw new Calc4DotNet.Core.Exceptions.StackOverflowException();
         }
     }
 }
