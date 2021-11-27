@@ -4,7 +4,6 @@ using System.Numerics;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Exceptions;
 using Calc4DotNet.Core.Execution;
-using Calc4DotNet.Core.ILCompilation;
 using Calc4DotNet.Core.Operators;
 using Calc4DotNet.Core.Optimization;
 using Calc4DotNet.Core.SyntaxAnalysis;
@@ -102,20 +101,7 @@ class Program
             }
 
             // Execute
-            TNumber result;
-            if (setting.ExecutorType == ExecutorType.LowLevel)
-            {
-                result = LowLevelExecutor.Execute((dynamic)module);
-            }
-            else if (setting.ExecutorType == ExecutorType.JIT)
-            {
-                ICompiledModule<TNumber> ilModule = ILCompiler.Compile(module);
-                result = ilModule.Run();
-            }
-            else
-            {
-                throw new InvalidOperationException();
-            }
+            TNumber result = LowLevelExecutor.Execute((dynamic)module);
 
             TimeSpan elapsed = sw.Elapsed;
 
