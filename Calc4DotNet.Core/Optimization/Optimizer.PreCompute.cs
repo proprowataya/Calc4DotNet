@@ -9,12 +9,14 @@ public static partial class Optimizer
     private sealed class PreComputeVisitor<TNumber> : IOperatorVisitor<IOperator>
         where TNumber : notnull
     {
-        private readonly CompilationContext context;
+        private readonly CompilationContext compilationContext;
+        private readonly EvaluationContext<TNumber> evaluationContext;
         private readonly int maxStep;
 
         public PreComputeVisitor(CompilationContext context, int maxStep)
         {
-            this.context = context ?? throw new ArgumentNullException(nameof(context));
+            this.compilationContext = context ?? throw new ArgumentNullException(nameof(context));
+            this.evaluationContext = new EvaluationContext<TNumber>();
             this.maxStep = maxStep;
         }
 
@@ -22,7 +24,7 @@ public static partial class Optimizer
         {
             try
             {
-                return new PreComputedOperator(Evaluator.Evaluate<TNumber>(op, context, maxStep));
+                return new PreComputedOperator(Evaluator.Evaluate<TNumber>(op, compilationContext, evaluationContext, maxStep));
             }
             catch (EvaluationStepLimitExceedException)
             {

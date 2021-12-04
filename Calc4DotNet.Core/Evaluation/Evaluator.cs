@@ -14,27 +14,39 @@ internal sealed class EvaluationArgumentNotSetException : Exception
 
 public static class Evaluator
 {
-    public static TNumber Evaluate<TNumber>(IOperator op, CompilationContext context, int maxStep = int.MaxValue)
+    public static TNumber Evaluate<TNumber>(IOperator op, CompilationContext compilationContext, EvaluationContext<TNumber> evaluationContext, int maxStep = int.MaxValue)
         where TNumber : notnull
     {
         if (typeof(TNumber) == typeof(Int32))
         {
-            var result = op.Accept(new Visitor<Int32, Int32Computer>(maxStep), (context, null));
+            var result =
+                op.Accept(new Visitor<Int32, Int32Computer>(compilationContext,
+                                                            (EvaluationContext<Int32>)(object)evaluationContext,
+                                                            maxStep), null);
             return Unsafe.As<Int32, TNumber>(ref result);
         }
         else if (typeof(TNumber) == typeof(Int64))
         {
-            var result = op.Accept(new Visitor<Int64, Int64Computer>(maxStep), (context, null));
+            var result =
+                op.Accept(new Visitor<Int64, Int64Computer>(compilationContext,
+                                                            (EvaluationContext<Int64>)(object)evaluationContext,
+                                                            maxStep), null);
             return Unsafe.As<Int64, TNumber>(ref result);
         }
         else if (typeof(TNumber) == typeof(Double))
         {
-            var result = op.Accept(new Visitor<Double, DoubleComputer>(maxStep), (context, null));
+            var result =
+                op.Accept(new Visitor<Double, DoubleComputer>(compilationContext,
+                                                              (EvaluationContext<Double>)(object)evaluationContext,
+                                                              maxStep), null);
             return Unsafe.As<Double, TNumber>(ref result);
         }
         else if (typeof(TNumber) == typeof(BigInteger))
         {
-            var result = op.Accept(new Visitor<BigInteger, BigIntegerComputer>(maxStep), (context, null));
+            var result =
+                op.Accept(new Visitor<BigInteger, BigIntegerComputer>(compilationContext,
+                                                                      (EvaluationContext<BigInteger>)(object)evaluationContext,
+                                                                      maxStep), null);
             return Unsafe.As<BigInteger, TNumber>(ref result);
         }
         else
@@ -44,61 +56,65 @@ public static class Evaluator
     }
 
     private sealed class Visitor<TNumber, TNumberComputer>
-        : IOperatorVisitor<TNumber, (CompilationContext context, TNumber[]? arguments)>
+        : IOperatorVisitor<TNumber, TNumber[]? /* arguments */>
         where TNumber : notnull
         where TNumberComputer : struct, INumberComputer<TNumber>
     {
+        private readonly CompilationContext compilationContext;
+        private readonly EvaluationContext<TNumber> evaluationContext;
         private readonly int maxStep = 0;
         private int step;
 
-        public Visitor(int maxStep)
+        public Visitor(CompilationContext compilationContext, EvaluationContext<TNumber> evaluationContext, int maxStep)
         {
+            this.compilationContext = compilationContext;
+            this.evaluationContext = evaluationContext;
             this.maxStep = maxStep;
         }
 
         /* ******************** */
 
-        public TNumber Visit(ZeroOperator op, (CompilationContext context, TNumber[]? arguments) param)
+        public TNumber Visit(ZeroOperator op, TNumber[]? arguments)
             => default(TNumberComputer).Zero;
 
-        public TNumber Visit(PreComputedOperator op, (CompilationContext context, TNumber[]? arguments) param)
+        public TNumber Visit(PreComputedOperator op, TNumber[]? arguments)
             => (TNumber)op.Value;
 
-        public TNumber Visit(ArgumentOperator op, (CompilationContext context, TNumber[]? arguments) param)
+        public TNumber Visit(ArgumentOperator op, TNumber[]? arguments)
         {
-            if (param.arguments is null)
+            if (arguments is null)
                 throw new EvaluationArgumentNotSetException();
-            return param.arguments[op.Index];
+            return arguments[op.Index];
         }
 
-        public TNumber Visit(DefineOperator op, (CompilationContext context, TNumber[]? arguments) param)
+        public TNumber Visit(DefineOperator op, TNumber[]? arguments)
             => default(TNumberComputer).Zero;
 
-        public TNumber Visit(ParenthesisOperator op, (CompilationContext context, TNumber[]? arguments) param)
+        public TNumber Visit(ParenthesisOperator op, TNumber[]? arguments)
         {
             TNumber result = default(TNumberComputer).Zero;
             ImmutableArray<IOperator> operators = op.Operators;
 
             for (int i = 0; i < operators.Length; i++)
             {
-                result = operators[i].Accept(this, param);
+                result = operators[i].Accept(this, arguments);
             }
 
             return result;
         }
 
-        public TNumber Visit(DecimalOperator op, (CompilationContext context, TNumber[]? arguments) param)
+        public TNumber Visit(DecimalOperator op, TNumber[]? arguments)
         {
             var c = default(TNumberComputer);
-            TNumber operand = op.Operand.Accept(this, param);
+            TNumber operand = op.Operand.Accept(this, arguments);
             return c.Add(c.Multiply(operand, c.Ten), c.FromInt(op.Value));
         }
 
-        public TNumber Visit(BinaryOperator op, (CompilationContext context, TNumber[]? arguments) param)
+        public TNumber Visit(BinaryOperator op, TNumber[]? arguments)
         {
             var c = default(TNumberComputer);
-            TNumber left = op.Left.Accept(this, param);
-            TNumber right = op.Right.Accept(this, param);
+            TNumber left = op.Left.Accept(this, arguments);
+            TNumber right = op.Right.Accept(this, arguments);
 
             return op.Type switch
             {
@@ -117,14 +133,14 @@ public static class Evaluator
             };
         }
 
-        public TNumber Visit(ConditionalOperator op, (CompilationContext context, TNumber[]? arguments) param)
+        public TNumber Visit(ConditionalOperator op, TNumber[]? arguments)
         {
             var c = default(TNumberComputer);
-            TNumber condition = op.Condition.Accept(this, param);
-            return c.NotEquals(condition, c.Zero) ? op.IfTrue.Accept(this, param) : op.IfFalse.Accept(this, param);
+            TNumber condition = op.Condition.Accept(this, arguments);
+            return c.NotEquals(condition, c.Zero) ? op.IfTrue.Accept(this, arguments) : op.IfFalse.Accept(this, arguments);
         }
 
-        public TNumber Visit(UserDefinedOperator op, (CompilationContext context, TNumber[]? arguments) param)
+        public TNumber Visit(UserDefinedOperator op, TNumber[]? arguments)
         {
             if (++step > maxStep)
             {
@@ -135,12 +151,12 @@ public static class Evaluator
 
             for (int i = 0; i < op.Operands.Length; i++)
             {
-                stack[i] = op.Operands[i].Accept(this, param);
+                stack[i] = op.Operands[i].Accept(this, arguments);
             }
 
-            var userDefinedOperatorBody = param.context.LookupOperatorImplement(op.Definition.Name).Operator;
+            var userDefinedOperatorBody = compilationContext.LookupOperatorImplement(op.Definition.Name).Operator;
             Debug.Assert(userDefinedOperatorBody is not null);
-            return userDefinedOperatorBody.Accept(this, (param.context, stack));
+            return userDefinedOperatorBody.Accept(this, stack);
         }
     }
 }

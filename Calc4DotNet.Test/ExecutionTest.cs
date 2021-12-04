@@ -61,7 +61,7 @@ public class ExecutionTest
     private static TNumber EvaluateDynamic<TNumber>(IOperator op, CompilationContext context, int maxStep, TNumber dummy)
         where TNumber : notnull
     {
-        return Evaluator.Evaluate<TNumber>(op, context, maxStep);
+        return Evaluator.Evaluate<TNumber>(op, context, new EvaluationContext<TNumber>(), maxStep);
     }
 
     private static LowLevelModule<TNumber> GenerateLowLevelModuleDynamic<TNumber>(IOperator op, CompilationContext context, TNumber dummy)
