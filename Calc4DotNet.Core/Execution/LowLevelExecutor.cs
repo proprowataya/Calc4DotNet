@@ -45,12 +45,14 @@ public static class LowLevelExecutor
 
         TNumber[] stack = new TNumber[StackSize];
         int[] ptrStack = new int[PtrStackSize];
+        TNumber[] variables = new TNumber[module.NumVariables];
         ref TNumber top = ref stack[0];
         ref TNumber bottom = ref stack[0];
         ref int ptrTop = ref ptrStack[0];
         ref TNumber stackBegin = ref stack[0];
         ref TNumber stackEnd = ref stack[^1];
         ref int ptrStackEnd = ref ptrStack[^1];
+        ref TNumber firstVariable = ref (variables.Length > 0 ? ref variables[0] : ref Unsafe.NullRef<TNumber>());
         ref LowLevelOperation op = ref firstOperation;
 
         while (true)
@@ -87,6 +89,16 @@ public static class LowLevelExecutor
                     VerifyRange(stack, ref top);
                     VerifyRange(stack, ref Unsafe.Add(ref bottom, -op.Value));
                     Unsafe.Add(ref bottom, -op.Value) = top;
+                    break;
+                case Opcode.LoadVariable:
+                    VerifyRange(variables, ref Unsafe.Add(ref firstVariable, op.Value));
+                    top = Unsafe.Add(ref firstVariable, op.Value);
+                    top = ref Unsafe.Add(ref top, 1);
+                    break;
+                case Opcode.StoreVariable:
+                    VerifyRange(stack, ref Unsafe.Add(ref top, -1));
+                    VerifyRange(variables, ref Unsafe.Add(ref firstVariable, op.Value));
+                    Unsafe.Add(ref firstVariable, op.Value) = Unsafe.Add(ref top, -1);
                     break;
                 case Opcode.Input:
                     throw new NotImplementedException();

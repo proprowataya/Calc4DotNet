@@ -20,7 +20,7 @@ public static partial class Optimizer
         where TNumber : notnull
     {
         OptimizeUserDefinedOperators<TNumber>(ref context);
-        op = OptimizeCore<TNumber>(op, context);
+        op = OptimizeCore<TNumber>(op, context, inMain: true);
     }
 
     private static void OptimizeUserDefinedOperator<TNumber>(OperatorImplement implement, ref CompilationContext context)
@@ -28,14 +28,14 @@ public static partial class Optimizer
     {
         var op = implement.Operator;
         Debug.Assert(op is not null);
-        var newRoot = OptimizeCore<TNumber>(op, context);
+        var newRoot = OptimizeCore<TNumber>(op, context, inMain: false);
         context = context.WithAddOrUpdateOperatorImplement(implement with { Operator = newRoot });
     }
 
-    private static IOperator OptimizeCore<TNumber>(IOperator op, CompilationContext context)
+    private static IOperator OptimizeCore<TNumber>(IOperator op, CompilationContext context, bool inMain)
         where TNumber : notnull
     {
-        op = op.Accept(new PreComputeVisitor<TNumber>(context, MaxPreEvaluationStep));
+        op = op.Accept(new PreComputeVisitor<TNumber>(context, MaxPreEvaluationStep, inMain));
         op = op.Accept(new TailCallVisitor(), /* isTailCallable */ true);
         return op;
     }

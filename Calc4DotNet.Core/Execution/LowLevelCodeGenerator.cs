@@ -12,6 +12,7 @@ public static class LowLevelCodeGenerator
         var constTable = new List<TNumber>();
         var userDefinedOperators = ImmutableArray.CreateBuilder<LowLevelUserDefinedOperator>();
         var operatorLabels = new Dictionary<OperatorDefinition, int>();
+        var variableIndices = new Dictionary<ValueBox<string>, int>();
 
         // Initialize operatorLabels
         int index = 0;
@@ -23,7 +24,7 @@ public static class LowLevelCodeGenerator
         // Generate user-defined operators' codes
         foreach (var implement in context.OperatorImplements)
         {
-            var visitor = new Visitor<TNumber>(context, constTable, operatorLabels, implement.Definition);
+            var visitor = new Visitor<TNumber>(context, constTable, operatorLabels, implement.Definition, variableIndices);
 
             var operatorBody = implement.Operator;
             Debug.Assert(operatorBody is not null);
@@ -38,14 +39,15 @@ public static class LowLevelCodeGenerator
         // Generate Main code
         ImmutableArray<LowLevelOperation> entryPoint;
         {
-            var visitor = new Visitor<TNumber>(context, constTable, operatorLabels, null);
+            var visitor = new Visitor<TNumber>(context, constTable, operatorLabels, null, variableIndices);
             visitor.Generate(op);
             entryPoint = visitor.Operations.ToImmutableArray();
         }
 
         return new LowLevelModule<TNumber>(entryPoint,
                                            constTable.ToImmutableArray(),
-                                           userDefinedOperators.ToImmutable());
+                                           userDefinedOperators.ToImmutable(),
+                                           variableIndices.Count);
     }
 
     private sealed class Visitor<TNumber> : IOperatorVisitor
@@ -57,6 +59,7 @@ public static class LowLevelCodeGenerator
         private readonly List<TNumber> constTable;
         private readonly Dictionary<OperatorDefinition, int> operatorLabels;
         private readonly OperatorDefinition? definition;
+        private readonly Dictionary<ValueBox<string>, int> variableIndices;
 
         private List<LowLevelOperation> list = new List<LowLevelOperation>();
         private int nextLabel = OperatorBeginLabel;
@@ -82,12 +85,13 @@ public static class LowLevelCodeGenerator
 
         public int MaxStackSize => maxStackSize;
 
-        public Visitor(CompilationContext context, List<TNumber> constTable, Dictionary<OperatorDefinition, int> operatorLabels, OperatorDefinition? definition)
+        public Visitor(CompilationContext context, List<TNumber> constTable, Dictionary<OperatorDefinition, int> operatorLabels, OperatorDefinition? definition, Dictionary<ValueBox<string>, int> variableIndices)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
             this.constTable = constTable ?? throw new ArgumentNullException(nameof(constTable));
             this.operatorLabels = operatorLabels ?? throw new ArgumentNullException(nameof(operatorLabels));
             this.definition = definition;
+            this.variableIndices = variableIndices ?? throw new ArgumentNullException(nameof(variableIndices));
         }
 
         public void Generate(IOperator op)
@@ -165,6 +169,7 @@ public static class LowLevelCodeGenerator
                 case Opcode.LoadConst:
                 case Opcode.LoadConstTable:
                 case Opcode.LoadArg:
+                case Opcode.LoadVariable:
                 case Opcode.Input:
                     StackSize++;
                     break;
@@ -180,6 +185,7 @@ public static class LowLevelCodeGenerator
                 case Opcode.Halt:
                     StackSize--;
                     break;
+                case Opcode.StoreVariable:
                 case Opcode.Goto:
                     // Stacksize will not change
                     break;
@@ -249,6 +255,11 @@ public static class LowLevelCodeGenerator
             AddOperation(new LowLevelOperation(Opcode.LoadConst, 0));
         }
 
+        public void Visit(LoadOperator op)
+        {
+            AddOperation(new LowLevelOperation(Opcode.LoadVariable, GetOrCreateVariableIndex(op.VariableName)));
+        }
+
         public void Visit(ParenthesisOperator op)
         {
             ImmutableArray<IOperator> operators = op.Operators;
@@ -267,6 +278,12 @@ public static class LowLevelCodeGenerator
             AddOperation(new LowLevelOperation(Opcode.Mult));
             AddOperation(new LowLevelOperation(Opcode.LoadConst, op.Value));
             AddOperation(new LowLevelOperation(Opcode.Add));
+        }
+
+        public void Visit(StoreOperator op)
+        {
+            op.Operand.Accept(this);
+            AddOperation(new LowLevelOperation(Opcode.StoreVariable, GetOrCreateVariableIndex(op.VariableName)));
         }
 
         public void Visit(BinaryOperator op)
@@ -435,6 +452,20 @@ public static class LowLevelCodeGenerator
         }
 
         /* ******************** */
+
+        private int GetOrCreateVariableIndex(string? variableName)
+        {
+            if (variableIndices.TryGetValue(ValueBox.Create(variableName), out var index))
+            {
+                return index;
+            }
+            else
+            {
+                index = variableIndices.Count;
+                variableIndices[ValueBox.Create(variableName)] = index;
+                return index;
+            }
+        }
 
         private static int GetArgumentAddress(int numOperands, int index) => numOperands - index;
     }

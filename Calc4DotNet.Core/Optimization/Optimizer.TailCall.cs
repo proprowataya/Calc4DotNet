@@ -27,6 +27,11 @@ public static partial class Optimizer
             return op;
         }
 
+        public IOperator Visit(LoadOperator op, bool isTailCallable)
+        {
+            return op;
+        }
+
         public IOperator Visit(ParenthesisOperator op, bool isTailCallable)
         {
             ImmutableArray<IOperator> operators = op.Operators;
@@ -43,6 +48,11 @@ public static partial class Optimizer
         public IOperator Visit(DecimalOperator op, bool isTailCallable)
         {
             return op with { Operand = op.Operand.Accept(this, false) };
+        }
+
+        public IOperator Visit(StoreOperator op, bool isTailCallable)
+        {
+            return op with { Operand = op.Operand.Accept(this, true) };
         }
 
         public IOperator Visit(BinaryOperator op, bool isTailCallable)

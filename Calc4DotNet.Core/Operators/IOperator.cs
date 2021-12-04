@@ -50,6 +50,16 @@ public sealed record DefineOperator(string? SupplementaryText = null) : IOperato
     public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
 }
 
+public sealed record LoadOperator(string? SupplementaryText = null) : IOperator
+{
+    public string? VariableName => SupplementaryText;
+    public IOperator[] GetOperands() => Array.Empty<IOperator>();
+
+    public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+    public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+    public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+}
+
 public sealed record ParenthesisOperator(ImmutableArray<IOperator> Operators, string? SupplementaryText = null) : IOperator
 {
     public IOperator[] GetOperands() => Array.Empty<IOperator>();
@@ -61,6 +71,16 @@ public sealed record ParenthesisOperator(ImmutableArray<IOperator> Operators, st
 
 public sealed record DecimalOperator(IOperator Operand, int Value, string? SupplementaryText = null) : IOperator
 {
+    public IOperator[] GetOperands() => new[] { Operand };
+
+    public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+    public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+    public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+}
+
+public sealed record StoreOperator(IOperator Operand, string? SupplementaryText = null) : IOperator
+{
+    public string? VariableName => SupplementaryText;
     public IOperator[] GetOperands() => new[] { Operand };
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);

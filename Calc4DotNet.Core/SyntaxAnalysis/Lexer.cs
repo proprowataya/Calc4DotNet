@@ -59,6 +59,10 @@ public static class Lexer
             {
                 case 'D':
                     return LexDefineToken();
+                case 'L':
+                    return LexLoadToken();
+                case 'S':
+                    return LexStoreToken();
                 case '0':
                 case '1':
                 case '2':
@@ -108,6 +112,20 @@ public static class Lexer
             var tokens = new Implement(context, content, dictionary).Lex();
 
             return new DefineToken(name, arguments.ToImmutableArray(), tokens.ToImmutableArray(), supplementaryText);
+        }
+
+        private LoadToken LexLoadToken()
+        {
+            Debug.Assert(text[Index] == 'L');
+            Index++;
+            return new LoadToken(LexSupplementaryText());
+        }
+
+        private StoreToken LexStoreToken()
+        {
+            Debug.Assert(text[Index] == 'S');
+            Index++;
+            return new StoreToken(LexSupplementaryText());
         }
 
         private DecimalToken LexDecimalToken()

@@ -12,21 +12,28 @@ public static partial class Optimizer
         private readonly CompilationContext compilationContext;
         private readonly EvaluationContext<TNumber> evaluationContext;
         private readonly int maxStep;
+        private bool inMain;
 
-        public PreComputeVisitor(CompilationContext context, int maxStep)
+        public PreComputeVisitor(CompilationContext context, int maxStep, bool inMain)
         {
             this.compilationContext = context ?? throw new ArgumentNullException(nameof(context));
             this.evaluationContext = new EvaluationContext<TNumber>();
             this.maxStep = maxStep;
+            this.inMain = inMain;
         }
 
         private IOperator PreComputeIfPossible(IOperator op)
         {
             try
             {
+                EvaluationContext<TNumber>? evaluationContext = inMain ? this.evaluationContext : null;
                 return new PreComputedOperator(Evaluator.Evaluate<TNumber>(op, compilationContext, evaluationContext, maxStep));
             }
             catch (EvaluationStepLimitExceedException)
+            {
+                return op;
+            }
+            catch (EvaluationContextNotSetException)
             {
                 return op;
             }
@@ -43,6 +50,8 @@ public static partial class Optimizer
         public IOperator Visit(ArgumentOperator op) => PreComputeIfPossible(op);
 
         public IOperator Visit(DefineOperator op) => PreComputeIfPossible(op);
+
+        public IOperator Visit(LoadOperator op) => inMain ? PreComputeIfPossible(op) : op;
 
         public IOperator Visit(ParenthesisOperator op)
         {
@@ -63,6 +72,13 @@ public static partial class Optimizer
             var operand = op.Operand.Accept(this);
             var newOp = op with { Operand = operand };
             return PreComputeIfPossible(newOp);
+        }
+
+        public IOperator Visit(StoreOperator op)
+        {
+            var operand = op.Operand.Accept(this);
+            var newOp = op with { Operand = operand };
+            return inMain ? PreComputeIfPossible(newOp) : newOp;
         }
 
         public IOperator Visit(BinaryOperator op)
