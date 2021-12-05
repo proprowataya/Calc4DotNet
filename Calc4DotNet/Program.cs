@@ -89,7 +89,7 @@ class Program
             // Optimize
             if (setting.Optimize)
             {
-                Optimizer.Optimize<TNumber>(ref op, ref context);
+                Optimizer.Optimize<TNumber>(ref op, ref context, OptimizeTarget.All);
             }
 
             // Generate low-level code and IL module

@@ -63,12 +63,17 @@ public class ExecutionTest
 
     private static readonly Type[] TestTypes = new[] { typeof(Int32), typeof(Int64), typeof(Double), typeof(BigInteger) };
 
+    private static readonly OptimizeTarget?[] OptimizeTargets = Enum.GetValues<OptimizeTarget>()
+                                                                    .Select(target => (OptimizeTarget?)target)
+                                                                    .Append(null)
+                                                                    .ToArray();
+
     public static readonly object[][] Source =
         (from test in TestCases
          from type in TestTypes
          where !test.skipTypes?.Contains(type) ?? true
-         from optimize in new[] { false, true }
-         select new object[] { test.text, test.expected, type, optimize })
+         from target in OptimizeTargets
+         select new object[] { test.text, test.expected, type, target })
         .ToArray();
 
     #endregion
@@ -90,22 +95,22 @@ public class ExecutionTest
         return LowLevelCodeGenerator.Generate<TNumber>(op, context);
     }
 
-    private static void TestCore(string text, object expected, Type type, bool optimize,
+    private static void TestCore(string text, object expected, Type type, OptimizeTarget? target,
                                  Func<object, object, object> executor)
     {
-        TestCoreGeneric(text, (dynamic)expected, optimize, executor, (dynamic)Activator.CreateInstance(type)!);
+        TestCoreGeneric(text, (dynamic)expected, target, executor, (dynamic)Activator.CreateInstance(type)!);
     }
 
-    private static void TestCoreGeneric<TNumber>(string text, TNumber expected, bool optimize,
+    private static void TestCoreGeneric<TNumber>(string text, TNumber expected, OptimizeTarget? target,
                                                  Func<object, object, object> executor, TNumber dummy)
         where TNumber : notnull
     {
         var context = CompilationContext.Empty;
         var tokens = Lexer.Lex(text, ref context);
         var op = Parser.Parse(tokens, ref context);
-        if (optimize)
+        if (target is not null)
         {
-            Optimizer.Optimize<TNumber>(ref op, ref context);
+            Optimizer.Optimize<TNumber>(ref op, ref context, target.GetValueOrDefault());
         }
 
         // TODO
@@ -115,9 +120,9 @@ public class ExecutionTest
     #endregion
 
     [Theory, MemberData(nameof(Source))]
-    public static void TestByTreeEvaluator(string text, object expected, Type type, bool optimize)
+    public static void TestByTreeEvaluator(string text, object expected, Type type, OptimizeTarget? target)
     {
-        TestCore(text, expected, type, optimize, (op, context) =>
+        TestCore(text, expected, type, target, (op, context) =>
         {
             return EvaluateDynamic((dynamic)op,
                                    (dynamic)context,
@@ -127,9 +132,9 @@ public class ExecutionTest
     }
 
     [Theory, MemberData(nameof(Source))]
-    public static void TestByLowLevelExecutor(string text, object expected, Type type, bool optimize)
+    public static void TestByLowLevelExecutor(string text, object expected, Type type, OptimizeTarget? target)
     {
-        TestCore(text, expected, type, optimize, (op, context) =>
+        TestCore(text, expected, type, target, (op, context) =>
         {
             var module = GenerateLowLevelModuleDynamic((dynamic)op,
                                                        (dynamic)context,
@@ -139,9 +144,9 @@ public class ExecutionTest
     }
 
     [Theory, MemberData(nameof(Source))]
-    public static void TestByJIT(string text, object expected, Type type, bool optimize)
+    public static void TestByJIT(string text, object expected, Type type, OptimizeTarget? target)
     {
-        TestCore(text, expected, type, optimize, (op, context) =>
+        TestCore(text, expected, type, target, (op, context) =>
         {
             var module = GenerateLowLevelModuleDynamic((dynamic)op,
                                                        (dynamic)context,
@@ -158,11 +163,11 @@ public class ExecutionTest
 
         foreach (var type in TestTypes)
         {
-            foreach (var optimize in new[] { true, false })
+            foreach (var target in OptimizeTargets)
             {
                 Assert.Throws<Calc4DotNet.Core.Exceptions.StackOverflowException>(() =>
                 {
-                    TestByLowLevelExecutor(text, Activator.CreateInstance(type)! /* dummy */, type, optimize);
+                    TestByLowLevelExecutor(text, Activator.CreateInstance(type)! /* dummy */, type, target);
                 });
             }
         }

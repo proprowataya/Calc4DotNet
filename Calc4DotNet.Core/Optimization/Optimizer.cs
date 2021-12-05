@@ -4,23 +4,44 @@ using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.Optimization;
 
+[Flags]
+public enum OptimizeTarget
+{
+    None = 0,
+    MainOperator = 1 << 0,
+    UserDefinedOperators = 1 << 1,
+    All = MainOperator | UserDefinedOperators,
+}
+
 public static partial class Optimizer
 {
     private const int MaxPreEvaluationStep = 100;
 
-    public static void Optimize<TNumber>(ref IOperator op, ref CompilationContext context)
+    public static void Optimize<TNumber>(ref IOperator op, ref CompilationContext context, OptimizeTarget target)
         where TNumber : notnull
     {
-        HashSet<string?> variables = GatherVariableNames(op, context);
-
-        // Optimize user defined operators
-        foreach (var implement in context.OperatorImplements)
+        if (target == OptimizeTarget.None)
         {
-            OptimizeUserDefinedOperator<TNumber>(implement, ref context, variables);
+            // There is nothing to do
+            return;
         }
 
-        // Optimize main operator
-        op = OptimizeCore<TNumber>(op, context, variables, inMain: true);
+        HashSet<string?> variables = GatherVariableNames(op, context);
+
+        if (target.HasFlag(OptimizeTarget.UserDefinedOperators))
+        {
+            // Optimize user defined operators
+            foreach (var implement in context.OperatorImplements)
+            {
+                OptimizeUserDefinedOperator<TNumber>(implement, ref context, variables);
+            }
+        }
+
+        if (target.HasFlag(OptimizeTarget.MainOperator))
+        {
+            // Optimize main operator
+            op = OptimizeCore<TNumber>(op, context, variables, inMain: true);
+        }
     }
 
     private static void OptimizeUserDefinedOperator<TNumber>(OperatorImplement implement, ref CompilationContext context, HashSet<string?> variables)

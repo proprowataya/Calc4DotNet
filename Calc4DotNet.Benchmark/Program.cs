@@ -33,7 +33,7 @@ public class Program
         CompilationContext context = CompilationContext.Empty;
         List<IToken> tokens = Lexer.Lex(Source!, ref context);
         IOperator op = Parser.Parse(tokens, ref context);
-        Optimizer.Optimize<NumberType>(ref op, ref context);
+        Optimizer.Optimize<NumberType>(ref op, ref context, OptimizeTarget.All);
         LowLevelModule<NumberType> module = LowLevelCodeGenerator.Generate<NumberType>(op, context);
 
         // Run
