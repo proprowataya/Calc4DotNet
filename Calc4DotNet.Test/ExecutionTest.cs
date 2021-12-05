@@ -57,6 +57,8 @@ public class ExecutionTest
         ("D[op||(123S)L*L]{op}", 123 * 123, null),
         ("D[op||L*L](123S){op}", 123 * 123, null),
         ("D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] (20{fib}S)+L", 6765 * 2, null),
+        ("D[get||L] D[set|x|xS] D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] (20{fib}>=1000?10?5)S {get}", 10, null),
+        ("D[get||L] D[set|x|xS] D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] (20{fib}>=1000?10S?5S) {get}", 10, null),
     };
 
     private static readonly Type[] TestTypes = new[] { typeof(Int32), typeof(Int64), typeof(Double), typeof(BigInteger) };
@@ -76,7 +78,10 @@ public class ExecutionTest
     private static TNumber EvaluateDynamic<TNumber>(IOperator op, CompilationContext context, int maxStep, TNumber dummy)
         where TNumber : notnull
     {
-        return Evaluator.Evaluate<TNumber>(op, context, new EvaluationContext<TNumber>(), maxStep);
+        return Evaluator.Evaluate<TNumber>(op,
+                                           context,
+                                           new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((TNumber)(dynamic)0)),
+                                           maxStep);
     }
 
     private static LowLevelModule<TNumber> GenerateLowLevelModuleDynamic<TNumber>(IOperator op, CompilationContext context, TNumber dummy)
