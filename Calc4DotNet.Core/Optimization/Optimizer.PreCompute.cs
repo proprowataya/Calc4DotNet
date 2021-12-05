@@ -55,15 +55,36 @@ public static partial class Optimizer
         public IOperator Visit(ParenthesisOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
             ImmutableArray<IOperator> operators = op.Operators;
-            var builder = ImmutableArray.CreateBuilder<IOperator>(operators.Length);
+            var optimized = new List<IOperator>();
 
+            // Optimize all operators in the ParenthesisOperator
             for (int i = 0; i < operators.Length; i++)
             {
-                builder.Add(operators[i].Accept(this, state));
+                optimized.Add(operators[i].Accept(this, state));
             }
 
-            var newOp = op with { Operators = builder.MoveToImmutable() };
-            return PreComputeIfPossible(newOp, state);
+            // Eliminate unnecessary PreComputed operators
+            var builder = ImmutableArray.CreateBuilder<IOperator>(operators.Length);
+
+            for (int i = 0; i < optimized.Count - 1; i++)
+            {
+                if (optimized[i] is not PreComputedOperator)
+                {
+                    builder.Add(optimized[i]);
+                }
+            }
+
+            // The last one is always necessary
+            builder.Add(optimized[^1]);
+
+            if (builder.Count == 1)
+            {
+                return builder[0];
+            }
+            else
+            {
+                return op with { Operators = builder.ToImmutable() };
+            }
         }
 
         public IOperator Visit(DecimalOperator op, OptimizeTimeEvaluationState<TNumber> state)
