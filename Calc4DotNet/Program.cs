@@ -38,6 +38,8 @@ class Program
             return;
         }
 
+        CompilationContext context = CompilationContext.Empty;
+
         while (true)
         {
             Console.Write("> ");
@@ -51,19 +53,19 @@ class Program
 
             if (setting.NumberType == typeof(Int32))
             {
-                ReplCore<Int32>(text, setting);
+                ReplCore<Int32>(text, ref context, setting);
             }
             else if (setting.NumberType == typeof(Int64))
             {
-                ReplCore<Int64>(text, setting);
+                ReplCore<Int64>(text, ref context, setting);
             }
             else if (setting.NumberType == typeof(Double))
             {
-                ReplCore<Double>(text, setting);
+                ReplCore<Double>(text, ref context, setting);
             }
             else if (setting.NumberType == typeof(BigInteger))
             {
-                ReplCore<BigInteger>(text, setting);
+                ReplCore<BigInteger>(text, ref context, setting);
             }
             else
             {
@@ -73,7 +75,7 @@ class Program
         }
     }
 
-    private static void ReplCore<TNumber>(string text, Setting setting)
+    private static void ReplCore<TNumber>(string text, ref CompilationContext context, Setting setting)
         where TNumber : notnull
     {
         try
@@ -82,7 +84,6 @@ class Program
             Stopwatch sw = Stopwatch.StartNew();
 
             // Compile
-            CompilationContext context = CompilationContext.Empty;
             List<IToken> tokens = Lexer.Lex(text, ref context);
             IOperator op = Parser.Parse(tokens, ref context);
 
