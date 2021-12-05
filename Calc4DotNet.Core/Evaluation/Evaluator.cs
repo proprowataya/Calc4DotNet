@@ -9,22 +9,19 @@ namespace Calc4DotNet.Core.Evaluation;
 public sealed class EvaluationStepLimitExceedException : Exception
 { }
 
-internal sealed class EvaluationContextNotSetException : Exception
-{ }
-
 internal sealed class EvaluationArgumentNotSetException : Exception
 { }
 
 public static class Evaluator
 {
-    public static TNumber Evaluate<TNumber>(IOperator op, CompilationContext compilationContext, EvaluationContext<TNumber>? evaluationContext, int maxStep = int.MaxValue)
+    public static TNumber Evaluate<TNumber>(IOperator op, CompilationContext compilationContext, IEvaluationState<TNumber> evaluationState, int maxStep = int.MaxValue)
         where TNumber : notnull
     {
         if (typeof(TNumber) == typeof(Int32))
         {
             var result =
                 op.Accept(new Visitor<Int32, Int32Computer>(compilationContext,
-                                                            (EvaluationContext<Int32>?)(object?)evaluationContext,
+                                                            (IEvaluationState<Int32>)(object)evaluationState,
                                                             maxStep), null);
             return Unsafe.As<Int32, TNumber>(ref result);
         }
@@ -32,7 +29,7 @@ public static class Evaluator
         {
             var result =
                 op.Accept(new Visitor<Int64, Int64Computer>(compilationContext,
-                                                            (EvaluationContext<Int64>?)(object?)evaluationContext,
+                                                            (IEvaluationState<Int64>)(object)evaluationState,
                                                             maxStep), null);
             return Unsafe.As<Int64, TNumber>(ref result);
         }
@@ -40,7 +37,7 @@ public static class Evaluator
         {
             var result =
                 op.Accept(new Visitor<Double, DoubleComputer>(compilationContext,
-                                                              (EvaluationContext<Double>?)(object?)evaluationContext,
+                                                              (IEvaluationState<Double>)(object)evaluationState,
                                                               maxStep), null);
             return Unsafe.As<Double, TNumber>(ref result);
         }
@@ -48,7 +45,7 @@ public static class Evaluator
         {
             var result =
                 op.Accept(new Visitor<BigInteger, BigIntegerComputer>(compilationContext,
-                                                                      (EvaluationContext<BigInteger>?)(object?)evaluationContext,
+                                                                      (IEvaluationState<BigInteger>)(object)evaluationState,
                                                                       maxStep), null);
             return Unsafe.As<BigInteger, TNumber>(ref result);
         }
@@ -64,14 +61,14 @@ public static class Evaluator
         where TNumberComputer : struct, INumberComputer<TNumber>
     {
         private readonly CompilationContext compilationContext;
-        private readonly EvaluationContext<TNumber>? evaluationContext;
+        private readonly IEvaluationState<TNumber> evaluationState;
         private readonly int maxStep = 0;
         private int step;
 
-        public Visitor(CompilationContext compilationContext, EvaluationContext<TNumber>? evaluationContext, int maxStep)
+        public Visitor(CompilationContext compilationContext, IEvaluationState<TNumber> evaluationState, int maxStep)
         {
             this.compilationContext = compilationContext;
-            this.evaluationContext = evaluationContext;
+            this.evaluationState = evaluationState;
             this.maxStep = maxStep;
         }
 
@@ -94,14 +91,7 @@ public static class Evaluator
             => default(TNumberComputer).Zero;
 
         public TNumber Visit(LoadOperator op, TNumber[]? arguments)
-        {
-            if (evaluationContext is null)
-            {
-                throw new EvaluationContextNotSetException();
-            }
-
-            return evaluationContext.GetVariableValue(op.VariableName, default(TNumberComputer).Zero);
-        }
+            => evaluationState.Variables[op.VariableName];
 
         public TNumber Visit(ParenthesisOperator op, TNumber[]? arguments)
         {
@@ -125,13 +115,8 @@ public static class Evaluator
 
         public TNumber Visit(StoreOperator op, TNumber[]? arguments)
         {
-            if (evaluationContext is null)
-            {
-                throw new EvaluationContextNotSetException();
-            }
-
             TNumber value = op.Operand.Accept(this, arguments);
-            evaluationContext.SetVariableValue(op.VariableName, value);
+            evaluationState.Variables[op.VariableName] = value;
             return value;
         }
 

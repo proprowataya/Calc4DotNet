@@ -6,34 +6,33 @@ namespace Calc4DotNet.Core.Optimization;
 
 public static partial class Optimizer
 {
-    private sealed class PreComputeVisitor<TNumber> : IOperatorVisitor<IOperator>
+    private sealed class PreComputeVisitor<TNumber> : IOperatorVisitor<IOperator, OptimizeTimeEvaluationState<TNumber>>
         where TNumber : notnull
     {
         private readonly CompilationContext compilationContext;
-        private readonly EvaluationContext<TNumber> evaluationContext;
         private readonly int maxStep;
-        private bool inMain;
 
-        public PreComputeVisitor(CompilationContext context, int maxStep, bool inMain)
+        public PreComputeVisitor(CompilationContext context, int maxStep)
         {
             this.compilationContext = context ?? throw new ArgumentNullException(nameof(context));
-            this.evaluationContext = new EvaluationContext<TNumber>();
             this.maxStep = maxStep;
-            this.inMain = inMain;
         }
 
-        private IOperator PreComputeIfPossible(IOperator op)
+        private IOperator PreComputeIfPossible(IOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
             try
             {
-                EvaluationContext<TNumber>? evaluationContext = inMain ? this.evaluationContext : null;
-                return new PreComputedOperator(Evaluator.Evaluate<TNumber>(op, compilationContext, evaluationContext, maxStep));
+                return new PreComputedOperator(
+                    Evaluator.Evaluate<TNumber>(op,
+                                                compilationContext,
+                                                new SimpleEvaluationState<TNumber>(state),
+                                                maxStep));
             }
             catch (EvaluationStepLimitExceedException)
             {
                 return op;
             }
-            catch (EvaluationContextNotSetException)
+            catch (VariableNotSetException)
             {
                 return op;
             }
@@ -43,60 +42,91 @@ public static partial class Optimizer
             }
         }
 
-        public IOperator Visit(ZeroOperator op) => PreComputeIfPossible(op);
+        public IOperator Visit(ZeroOperator op, OptimizeTimeEvaluationState<TNumber> state) => PreComputeIfPossible(op, state);
 
-        public IOperator Visit(PreComputedOperator op) => PreComputeIfPossible(op);
+        public IOperator Visit(PreComputedOperator op, OptimizeTimeEvaluationState<TNumber> state) => PreComputeIfPossible(op, state);
 
-        public IOperator Visit(ArgumentOperator op) => PreComputeIfPossible(op);
+        public IOperator Visit(ArgumentOperator op, OptimizeTimeEvaluationState<TNumber> state) => PreComputeIfPossible(op, state);
 
-        public IOperator Visit(DefineOperator op) => PreComputeIfPossible(op);
+        public IOperator Visit(DefineOperator op, OptimizeTimeEvaluationState<TNumber> state) => PreComputeIfPossible(op, state);
 
-        public IOperator Visit(LoadOperator op) => inMain ? PreComputeIfPossible(op) : op;
+        public IOperator Visit(LoadOperator op, OptimizeTimeEvaluationState<TNumber> state) => PreComputeIfPossible(op, state);
 
-        public IOperator Visit(ParenthesisOperator op)
+        public IOperator Visit(ParenthesisOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
             ImmutableArray<IOperator> operators = op.Operators;
             var builder = ImmutableArray.CreateBuilder<IOperator>(operators.Length);
 
             for (int i = 0; i < operators.Length; i++)
             {
-                builder.Add(operators[i].Accept(this));
+                builder.Add(operators[i].Accept(this, state));
             }
 
             var newOp = op with { Operators = builder.MoveToImmutable() };
-            return PreComputeIfPossible(newOp);
+            return PreComputeIfPossible(newOp, state);
         }
 
-        public IOperator Visit(DecimalOperator op)
+        public IOperator Visit(DecimalOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
-            var operand = op.Operand.Accept(this);
+            var operand = op.Operand.Accept(this, state);
             var newOp = op with { Operand = operand };
-            return PreComputeIfPossible(newOp);
+            return PreComputeIfPossible(newOp, state);
         }
 
-        public IOperator Visit(StoreOperator op)
+        public IOperator Visit(StoreOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
-            var operand = op.Operand.Accept(this);
+            var operand = op.Operand.Accept(this, state);
             var newOp = op with { Operand = operand };
-            return inMain ? PreComputeIfPossible(newOp) : newOp;
+
+            if (operand is PreComputedOperator preComputed)
+            {
+                // Tell the pre-computed value to another operator
+                state[op.VariableName] = (TNumber)preComputed.Value;
+            }
+            else
+            {
+                // We failed to pre-compute the operand of this StoreOperator.
+                // Therefore, the variable that this operator indicates is unknown.
+                // We unset the variable so as not for another operator to load it.
+                state.UnsetVariable(op.VariableName);
+            }
+
+            // Do NOT make PreComputedOperator for StoreOperator because it mistakenly eliminates store operation
+            return newOp;
         }
 
-        public IOperator Visit(BinaryOperator op)
+        public IOperator Visit(BinaryOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
-            var left = op.Left.Accept(this);
-            var right = op.Right.Accept(this);
+            var left = op.Left.Accept(this, state);
+            var right = op.Right.Accept(this, state);
             var newOp = op with { Left = left, Right = right };
-            return PreComputeIfPossible(newOp);
+            return PreComputeIfPossible(newOp, state);
         }
 
-        public IOperator Visit(ConditionalOperator op)
+        public IOperator Visit(ConditionalOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
-            var condition = op.Condition.Accept(this);
-            var ifTrue = op.IfTrue.Accept(this);
-            var ifFalse = op.IfFalse.Accept(this);
+            var condition = op.Condition.Accept(this, state);
+
+            // From now on, we use cloned object of the evaluation state
+            // because IfTrue and IfFalse will not always be executed.
+
+            // Process IfTrue
+            var ifTrueState = state.Clone();
+            var ifTrue = op.IfTrue.Accept(this, ifTrueState);
+
+            // Process IfFalse
+            var ifFalseState = state.Clone();
+            var ifFalse = op.IfFalse.Accept(this, ifFalseState);
+
+            // We must unset variables that have different values after execution of ifTrue and ifFalse.
+            // We calculate intersection of ifTrueState and ifFalseState
+            var intersection = OptimizeTimeEvaluationState<TNumber>.Intersect(ifTrueState, ifFalseState);
+            state.Assign(intersection);
+
+            // Create new operator
             var newOp = op with { Condition = condition, IfTrue = ifTrue, IfFalse = ifFalse };
 
-            if (PreComputeIfPossible(condition) is PreComputedOperator preComputed)
+            if (PreComputeIfPossible(condition, state) is PreComputedOperator preComputed)
             {
                 // TODO: More wise determination method of whether the value is zero or not
                 return (dynamic)preComputed.Value != 0 ? ifTrue : ifFalse;
@@ -107,11 +137,11 @@ public static partial class Optimizer
             }
         }
 
-        public IOperator Visit(UserDefinedOperator op)
+        public IOperator Visit(UserDefinedOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
-            var operands = op.Operands.Select(x => x.Accept(this)).ToImmutableArray();
+            var operands = op.Operands.Select(x => x.Accept(this, state)).ToImmutableArray();
             var newOp = op with { Operands = operands };
-            return PreComputeIfPossible(newOp);
+            return PreComputeIfPossible(newOp, state);
         }
     }
 }
