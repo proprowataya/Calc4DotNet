@@ -44,12 +44,17 @@ public class ExecutionTest
         ("D[tarai|x,y,z|x <= y ? y ? (((x - 1){tarai}y{tarai}z){tarai}((y - 1){tarai}z{tarai}x){tarai}((z - 1){tarai}x{tarai}y))] 10{tarai}5{tarai}5", 5, null),
 
         // User defined variables
+        ("1S", 1, null),
+        ("L", 0, null),
+        ("1S[var]", 1, null),
+        ("L[var]", 0, null),
         ("(123S)L*L", 123 * 123, null),
         ("(123S[var])L[var]*L[var]", 123 * 123, null),
         ("((100+20+3)S)L*L", 123 * 123, null),
         ("((100+20+3)S[var])L[var]*L[var]", 123 * 123, null),
         ("D[op||(123S)L*L]{op}", 123 * 123, null),
         ("D[op||L*L](123S){op}", 123 * 123, null),
+        ("D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] (20{fib}S)+L", 6765 * 2, null),
     };
 
     private static readonly Type[] TestTypes = new[] { typeof(Int32), typeof(Int64), typeof(Double), typeof(BigInteger) };
