@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.SyntaxAnalysis;
@@ -8,11 +9,39 @@ public static class Parser
     public static IOperator Parse(IReadOnlyList<IToken> tokens, ref CompilationContext context)
     {
         var boxedContext = new CompilationContext.Boxed(context);
-        var implement = new Implement(tokens, boxedContext);
-        var op = implement.Parse();
-
+        GenerateUserDefinedCode(tokens, boxedContext);
+        var op = ParseCore(tokens, boxedContext);
         context = boxedContext.Value;
         return op;
+    }
+
+    private static IOperator ParseCore(IReadOnlyList<IToken> tokens, CompilationContext.Boxed context)
+    {
+        var operators = ImmutableArray.CreateBuilder<IOperator>();
+
+        int index = 0;
+        while (index < tokens.Count)
+        {
+            (var op, index) = new Implement(tokens, context, index).ParseOne();
+            operators.Add(op);
+        }
+
+        return operators.Count switch
+        {
+            0 => throw new Calc4DotNet.Core.Exceptions.CodeIsEmptyException(),
+            1 => operators[0],
+            _ => new ParenthesisOperator(operators.ToImmutable()),
+        };
+    }
+
+    private static void GenerateUserDefinedCode(IReadOnlyList<IToken> tokens, CompilationContext.Boxed context)
+    {
+        foreach (var token in tokens.OfType<DefineToken>())
+        {
+            IOperator op = ParseCore(token.Tokens, context);
+            context.Value = context.Value.WithAddOrUpdateOperatorImplement(
+                context.Value.LookupOperatorImplement(token.Name) with { Operator = op });
+        }
     }
 
     private struct Implement
@@ -22,26 +51,21 @@ public static class Parser
         private readonly int maxNumOperands;
         private int index;
 
-        public Implement(IReadOnlyList<IToken> tokens, CompilationContext.Boxed context)
+        public Implement(IReadOnlyList<IToken> tokens, CompilationContext.Boxed context, int startIndex)
         {
             this.tokens = tokens ?? throw new ArgumentNullException(nameof(tokens));
             this.context = context ?? throw new ArgumentNullException(nameof(context));
-            this.maxNumOperands = tokens.Count > 0 ? tokens.Max(t => t.NumOperands) : 0;
-            this.index = 0;
+            this.maxNumOperands = tokens.Skip(startIndex).DefaultIfEmpty(null).Max(t => t?.NumOperands ?? 0);
+            this.index = startIndex;
         }
 
-        public IOperator Parse()
+        public (IOperator Operator, int NextIndex) ParseOne()
         {
-            GenerateUserDefinedCode();
-            List<IOperator> results = new List<IOperator>();
-
             if (maxNumOperands == 0)
             {
-                while (index < tokens.Count)
-                {
-                    results.Add(CreateOperator(tokens[index], Array.Empty<IOperator>()));
-                    index++;
-                }
+                IOperator result = CreateOperator(tokens[index], Array.Empty<IOperator>());
+                index++;
+                return (result, index);
             }
             else
             {
@@ -59,12 +83,18 @@ public static class Parser
                         throw new Calc4DotNet.Core.Exceptions.SomeOperandsMissingException();
                     }
 
-                    operands.Add(new Implement(lower, context).Parse());
+                    operands.Add(ParseCore(lower, context));
                 }
 
+                IOperator? result = null;
                 while (index < tokens.Count)
                 {
                     IToken token = tokens[index];
+                    if (token.NumOperands < maxNumOperands)
+                    {
+                        break;
+                    }
+
                     index++;
 
                     while (operands.Count < maxNumOperands)
@@ -75,7 +105,7 @@ public static class Parser
                             throw new Calc4DotNet.Core.Exceptions.SomeOperandsMissingException();
                         }
 
-                        operands.Add(new Implement(lower, context).Parse());
+                        operands.Add(ParseCore(lower, context));
                         if (operands.Count < maxNumOperands)
                             index++;
                     }
@@ -83,26 +113,11 @@ public static class Parser
                     IOperator op = CreateOperator(token, operands);
                     operands.Clear();
                     operands.Add(op);
+                    result = op;
                 }
 
-                results.AddRange(operands);
-            }
-
-            return results.Count switch
-            {
-                0 => throw new Calc4DotNet.Core.Exceptions.CodeIsEmptyException(),
-                1 => results[0],
-                _ => new ParenthesisOperator(results.ToImmutableArray()),
-            };
-        }
-
-        private void GenerateUserDefinedCode()
-        {
-            foreach (var token in tokens.OfType<DefineToken>())
-            {
-                IOperator op = new Implement(token.Tokens, context).Parse();
-                context.Value = context.Value.WithAddOrUpdateOperatorImplement(
-                                                context.Value.LookupOperatorImplement(token.Name) with { Operator = op });
+                Debug.Assert(result is not null);
+                return (result, index);
             }
         }
 
@@ -113,7 +128,7 @@ public static class Parser
                 ArgumentToken arg => new ArgumentOperator(arg.Index, arg.SupplementaryText),
                 DefineToken def => new DefineOperator(def.SupplementaryText),
                 LoadToken load => new LoadOperator(load.SupplementaryText),
-                ParenthesisToken parenthesis => new Implement(parenthesis.Tokens, context).Parse(),
+                ParenthesisToken parenthesis => ParseCore(parenthesis.Tokens, context),
                 DecimalToken dec => new DecimalOperator(operands[0], dec.Value, dec.SupplementaryText),
                 StoreToken store => new StoreOperator(operands[0], store.SupplementaryText),
                 BinaryOperatorToken binary => new BinaryOperator(operands[0], operands[1], binary.Type, binary.SupplementaryText),
