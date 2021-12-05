@@ -4,7 +4,7 @@ namespace Calc4DotNet.Core.Operators;
 
 public static class OperatorExtensions
 {
-    private static readonly HashSet<string> HiddenPropertyNames = new HashSet<string>() { };
+    private static readonly HashSet<string> HiddenPropertyNames = new HashSet<string>() { "Operators" };
 
     public static string ToDetailString(this IOperator op)
     {

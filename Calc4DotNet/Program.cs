@@ -215,7 +215,7 @@ class Program
     private static void PrintTree(IOperator op, int depth = 0)
     {
         Console.WriteLine(new string(' ', Indent * depth) + op.ToDetailString());
-        foreach (var item in op.GetOperands())
+        foreach (var item in op is ParenthesisOperator parenthesis ? (IEnumerable<IOperator>)parenthesis.Operators : op.GetOperands())
         {
             PrintTree(item, depth + 1);
         }
