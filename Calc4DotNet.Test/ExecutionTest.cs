@@ -48,6 +48,8 @@ public class ExecutionTest
         ("L", 0, null),
         ("1S[var]", 1, null),
         ("L[var]", 0, null),
+        ("D[set|x|xS] 7{set}L", 7, null),
+        ("D[set|x|xS] 7{set}LS[var1] L[zero]3{set}LS[var2] L[var1]*L[var2]", 21, null),
         ("(123S)L*L", 123 * 123, null),
         ("(123S[var])L[var]*L[var]", 123 * 123, null),
         ("((100+20+3)S)L*L", 123 * 123, null),
