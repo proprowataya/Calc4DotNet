@@ -25,6 +25,12 @@ public static class ILCompiler
                                        TypeAttributes.Class | TypeAttributes.Public,
                                        typeof(object),
                                        new[] { typeof(ICompiledModule<TNumber>) });
+        // Define variables
+        FieldBuilder[] fieldBuilders = new FieldBuilder[module.NumVariables];
+        for (int i = 0; i < fieldBuilders.Length; i++)
+        {
+            fieldBuilders[i] = typeBuilder.DefineField($"Field{i}", typeof(TNumber), FieldAttributes.Private | FieldAttributes.Static);
+        }
         // Define Run Method
         MethodBuilder runMethod
             = typeBuilder.DefineMethod(nameof(ICompiledModule<TNumber>.Run),
@@ -47,25 +53,25 @@ public static class ILCompiler
             methods[i] = (methodBuilder, op.Definition.NumOperands);
         }
 
-        EmitIL(module, runMethod, methods);
+        EmitIL(module, fieldBuilders, runMethod, methods);
         Type type = typeBuilder.CreateType()!;
         return (ICompiledModule<TNumber>)Activator.CreateInstance(type)!;
     }
 
-    private static void EmitIL<TNumber>(LowLevelModule<TNumber> module, MethodBuilder runMethod, (MethodBuilder Method, int NumOperands)[] methods)
+    private static void EmitIL<TNumber>(LowLevelModule<TNumber> module, FieldBuilder[] fieldBuilders, MethodBuilder runMethod, (MethodBuilder Method, int NumOperands)[] methods)
         where TNumber : notnull
     {
         // Emit Main(Run) operator
-        EmitILCore(module, module.EntryPoint, runMethod, 0, methods);
+        EmitILCore(module, module.EntryPoint, fieldBuilders, runMethod, 0, methods);
 
         // Emit user-defined operators
         for (int i = 0; i < module.UserDefinedOperators.Length; i++)
         {
-            EmitILCore(module, module.UserDefinedOperators[i].Operations, methods[i].Method, methods[i].NumOperands, methods);
+            EmitILCore(module, module.UserDefinedOperators[i].Operations, fieldBuilders, methods[i].Method, methods[i].NumOperands, methods);
         }
     }
 
-    private static void EmitILCore<TNumber>(LowLevelModule<TNumber> module, ImmutableArray<LowLevelOperation> operations, MethodBuilder method, int numOperands, (MethodBuilder Method, int NumOperands)[] methods)
+    private static void EmitILCore<TNumber>(LowLevelModule<TNumber> module, ImmutableArray<LowLevelOperation> operations, FieldBuilder[] fieldBuilders, MethodBuilder method, int numOperands, (MethodBuilder Method, int NumOperands)[] methods)
         where TNumber : notnull
     {
         /* Local method */
@@ -103,6 +109,13 @@ public static class ILCompiler
                     break;
                 case Opcode.StoreArg:
                     il.EmitStarg(RestoreMethodParameterIndex(op.Value));
+                    break;
+                case Opcode.LoadVariable:
+                    il.Emit(OpCodes.Ldsfld, fieldBuilders[op.Value]);
+                    break;
+                case Opcode.StoreVariable:
+                    il.Emit(OpCodes.Dup);
+                    il.Emit(OpCodes.Stsfld, fieldBuilders[op.Value]);
                     break;
                 case Opcode.Input:
                     throw new NotImplementedException();

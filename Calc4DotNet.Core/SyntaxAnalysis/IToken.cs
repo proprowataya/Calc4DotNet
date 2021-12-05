@@ -19,6 +19,12 @@ public sealed record DefineToken(string Name, ImmutableArray<string> Arguments, 
     public int NumOperands => 0;
 }
 
+public sealed record LoadToken(string? SupplementaryText = null) : IToken
+{
+    public string? VariableName => SupplementaryText;
+    public int NumOperands => 0;
+}
+
 public sealed record ParenthesisToken(ImmutableArray<IToken> Tokens, string? SupplementaryText = null) : IToken
 {
     public int NumOperands => 0;
@@ -26,6 +32,12 @@ public sealed record ParenthesisToken(ImmutableArray<IToken> Tokens, string? Sup
 
 public sealed record DecimalToken(int Value, string? SupplementaryText = null) : IToken
 {
+    public int NumOperands => 1;
+}
+
+public sealed record StoreToken(string? SupplementaryText = null) : IToken
+{
+    public string? VariableName => SupplementaryText;
     public int NumOperands => 1;
 }
 
