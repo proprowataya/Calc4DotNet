@@ -33,7 +33,10 @@ public static partial class Optimizer
             // Optimize user defined operators
             foreach (var implement in context.OperatorImplements)
             {
-                OptimizeUserDefinedOperator<TNumber>(implement, ref context, variables);
+                if (!implement.IsOptimized)
+                {
+                    OptimizeUserDefinedOperator<TNumber>(implement, ref context, variables);
+                }
             }
         }
 
@@ -47,10 +50,12 @@ public static partial class Optimizer
     private static void OptimizeUserDefinedOperator<TNumber>(OperatorImplement implement, ref CompilationContext context, HashSet<string?> variables)
         where TNumber : notnull
     {
+        Debug.Assert(!implement.IsOptimized);
+
         var op = implement.Operator;
         Debug.Assert(op is not null);
         var newRoot = OptimizeCore<TNumber>(op, context, variables, inMain: false);
-        context = context.WithAddOrUpdateOperatorImplement(implement with { Operator = newRoot });
+        context = context.WithAddOrUpdateOperatorImplement(implement with { Operator = newRoot, IsOptimized = true });
     }
 
     private static IOperator OptimizeCore<TNumber>(IOperator op, CompilationContext context, HashSet<string?> variables, bool inMain)
