@@ -10,58 +10,16 @@ using Xunit;
 
 namespace Calc4DotNet.Test;
 
+internal enum ExecutorType
+{
+    Tree, LowLevel, Jit,
+}
+
 public class ExecutionTest
 {
-    #region Sources
+    private static readonly Type[] ValueTypes = new[] { typeof(Int32), typeof(Int64), typeof(Double), typeof(BigInteger) };
 
-    private static readonly (string text, int expected, Type[]? skipTypes)[] TestCases = new (string text, int expected, Type[]? skipTypes)[]
-    {
-        ("1<2", 1, null),
-        ("1<=2", 1, null),
-        ("1>=2", 0, null),
-        ("1>2", 0, null),
-        ("2<1", 0, null),
-        ("2<=1", 0, null),
-        ("2>=1", 1, null),
-        ("2>1", 1, null),
-        ("1<1", 0, null),
-        ("1<=1", 1, null),
-        ("1>=1", 1, null),
-        ("1>1", 0, null),
-        ("12345678", 12345678, null),
-        ("1+2*3-10", (1 + 2) * 3 - 10, null),
-        ("0?1?2?3?4", 3, null),
-        ("D[add|x,y|x+y] 12{add}23", 12 + 23, null),
-        ("D[get12345||12345] {get12345}+{get12345}", 12345 + 12345, null),
-        ("D[fact|x,y|x==0?y?(x-1){fact}(x*y)] 10{fact}1", 3628800, null),
-
-        // Fibonacci
-        ("D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}] 10{fib}", 55, null),
-        ("D[fibImpl|x,a,b|x ? ((x-1) ? ((x-1){fibImpl}(a+b){fibImpl}a) ? a) ? b] D[fib|x|x{fibImpl}1{fibImpl}0] 10{fib}", 55, null),
-        ("D[f|a,b,p,q,c|c < 2 ? ((a*p) + (b*q)) ? (c % 2 ? ((a*p) + (b*q) {f} (a*q) + (b*q) + (b*p) {f} (p*p) + (q*q) {f} (2*p+q)*q {f} c/2) ? (a {f} b {f} (p*p) + (q*q) {f} (2*p+q)*q {f} c/2))] D[fib|n|0{f}1{f}0{f}1{f}n] 10{fib}", 55, new[] { typeof(Double) }),
-
-        // Tarai
-        ("D[tarai|x,y,z|x <= y ? y ? (((x - 1){tarai}y{tarai}z){tarai}((y - 1){tarai}z{tarai}x){tarai}((z - 1){tarai}x{tarai}y))] 10{tarai}5{tarai}5", 5, null),
-
-        // User defined variables
-        ("1S", 1, null),
-        ("L", 0, null),
-        ("1S[var]", 1, null),
-        ("L[var]", 0, null),
-        ("D[set|x|xS] 7{set}L", 7, null),
-        ("D[set|x|xS] 7{set}LS[var1] L[zero]3{set}LS[var2] L[var1]*L[var2]", 21, null),
-        ("(123S)L*L", 123 * 123, null),
-        ("(123S[var])L[var]*L[var]", 123 * 123, null),
-        ("((100+20+3)S)L*L", 123 * 123, null),
-        ("((100+20+3)S[var])L[var]*L[var]", 123 * 123, null),
-        ("D[op||(123S)L*L]{op}", 123 * 123, null),
-        ("D[op||L*L](123S){op}", 123 * 123, null),
-        ("D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] (20{fib}S)+L", 6765 * 2, null),
-        ("D[get||L] D[set|x|xS] D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] (20{fib}>=1000?10?5)S {get}", 10, null),
-        ("D[get||L] D[set|x|xS] D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] (20{fib}>=1000?10S?5S) {get}", 10, null),
-    };
-
-    private static readonly Type[] TestTypes = new[] { typeof(Int32), typeof(Int64), typeof(Double), typeof(BigInteger) };
+    private static readonly ExecutorType[] ExecutorTypes = Enum.GetValues<ExecutorType>();
 
     private static readonly OptimizeTarget?[] OptimizeTargets = Enum.GetValues<OptimizeTarget>()
                                                                     .Select(target => (OptimizeTarget?)target)
@@ -69,16 +27,138 @@ public class ExecutionTest
                                                                     .ToArray();
 
     public static readonly object[][] Source =
-        (from test in TestCases
-         from type in TestTypes
-         where !test.skipTypes?.Contains(type) ?? true
+        (from testCase in TestCases.Values
+         from valueType in ValueTypes
+         where !testCase.SkipTypes?.Contains(valueType) ?? true
+         from executorType in ExecutorTypes
          from target in OptimizeTargets
-         select new object[] { test.text, test.expected, type, target })
+         select new object[] { testCase, valueType, executorType, target })
         .ToArray();
 
-    #endregion
+    [Theory, MemberData(nameof(Source))]
+    private static void TestCompilationAndExecution(TestCase testCase,
+                                                    Type valueType,
+                                                    ExecutorType executorType,
+                                                    OptimizeTarget? target)
+    {
+        TestCoreGeneric(executorType, target, testCase, (dynamic)Activator.CreateInstance(valueType)!);
+    }
 
-    #region Helpers
+    private static void TestCoreGeneric<TNumber>(ExecutorType executorType,
+                                                 OptimizeTarget? target,
+                                                 TestCase testCase,
+                                                 TNumber dummy)
+        where TNumber : notnull
+    {
+        /*****
+         * Compile
+         *****/
+
+        var (op, context, module) = CompileGeneric<TNumber>(testCase.Source, target, default!);
+
+        /*****
+         * Check compilation result
+         *****/
+
+        if (typeof(TNumber) == typeof(Int32))
+        {
+            // TODO:
+            // Checking compilation result is currenly supported only for Int32 type
+
+            // Main operator
+            {
+                CompilationResult<Int32> expected =
+                    (target?.HasFlag(OptimizeTarget.MainOperator) ?? false)
+                    ? testCase.ExpectedWhenOptimized
+                    : testCase.ExpectedWhenNotOptimized;
+
+                Assert.Equal(expected.Operator, op);
+            }
+
+            // CompilationContext
+            {
+                CompilationResult<Int32> expected =
+                    (target?.HasFlag(OptimizeTarget.UserDefinedOperators) ?? false)
+                    ? testCase.ExpectedWhenOptimized
+                    : testCase.ExpectedWhenNotOptimized;
+
+                Assert.Equal(expected.Context, context, CompilationContextEqualityComparer.Instance);
+            }
+
+            // LowLevelModule
+            {
+                CompilationResult<Int32>? expected = target switch
+                {
+                    null or OptimizeTarget.None => testCase.ExpectedWhenNotOptimized,
+
+                    // TODO: The following two cases are not currently supported
+                    OptimizeTarget.MainOperator => null,
+                    OptimizeTarget.UserDefinedOperators => null,
+
+                    OptimizeTarget.All => testCase.ExpectedWhenOptimized,
+                    _ => throw new InvalidOperationException()
+                };
+
+                if (expected is not null)
+                {
+                    Assert.Equal(expected.Module, (LowLevelModule<int>)(object)module, LowLevelModuleEqualityComparer<int>.Instance);
+                }
+            }
+        }
+
+        /*****
+         * Check execution result
+         *****/
+
+        {
+            TNumber expected = (TNumber)(dynamic)testCase.ExpectedValue;
+
+            object actual = executorType switch
+            {
+                ExecutorType.Tree => Evaluator.Evaluate<TNumber>(op,
+                                                                 context,
+                                                                 new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((dynamic)0))),
+                ExecutorType.LowLevel => LowLevelExecutor.Execute((dynamic)module),
+                ExecutorType.Jit => ILCompiler.Compile(module).Run(),
+                _ => throw new InvalidOperationException(),
+            };
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fact]
+    public static void TestStackOverflow()
+    {
+        const string Source = "D[x||{x} + 1] {x}";
+
+        foreach (var valueType in ValueTypes)
+        {
+            foreach (var target in OptimizeTargets)
+            {
+                Assert.Throws<Calc4DotNet.Core.Exceptions.StackOverflowException>(() =>
+                {
+                    dynamic module = CompileGeneric(Source, target, (dynamic)Activator.CreateInstance(valueType)!).Module;
+                    LowLevelExecutor.Execute(module);
+                });
+            }
+        }
+    }
+
+    private static CompilationResult<TNumber> CompileGeneric<TNumber>(string source, OptimizeTarget? target, TNumber dummy)
+        where TNumber : notnull
+    {
+        CompilationContext context = CompilationContext.Empty;
+        List<IToken> tokens = Lexer.Lex(source, ref context);
+        IOperator op = Parser.Parse(tokens, ref context);
+        if (target is not null)
+        {
+            Optimizer.Optimize<TNumber>(ref op, ref context, target.GetValueOrDefault());
+        }
+        LowLevelModule<TNumber> module = LowLevelCodeGenerator.Generate<TNumber>(op, context);
+
+        return new CompilationResult<TNumber>(op, context, module);
+    }
 
     private static TNumber EvaluateDynamic<TNumber>(IOperator op, CompilationContext context, int maxStep, TNumber dummy)
         where TNumber : notnull
@@ -87,89 +167,5 @@ public class ExecutionTest
                                            context,
                                            new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((TNumber)(dynamic)0)),
                                            maxStep);
-    }
-
-    private static LowLevelModule<TNumber> GenerateLowLevelModuleDynamic<TNumber>(IOperator op, CompilationContext context, TNumber dummy)
-        where TNumber : notnull
-    {
-        return LowLevelCodeGenerator.Generate<TNumber>(op, context);
-    }
-
-    private static void TestCore(string text, object expected, Type type, OptimizeTarget? target,
-                                 Func<object, object, object> executor)
-    {
-        TestCoreGeneric(text, (dynamic)expected, target, executor, (dynamic)Activator.CreateInstance(type)!);
-    }
-
-    private static void TestCoreGeneric<TNumber>(string text, TNumber expected, OptimizeTarget? target,
-                                                 Func<object, object, object> executor, TNumber dummy)
-        where TNumber : notnull
-    {
-        var context = CompilationContext.Empty;
-        var tokens = Lexer.Lex(text, ref context);
-        var op = Parser.Parse(tokens, ref context);
-        if (target is not null)
-        {
-            Optimizer.Optimize<TNumber>(ref op, ref context, target.GetValueOrDefault());
-        }
-
-        // TODO
-        Assert.Equal(expected, executor(op, context));
-    }
-
-    #endregion
-
-    [Theory, MemberData(nameof(Source))]
-    public static void TestByTreeEvaluator(string text, object expected, Type type, OptimizeTarget? target)
-    {
-        TestCore(text, expected, type, target, (op, context) =>
-        {
-            return EvaluateDynamic((dynamic)op,
-                                   (dynamic)context,
-                                   int.MaxValue,
-                                   (dynamic)Activator.CreateInstance(type)!);
-        });
-    }
-
-    [Theory, MemberData(nameof(Source))]
-    public static void TestByLowLevelExecutor(string text, object expected, Type type, OptimizeTarget? target)
-    {
-        TestCore(text, expected, type, target, (op, context) =>
-        {
-            var module = GenerateLowLevelModuleDynamic((dynamic)op,
-                                                       (dynamic)context,
-                                                       (dynamic)Activator.CreateInstance(type)!);
-            return LowLevelExecutor.Execute(module);
-        });
-    }
-
-    [Theory, MemberData(nameof(Source))]
-    public static void TestByJIT(string text, object expected, Type type, OptimizeTarget? target)
-    {
-        TestCore(text, expected, type, target, (op, context) =>
-        {
-            var module = GenerateLowLevelModuleDynamic((dynamic)op,
-                                                       (dynamic)context,
-                                                       (dynamic)Activator.CreateInstance(type)!);
-            var compiled = ILCompiler.Compile(module);
-            return compiled.Run();
-        });
-    }
-
-    [Fact]
-    public static void TestStackOverflow()
-    {
-        const string text = "D[x||{x} + 1] {x}";
-
-        foreach (var type in TestTypes)
-        {
-            foreach (var target in OptimizeTargets)
-            {
-                Assert.Throws<Calc4DotNet.Core.Exceptions.StackOverflowException>(() =>
-                {
-                    TestByLowLevelExecutor(text, Activator.CreateInstance(type)! /* dummy */, type, target);
-                });
-            }
-        }
     }
 }
