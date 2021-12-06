@@ -1,6 +1,8 @@
-﻿namespace Calc4DotNet.Core.Execution;
+﻿using System.Diagnostics.CodeAnalysis;
 
-public readonly struct LowLevelOperation
+namespace Calc4DotNet.Core.Execution;
+
+public readonly struct LowLevelOperation : IEquatable<LowLevelOperation>
 {
     private static readonly int MaxOpcodeNameLength = Enum.GetNames(typeof(Opcode)).Max(s => s.Length);
 
@@ -17,6 +19,21 @@ public readonly struct LowLevelOperation
     {
         string str = Opcode.ToString();
         return $"{str.PadRight(MaxOpcodeNameLength)} [Value = {Value}]";
+    }
+
+    public bool Equals(LowLevelOperation other)
+    {
+        return (Opcode, Value) == (other.Opcode, other.Value);
+    }
+
+    public override bool Equals([NotNullWhen(true)] object? obj)
+    {
+        return obj is LowLevelOperation other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Opcode, Value);
     }
 }
 
