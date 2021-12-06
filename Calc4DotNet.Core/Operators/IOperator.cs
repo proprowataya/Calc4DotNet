@@ -67,6 +67,27 @@ public sealed record ParenthesisOperator(ImmutableArray<IOperator> Operators, st
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
     public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+
+    public bool Equals(ParenthesisOperator? other)
+    {
+        return ReferenceEquals(this, other)
+                || (other is not null
+                    && Operators.SequenceEqual(other.Operators)
+                    && SupplementaryText == other.SupplementaryText);
+    }
+
+    public override int GetHashCode()
+    {
+        HashCode hash = new HashCode();
+
+        foreach (var op in Operators)
+        {
+            hash.Add(op);
+        }
+
+        hash.Add(SupplementaryText);
+        return hash.ToHashCode();
+    }
 }
 
 public sealed record DecimalOperator(IOperator Operand, int Value, string? SupplementaryText = null) : IOperator
@@ -115,4 +136,29 @@ public sealed record UserDefinedOperator(OperatorDefinition Definition, Immutabl
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
     public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+
+    public bool Equals(UserDefinedOperator? other)
+    {
+        return ReferenceEquals(this, other)
+                || (other is not null
+                    && Definition.Equals(other.Definition)
+                    && Operands.SequenceEqual(other.Operands)
+                    && IsTailCallable == other.IsTailCallable
+                    && SupplementaryText == other.SupplementaryText);
+    }
+
+    public override int GetHashCode()
+    {
+        HashCode hash = new HashCode();
+        hash.Add(Definition);
+
+        foreach (var op in Operands)
+        {
+            hash.Add(op);
+        }
+
+        hash.Add(IsTailCallable);
+        hash.Add(SupplementaryText);
+        return hash.ToHashCode();
+    }
 }
