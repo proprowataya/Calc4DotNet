@@ -38,7 +38,8 @@ public sealed class CompilationContext
 
     #endregion
 
-    public IEnumerable<OperatorImplement> OperatorImplements => userDefinedOperators.Values;
+    public IEnumerable<OperatorImplement> OperatorImplements =>
+        userDefinedOperators.Values.OrderBy(implement => implement.Definition.Name);
 
     public OperatorImplement LookupOperatorImplement(string name)
     {
