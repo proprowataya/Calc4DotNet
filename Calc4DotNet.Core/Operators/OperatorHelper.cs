@@ -2,11 +2,11 @@
 
 namespace Calc4DotNet.Core.Operators;
 
-public static class OperatorExtensions
+internal static class OperatorHelper
 {
     private static readonly HashSet<string> HiddenPropertyNames = new HashSet<string>() { "Operators" };
 
-    public static string ToDetailString(this IOperator op)
+    public static string ToStringImplement(this IOperator op)
     {
         var type = op.GetType();
         var props = type.GetProperties()
@@ -21,7 +21,7 @@ public static class OperatorExtensions
     {
         string str => '"' + str + '"',
         IEnumerable enumerable => $"{{{string.Join(", ", enumerable.Cast<object>().Select(x => ObjectToString(x)))}}}",
-        IOperator op => op.ToDetailString(),
+        IOperator op => op.ToStringImplement(),
         _ => obj?.ToString() ?? "",
     };
 }
