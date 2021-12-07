@@ -159,13 +159,4 @@ public class ExecutionTest
 
         return new CompilationResult<TNumber>(op, context, module);
     }
-
-    private static TNumber EvaluateDynamic<TNumber>(IOperator op, CompilationContext context, int maxStep, TNumber dummy)
-        where TNumber : notnull
-    {
-        return Evaluator.Evaluate<TNumber>(op,
-                                           context,
-                                           new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((TNumber)(dynamic)0)),
-                                           maxStep);
-    }
 }
