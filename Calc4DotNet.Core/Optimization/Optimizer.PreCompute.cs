@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Operators;
 
@@ -162,7 +163,64 @@ public static partial class Optimizer
         {
             var operands = op.Operands.Select(x => x.Accept(this, state)).ToImmutableArray();
             var newOp = op with { Operands = operands };
-            return PreComputeIfPossible(newOp, state);
+
+            if (GetVariablesToBeWritten(op, compilationContext) is var variables && variables.Count > 0)
+            {
+                // If this user defined operator writes variables, we cannot eliminate its call.
+                // We unset such variables because their values are unknown.
+                foreach (var variableName in variables)
+                {
+                    state.UnsetVariable(variableName);
+                }
+
+                // We will not perform any further optimizations.
+                return newOp;
+            }
+            else
+            {
+                return PreComputeIfPossible(newOp, state);
+            }
         }
+    }
+
+    private static HashSet<string?> GetVariablesToBeWritten(IOperator op, CompilationContext context)
+    {
+        HashSet<string?> variables = new();
+        HashSet<string> visitedUserDefinedOperators = new();
+
+        void Core(IOperator op)
+        {
+            switch (op)
+            {
+                case StoreOperator store:
+                    variables.Add(store.VariableName);
+                    break;
+                case UserDefinedOperator userDefined:
+                    if (!visitedUserDefinedOperators.Contains(userDefined.Definition.Name))
+                    {
+                        visitedUserDefinedOperators.Add(userDefined.Definition.Name);
+                        var implement = context.LookupOperatorImplement(userDefined.Definition.Name);
+                        Debug.Assert(implement.Operator is not null);
+                        Core(implement.Operator);
+                    }
+                    break;
+                case ParenthesisOperator parenthesis:
+                    foreach (var inner in parenthesis.Operators)
+                    {
+                        Core(inner);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            foreach (var operand in op.GetOperands())
+            {
+                Core(operand);
+            }
+        }
+
+        Core(op);
+        return variables;
     }
 }
