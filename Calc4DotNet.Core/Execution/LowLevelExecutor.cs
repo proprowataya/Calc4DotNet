@@ -45,7 +45,7 @@ public static class LowLevelExecutor
 
         TNumber[] stack = new TNumber[StackSize];
         int[] ptrStack = new int[PtrStackSize];
-        TNumber[] variables = new TNumber[module.NumVariables];
+        TNumber[] variables = new TNumber[module.Variables.Length];
         ref TNumber top = ref stack[0];
         ref TNumber bottom = ref stack[0];
         ref int ptrTop = ref ptrStack[0];

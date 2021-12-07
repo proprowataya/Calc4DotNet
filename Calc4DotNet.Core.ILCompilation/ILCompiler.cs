@@ -26,7 +26,7 @@ public static class ILCompiler
                                        typeof(object),
                                        new[] { typeof(ICompiledModule<TNumber>) });
         // Define variables
-        FieldBuilder[] fieldBuilders = new FieldBuilder[module.NumVariables];
+        FieldBuilder[] fieldBuilders = new FieldBuilder[module.Variables.Length];
         for (int i = 0; i < fieldBuilders.Length; i++)
         {
             fieldBuilders[i] = typeBuilder.DefineField($"Field{i}", typeof(TNumber), FieldAttributes.Private | FieldAttributes.Static);

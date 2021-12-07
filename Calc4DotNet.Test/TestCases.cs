@@ -1,4 +1,6 @@
-﻿using System.Collections.Immutable;
+﻿#nullable disable
+
+using System.Collections.Immutable;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Execution;
 using Calc4DotNet.Core.Operators;
@@ -59,7 +61,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -86,7 +90,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -142,7 +148,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -169,7 +177,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -225,7 +235,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -252,7 +264,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -308,7 +322,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -335,7 +351,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -391,7 +409,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -418,7 +438,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -474,7 +496,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -501,7 +525,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -557,7 +583,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -584,7 +612,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -640,7 +670,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -667,7 +699,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -723,7 +757,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -750,7 +786,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -806,7 +844,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -833,7 +873,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -889,7 +931,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -916,7 +960,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -972,7 +1018,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -999,7 +1047,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -1093,7 +1143,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -1121,7 +1173,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -1212,7 +1266,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -1239,7 +1295,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -1327,7 +1385,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -1354,7 +1414,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -1455,7 +1517,9 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     2)
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -1508,7 +1572,9 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     2)
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -1623,7 +1689,9 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     2)
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -1665,7 +1733,9 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     1)
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -1816,7 +1886,9 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     3)
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -1917,7 +1989,9 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     3)
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -2077,7 +2151,9 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     4)
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -2198,7 +2274,9 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     3)
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -2416,7 +2494,9 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     3)
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -2572,7 +2652,9 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     3)
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -3108,7 +3190,9 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     5)
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -3551,7 +3635,9 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     5)
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: new[] { typeof(Double) }
@@ -3789,7 +3875,9 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     5)
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -3961,7 +4049,9 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     5)
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -4003,7 +4093,10 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                null
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -4034,7 +4127,10 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                null
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -4066,7 +4162,10 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                null
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -4093,7 +4192,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -4135,7 +4236,10 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                "var"
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -4166,7 +4270,10 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                "var"
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -4198,7 +4305,10 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                "var"
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -4225,7 +4335,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -4305,7 +4417,10 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     1)
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                null
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -4352,7 +4467,10 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     1)
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                null
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -4481,7 +4599,13 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     1)
                             }.ToImmutableArray(),
-                            4
+                            new String[]
+                            {
+                                null,
+                                "var1",
+                                "zero",
+                                "var2"
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -4528,7 +4652,10 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     1)
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                null
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -4606,7 +4733,10 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                null
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -4633,7 +4763,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -4711,7 +4843,10 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                "var"
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -4738,7 +4873,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -4854,7 +4991,10 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                null
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -4881,7 +5021,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -4997,7 +5139,10 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                "var"
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -5024,7 +5169,9 @@ internal static class TestCases
                             new LowLevelUserDefinedOperator[]
                             {
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -5133,7 +5280,10 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     2)
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                null
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -5175,7 +5325,9 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     1)
                             }.ToImmutableArray(),
-                            0
+                            new String[]
+                            {
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -5278,7 +5430,10 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     2)
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                null
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -5344,7 +5499,10 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     2)
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                null
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -5526,7 +5684,10 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     4)
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                null
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -5660,7 +5821,10 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     3)
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                null
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -5965,7 +6129,10 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     1)
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                null
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -6162,7 +6329,10 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     1)
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                null
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null
@@ -6465,7 +6635,10 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     1)
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                null
+                            }.ToImmutableArray()
                         )
                 ),
             ExpectedWhenOptimized:
@@ -6666,7 +6839,10 @@ internal static class TestCases
                                     }.ToImmutableArray(),
                                     1)
                             }.ToImmutableArray(),
-                            1
+                            new String[]
+                            {
+                                null
+                            }.ToImmutableArray()
                         )
                 ),
             SkipTypes: null

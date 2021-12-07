@@ -44,10 +44,13 @@ public static class LowLevelCodeGenerator
             entryPoint = visitor.Operations.ToImmutableArray();
         }
 
+        // Assert all variable indicies are consecutive
+        Debug.Assert(variableIndices.Select(pair => pair.Value).OrderBy(x => x).SequenceEqual(Enumerable.Range(0, variableIndices.Count)));
+
         return new LowLevelModule<TNumber>(entryPoint,
                                            constTable.ToImmutableArray(),
                                            userDefinedOperators.ToImmutable(),
-                                           variableIndices.Count);
+                                           variableIndices.OrderBy(pair => pair.Value).Select(pair => pair.Key.Value).ToImmutableArray());
     }
 
     private sealed class Visitor<TNumber> : IOperatorVisitor

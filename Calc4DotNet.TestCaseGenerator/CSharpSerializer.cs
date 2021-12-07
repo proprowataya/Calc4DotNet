@@ -171,7 +171,7 @@ internal struct CSharpSerializer
         Serialize(module.UserDefinedOperators);
         WriteLine(",", insertIndent: false);
 
-        Serialize(module.NumVariables);
+        Serialize(module.Variables);
         WriteLine(null, insertIndent: false);
 
         indent--;
@@ -194,7 +194,15 @@ internal struct CSharpSerializer
                 Write(null);
             }
 
-            Serialize((dynamic)array[i]!, insertIndentFirst: false);
+            if (array[i] is null)
+            {
+                Write("null", insertIndent: false);
+            }
+            else
+            {
+                Serialize((dynamic)array[i]!, insertIndentFirst: false);
+            }
+
             WriteLine(i < array.Length - 1 ? "," : "", insertIndent: false);
         }
         indent--;

@@ -10,14 +10,14 @@ public sealed class LowLevelModule<TNumber>
     public ImmutableArray<LowLevelOperation> EntryPoint { get; }
     public ImmutableArray<TNumber> ConstTable { get; }
     public ImmutableArray<LowLevelUserDefinedOperator> UserDefinedOperators { get; }
-    public int NumVariables { get; }
+    public ImmutableArray<string?> Variables { get; }
 
-    public LowLevelModule(ImmutableArray<LowLevelOperation> entryPoint, ImmutableArray<TNumber> constTable, ImmutableArray<LowLevelUserDefinedOperator> userDefinedOperators, int numVariables)
+    public LowLevelModule(ImmutableArray<LowLevelOperation> entryPoint, ImmutableArray<TNumber> constTable, ImmutableArray<LowLevelUserDefinedOperator> userDefinedOperators, ImmutableArray<string?> variables)
     {
         EntryPoint = entryPoint;
         ConstTable = constTable;
         UserDefinedOperators = userDefinedOperators;
-        NumVariables = numVariables;
+        Variables = variables;
     }
 
     public (LowLevelOperation[] Operations, int[] MaxStackSizes) FlattenOperations()

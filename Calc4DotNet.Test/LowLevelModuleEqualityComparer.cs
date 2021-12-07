@@ -21,7 +21,7 @@ internal sealed class LowLevelModuleEqualityComparer<TNumber> : IEqualityCompare
             _ => x.EntryPoint.SequenceEqual(y.EntryPoint)
                  && x.ConstTable.SequenceEqual(y.ConstTable)
                  && x.UserDefinedOperators.SequenceEqual(y.UserDefinedOperators)
-                 && x.NumVariables == y.NumVariables,
+                 && x.Variables.SequenceEqual(y.Variables),
         };
     }
 

@@ -62,7 +62,9 @@ using var stream = new FileStream(outputPath, FileMode.Create);
 using var writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
 
 writer.Write(
-@"using System.Collections.Immutable;
+@"#nullable disable
+
+using System.Collections.Immutable;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Execution;
 using Calc4DotNet.Core.Operators;
