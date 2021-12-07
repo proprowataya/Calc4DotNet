@@ -139,7 +139,7 @@ public sealed record ConditionalOperator(IOperator Condition, IOperator IfTrue, 
     public override string ToString() => this.ToStringImplement();
 }
 
-public sealed record UserDefinedOperator(OperatorDefinition Definition, ImmutableArray<IOperator> Operands, bool? IsTailCallable, string? SupplementaryText = null) : IOperator
+public sealed record UserDefinedOperator(OperatorDefinition Definition, ImmutableArray<IOperator> Operands, bool? IsTailCall, string? SupplementaryText = null) : IOperator
 {
     public IOperator[] GetOperands() => Operands.ToArray();
 
@@ -154,7 +154,7 @@ public sealed record UserDefinedOperator(OperatorDefinition Definition, Immutabl
                 || (other is not null
                     && Definition.Equals(other.Definition)
                     && Operands.SequenceEqual(other.Operands)
-                    && IsTailCallable == other.IsTailCallable
+                    && IsTailCall == other.IsTailCall
                     && SupplementaryText == other.SupplementaryText);
     }
 
@@ -168,7 +168,7 @@ public sealed record UserDefinedOperator(OperatorDefinition Definition, Immutabl
             hash.Add(op);
         }
 
-        hash.Add(IsTailCallable);
+        hash.Add(IsTailCall);
         hash.Add(SupplementaryText);
         return hash.ToHashCode();
     }

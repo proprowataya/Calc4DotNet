@@ -424,7 +424,7 @@ public static class LowLevelCodeGenerator
                 op.Operands[i].Accept(this);
             }
 
-            if (OptimizableTailCall(op))
+            if (IsReplaceableWithJump(op))
             {
                 for (int i = op.Operands.Length - 1; i >= 0; i--)
                 {
@@ -444,11 +444,9 @@ public static class LowLevelCodeGenerator
             }
         }
 
-        private bool OptimizableTailCall(IOperator op)
+        private bool IsReplaceableWithJump(UserDefinedOperator op)
         {
-            return op is UserDefinedOperator userDefined
-                    && definition == userDefined.Definition
-                    && (userDefined.IsTailCallable ?? false);
+            return definition == op.Definition && (op.IsTailCall ?? false);
         }
 
         /* ******************** */

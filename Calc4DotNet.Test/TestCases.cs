@@ -1389,7 +1389,7 @@ internal static class TestCases
                                 SupplementaryText: null
                             )
                         }.ToImmutableArray(),
-                        IsTailCallable: null,
+                        IsTailCall: null,
                         SupplementaryText: null
                     ),
                     Context:
@@ -1530,7 +1530,7 @@ internal static class TestCases
                                     Operands: new IOperator[]
                                     {
                                     }.ToImmutableArray(),
-                                    IsTailCallable: null,
+                                    IsTailCall: null,
                                     SupplementaryText: null
                                 )
                             }.ToImmutableArray(),
@@ -1541,7 +1541,7 @@ internal static class TestCases
                             Operands: new IOperator[]
                             {
                             }.ToImmutableArray(),
-                            IsTailCallable: null,
+                            IsTailCall: null,
                             SupplementaryText: null
                         ),
                         Type: BinaryType.Add,
@@ -1696,7 +1696,7 @@ internal static class TestCases
                                 SupplementaryText: null
                             )
                         }.ToImmutableArray(),
-                        IsTailCallable: null,
+                        IsTailCall: null,
                         SupplementaryText: null
                     ),
                     Context:
@@ -1754,7 +1754,7 @@ internal static class TestCases
                                                     SupplementaryText: null
                                                 )
                                             }.ToImmutableArray(),
-                                            IsTailCallable: null,
+                                            IsTailCall: null,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
@@ -1875,7 +1875,7 @@ internal static class TestCases
                                                     SupplementaryText: null
                                                 )
                                             }.ToImmutableArray(),
-                                            IsTailCallable: true,
+                                            IsTailCall: true,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
@@ -1943,7 +1943,7 @@ internal static class TestCases
                                 SupplementaryText: null
                             )
                         }.ToImmutableArray(),
-                        IsTailCallable: null,
+                        IsTailCall: null,
                         SupplementaryText: null
                     ),
                     Context:
@@ -1990,7 +1990,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: null,
+                                                IsTailCall: null,
                                                 SupplementaryText: null
                                             ),
                                             Right: new UserDefinedOperator(
@@ -2011,7 +2011,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: null,
+                                                IsTailCall: null,
                                                 SupplementaryText: null
                                             ),
                                             Type: BinaryType.Add,
@@ -2090,7 +2090,7 @@ internal static class TestCases
                                 Value: 10
                             )
                         }.ToImmutableArray(),
-                        IsTailCallable: true,
+                        IsTailCall: true,
                         SupplementaryText: null
                     ),
                     Context:
@@ -2133,7 +2133,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: false,
+                                                IsTailCall: false,
                                                 SupplementaryText: null
                                             ),
                                             Right: new UserDefinedOperator(
@@ -2152,7 +2152,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: false,
+                                                IsTailCall: false,
                                                 SupplementaryText: null
                                             ),
                                             Type: BinaryType.Add,
@@ -2233,7 +2233,7 @@ internal static class TestCases
                                 SupplementaryText: null
                             )
                         }.ToImmutableArray(),
-                        IsTailCallable: null,
+                        IsTailCall: null,
                         SupplementaryText: null
                     ),
                     Context:
@@ -2262,7 +2262,7 @@ internal static class TestCases
                                                 SupplementaryText: null
                                             )
                                         }.ToImmutableArray(),
-                                        IsTailCallable: null,
+                                        IsTailCall: null,
                                         SupplementaryText: null
                                     )
                                 ),
@@ -2322,7 +2322,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: null,
+                                                IsTailCall: null,
                                                 SupplementaryText: null
                                             ),
                                             IfFalse: new ArgumentOperator(
@@ -2446,7 +2446,7 @@ internal static class TestCases
                                                 Value: 0
                                             )
                                         }.ToImmutableArray(),
-                                        IsTailCallable: true,
+                                        IsTailCall: true,
                                         SupplementaryText: null
                                     )
                                 ),
@@ -2502,7 +2502,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: true,
+                                                IsTailCall: true,
                                                 SupplementaryText: null
                                             ),
                                             IfFalse: new ArgumentOperator(
@@ -2607,7 +2607,7 @@ internal static class TestCases
                                 SupplementaryText: null
                             )
                         }.ToImmutableArray(),
-                        IsTailCallable: null,
+                        IsTailCall: null,
                         SupplementaryText: null
                     ),
                     Context:
@@ -2820,7 +2820,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: null,
+                                                IsTailCall: null,
                                                 SupplementaryText: null
                                             ),
                                             IfFalse: new UserDefinedOperator(
@@ -2906,7 +2906,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: null,
+                                                IsTailCall: null,
                                                 SupplementaryText: null
                                             ),
                                             SupplementaryText: null
@@ -2946,7 +2946,7 @@ internal static class TestCases
                                                 SupplementaryText: null
                                             )
                                         }.ToImmutableArray(),
-                                        IsTailCallable: null,
+                                        IsTailCall: null,
                                         SupplementaryText: null
                                     )
                                 )
@@ -3318,7 +3318,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: true,
+                                                IsTailCall: true,
                                                 SupplementaryText: null
                                             ),
                                             IfFalse: new UserDefinedOperator(
@@ -3400,7 +3400,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: true,
+                                                IsTailCall: true,
                                                 SupplementaryText: null
                                             ),
                                             SupplementaryText: null
@@ -3432,7 +3432,7 @@ internal static class TestCases
                                                 SupplementaryText: null
                                             )
                                         }.ToImmutableArray(),
-                                        IsTailCallable: true,
+                                        IsTailCall: true,
                                         SupplementaryText: null
                                     )
                                 )
@@ -3587,7 +3587,7 @@ internal static class TestCases
                                 SupplementaryText: null
                             )
                         }.ToImmutableArray(),
-                        IsTailCallable: null,
+                        IsTailCall: null,
                         SupplementaryText: null
                     ),
                     Context:
@@ -3644,7 +3644,7 @@ internal static class TestCases
                                                             SupplementaryText: null
                                                         )
                                                     }.ToImmutableArray(),
-                                                    IsTailCallable: null,
+                                                    IsTailCall: null,
                                                     SupplementaryText: null
                                                 ),
                                                 new UserDefinedOperator(
@@ -3673,7 +3673,7 @@ internal static class TestCases
                                                             SupplementaryText: null
                                                         )
                                                     }.ToImmutableArray(),
-                                                    IsTailCallable: null,
+                                                    IsTailCall: null,
                                                     SupplementaryText: null
                                                 ),
                                                 new UserDefinedOperator(
@@ -3702,11 +3702,11 @@ internal static class TestCases
                                                             SupplementaryText: null
                                                         )
                                                     }.ToImmutableArray(),
-                                                    IsTailCallable: null,
+                                                    IsTailCall: null,
                                                     SupplementaryText: null
                                                 )
                                             }.ToImmutableArray(),
-                                            IsTailCallable: null,
+                                            IsTailCall: null,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
@@ -3849,7 +3849,7 @@ internal static class TestCases
                                                             SupplementaryText: null
                                                         )
                                                     }.ToImmutableArray(),
-                                                    IsTailCallable: false,
+                                                    IsTailCall: false,
                                                     SupplementaryText: null
                                                 ),
                                                 new UserDefinedOperator(
@@ -3876,7 +3876,7 @@ internal static class TestCases
                                                             SupplementaryText: null
                                                         )
                                                     }.ToImmutableArray(),
-                                                    IsTailCallable: false,
+                                                    IsTailCall: false,
                                                     SupplementaryText: null
                                                 ),
                                                 new UserDefinedOperator(
@@ -3903,11 +3903,11 @@ internal static class TestCases
                                                             SupplementaryText: null
                                                         )
                                                     }.ToImmutableArray(),
-                                                    IsTailCallable: false,
+                                                    IsTailCall: false,
                                                     SupplementaryText: null
                                                 )
                                             }.ToImmutableArray(),
-                                            IsTailCallable: true,
+                                            IsTailCall: true,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
@@ -4250,7 +4250,7 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 }.ToImmutableArray(),
-                                IsTailCallable: null,
+                                IsTailCall: null,
                                 SupplementaryText: null
                             ),
                             new LoadOperator(
@@ -4378,7 +4378,7 @@ internal static class TestCases
                                             SupplementaryText: null
                                         )
                                     }.ToImmutableArray(),
-                                    IsTailCallable: null,
+                                    IsTailCall: null,
                                     SupplementaryText: null
                                 ),
                                 new StoreOperator(
@@ -4399,7 +4399,7 @@ internal static class TestCases
                                             SupplementaryText: null
                                         )
                                     }.ToImmutableArray(),
-                                    IsTailCallable: null,
+                                    IsTailCall: null,
                                     SupplementaryText: null
                                 ),
                                 new StoreOperator(
@@ -5045,7 +5045,7 @@ internal static class TestCases
                                 Operands: new IOperator[]
                                 {
                                 }.ToImmutableArray(),
-                                IsTailCallable: null,
+                                IsTailCall: null,
                                 SupplementaryText: null
                             )
                         }.ToImmutableArray(),
@@ -5212,7 +5212,7 @@ internal static class TestCases
                                 Operands: new IOperator[]
                                 {
                                 }.ToImmutableArray(),
-                                IsTailCallable: null,
+                                IsTailCall: null,
                                 SupplementaryText: null
                             )
                         }.ToImmutableArray(),
@@ -5376,7 +5376,7 @@ internal static class TestCases
                                                 SupplementaryText: null
                                             )
                                         }.ToImmutableArray(),
-                                        IsTailCallable: null,
+                                        IsTailCall: null,
                                         SupplementaryText: null
                                     ),
                                     SupplementaryText: null
@@ -5434,7 +5434,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: null,
+                                                IsTailCall: null,
                                                 SupplementaryText: null
                                             ),
                                             Right: new UserDefinedOperator(
@@ -5455,7 +5455,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: null,
+                                                IsTailCall: null,
                                                 SupplementaryText: null
                                             ),
                                             Type: BinaryType.Add,
@@ -5541,7 +5541,7 @@ internal static class TestCases
                                         Value: 20
                                     )
                                 }.ToImmutableArray(),
-                                IsTailCallable: true,
+                                IsTailCall: true,
                                 SupplementaryText: null
                             ),
                             SupplementaryText: null
@@ -5592,7 +5592,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: false,
+                                                IsTailCall: false,
                                                 SupplementaryText: null
                                             ),
                                             Right: new UserDefinedOperator(
@@ -5611,7 +5611,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: false,
+                                                IsTailCall: false,
                                                 SupplementaryText: null
                                             ),
                                             Type: BinaryType.Add,
@@ -5702,7 +5702,7 @@ internal static class TestCases
                                                             SupplementaryText: null
                                                         )
                                                     }.ToImmutableArray(),
-                                                    IsTailCallable: null,
+                                                    IsTailCall: null,
                                                     SupplementaryText: null
                                                 ),
                                                 Right: new DecimalOperator(
@@ -5751,7 +5751,7 @@ internal static class TestCases
                                 Operands: new IOperator[]
                                 {
                                 }.ToImmutableArray(),
-                                IsTailCallable: null,
+                                IsTailCall: null,
                                 SupplementaryText: null
                             )
                         }.ToImmutableArray(),
@@ -5801,7 +5801,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: null,
+                                                IsTailCall: null,
                                                 SupplementaryText: null
                                             ),
                                             Right: new UserDefinedOperator(
@@ -5822,7 +5822,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: null,
+                                                IsTailCall: null,
                                                 SupplementaryText: null
                                             ),
                                             Type: BinaryType.Add,
@@ -5984,7 +5984,7 @@ internal static class TestCases
                                                     Value: 20
                                                 )
                                             }.ToImmutableArray(),
-                                            IsTailCallable: false,
+                                            IsTailCall: false,
                                             SupplementaryText: null
                                         ),
                                         Right: new PreComputedOperator(
@@ -6008,7 +6008,7 @@ internal static class TestCases
                                 Operands: new IOperator[]
                                 {
                                 }.ToImmutableArray(),
-                                IsTailCallable: true,
+                                IsTailCall: true,
                                 SupplementaryText: null
                             )
                         }.ToImmutableArray(),
@@ -6054,7 +6054,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: false,
+                                                IsTailCall: false,
                                                 SupplementaryText: null
                                             ),
                                             Right: new UserDefinedOperator(
@@ -6073,7 +6073,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: false,
+                                                IsTailCall: false,
                                                 SupplementaryText: null
                                             ),
                                             Type: BinaryType.Add,
@@ -6200,7 +6200,7 @@ internal static class TestCases
                                                 SupplementaryText: null
                                             )
                                         }.ToImmutableArray(),
-                                        IsTailCallable: null,
+                                        IsTailCall: null,
                                         SupplementaryText: null
                                     ),
                                     Right: new DecimalOperator(
@@ -6250,7 +6250,7 @@ internal static class TestCases
                                 Operands: new IOperator[]
                                 {
                                 }.ToImmutableArray(),
-                                IsTailCallable: null,
+                                IsTailCall: null,
                                 SupplementaryText: null
                             )
                         }.ToImmutableArray(),
@@ -6300,7 +6300,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: null,
+                                                IsTailCall: null,
                                                 SupplementaryText: null
                                             ),
                                             Right: new UserDefinedOperator(
@@ -6321,7 +6321,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: null,
+                                                IsTailCall: null,
                                                 SupplementaryText: null
                                             ),
                                             Type: BinaryType.Add,
@@ -6483,7 +6483,7 @@ internal static class TestCases
                                                 Value: 20
                                             )
                                         }.ToImmutableArray(),
-                                        IsTailCallable: false,
+                                        IsTailCall: false,
                                         SupplementaryText: null
                                     ),
                                     Right: new PreComputedOperator(
@@ -6511,7 +6511,7 @@ internal static class TestCases
                                 Operands: new IOperator[]
                                 {
                                 }.ToImmutableArray(),
-                                IsTailCallable: true,
+                                IsTailCall: true,
                                 SupplementaryText: null
                             )
                         }.ToImmutableArray(),
@@ -6557,7 +6557,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: false,
+                                                IsTailCall: false,
                                                 SupplementaryText: null
                                             ),
                                             Right: new UserDefinedOperator(
@@ -6576,7 +6576,7 @@ internal static class TestCases
                                                         SupplementaryText: null
                                                     )
                                                 }.ToImmutableArray(),
-                                                IsTailCallable: false,
+                                                IsTailCall: false,
                                                 SupplementaryText: null
                                             ),
                                             Type: BinaryType.Add,

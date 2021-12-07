@@ -65,7 +65,7 @@ public static partial class Optimizer
                        new OptimizeTimeEvaluationState<TNumber>(variables,
                                                                 inMain ? variables : null,  // If we are in main operator, all variables have default value. Otherwise, their values are unknown.
                                                                 (TNumber)(dynamic)0));
-        op = op.Accept(new TailCallVisitor(), /* isTailCallable */ true);
+        op = op.Accept(new TailCallVisitor(), /* isTailCall */ true);
         return op;
     }
 
