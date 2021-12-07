@@ -21,6 +21,20 @@ public static partial class Optimizer
 
         private IOperator PreComputeIfPossible(IOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
+            if (GetVariablesToBeWritten(op, compilationContext) is var variables && variables.Count > 0)
+            {
+                // If this operator writes variables, we cannot eliminate its call.
+                // We unset such variables because their values are unknown.
+                foreach (var variableName in variables)
+                {
+                    state.UnsetVariable(variableName);
+                }
+
+                // We will not perform any further optimizations
+                return op;
+            }
+
+            // Otherwise, we try to execute
             try
             {
                 return new PreComputedOperator(
@@ -163,23 +177,7 @@ public static partial class Optimizer
         {
             var operands = op.Operands.Select(x => x.Accept(this, state)).ToImmutableArray();
             var newOp = op with { Operands = operands };
-
-            if (GetVariablesToBeWritten(op, compilationContext) is var variables && variables.Count > 0)
-            {
-                // If this user defined operator writes variables, we cannot eliminate its call.
-                // We unset such variables because their values are unknown.
-                foreach (var variableName in variables)
-                {
-                    state.UnsetVariable(variableName);
-                }
-
-                // We will not perform any further optimizations.
-                return newOp;
-            }
-            else
-            {
-                return PreComputeIfPossible(newOp, state);
-            }
+            return PreComputeIfPossible(newOp, state);
         }
     }
 
