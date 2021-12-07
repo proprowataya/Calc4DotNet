@@ -60,10 +60,11 @@ public class ExecutionTest
          * Check compilation result
          *****/
 
-        if (typeof(TNumber) == typeof(Int32))
+        if (typeof(TNumber) == typeof(Int32) && target is (null or OptimizeTarget.None or OptimizeTarget.All))
         {
             // TODO:
-            // Checking compilation result is currenly supported only for Int32 type
+            // Checking compilation result is currenly supported only for Int32 type.
+            // Also, we cannot handle partial optimizations, that is the ones optimizing only for main operator or user defined operator.
 
             // Main operator
             {
