@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Numerics;
 using Calc4DotNet.Core;
+using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Exceptions;
 using Calc4DotNet.Core.Execution;
 using Calc4DotNet.Core.ILCompilation;
@@ -103,10 +104,12 @@ class Program
             }
 
             // Execute
+            var state = new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((dynamic)0));
             TNumber result;
+
             if (setting.ExecutorType == ExecutorType.LowLevel)
             {
-                result = LowLevelExecutor.Execute((dynamic)module);
+                result = LowLevelExecutor.Execute((dynamic)module, (dynamic)state);
             }
             else if (setting.ExecutorType == ExecutorType.JIT)
             {

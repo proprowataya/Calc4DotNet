@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Calc4DotNet.Core.Evaluation;
 
 namespace Calc4DotNet.Core.Execution;
 
@@ -9,27 +10,49 @@ public static class LowLevelExecutor
     private const int StackSize = 1 << 20;
     private const int PtrStackSize = 1 << 20;
 
-    public static Int32 Execute(LowLevelModule<Int32> module)
+    public static Int32 Execute(LowLevelModule<Int32> module, IEvaluationState<Int32> state)
     {
-        return ExecuteCore<Int32, Int32Computer>(module);
+        return ExecuteCore<Int32, Int32Computer>(module, state);
     }
 
-    public static Int64 Execute(LowLevelModule<Int64> module)
+    public static Int64 Execute(LowLevelModule<Int64> module, IEvaluationState<Int64> state)
     {
-        return ExecuteCore<Int64, Int64Computer>(module);
+        return ExecuteCore<Int64, Int64Computer>(module, state);
     }
 
-    public static Double Execute(LowLevelModule<Double> module)
+    public static Double Execute(LowLevelModule<Double> module, IEvaluationState<Double> state)
     {
-        return ExecuteCore<Double, DoubleComputer>(module);
+        return ExecuteCore<Double, DoubleComputer>(module, state);
     }
 
-    public static BigInteger Execute(LowLevelModule<BigInteger> module)
+    public static BigInteger Execute(LowLevelModule<BigInteger> module, IEvaluationState<BigInteger> state)
     {
-        return ExecuteCore<BigInteger, BigIntegerComputer>(module);
+        return ExecuteCore<BigInteger, BigIntegerComputer>(module, state);
     }
 
-    private static TNumber ExecuteCore<TNumber, TNumberComputer>(LowLevelModule<TNumber> module)
+    private static TNumber ExecuteCore<TNumber, TNumberComputer>(LowLevelModule<TNumber> module, IEvaluationState<TNumber> state)
+        where TNumber : notnull
+        where TNumberComputer : struct, INumberComputer<TNumber>
+    {
+        // Get variable's values from IEvaluationState
+        TNumber[] variables = new TNumber[module.Variables.Length];
+        for (int i = 0; i < variables.Length; i++)
+        {
+            variables[i] = state.Variables[module.Variables[i]];
+        }
+
+        TNumber result = ExecuteCoreCore<TNumber, TNumberComputer>(module, variables);
+
+        // Store variable's values to IEvaluationState
+        for (int i = 0; i < variables.Length; i++)
+        {
+            state.Variables[module.Variables[i]] = variables[i];
+        }
+
+        return result;
+    }
+
+    private static TNumber ExecuteCoreCore<TNumber, TNumberComputer>(LowLevelModule<TNumber> module, TNumber[] variables)
         where TNumber : notnull
         where TNumberComputer : struct, INumberComputer<TNumber>
     {
@@ -45,7 +68,6 @@ public static class LowLevelExecutor
 
         TNumber[] stack = new TNumber[StackSize];
         int[] ptrStack = new int[PtrStackSize];
-        TNumber[] variables = new TNumber[module.Variables.Length];
         ref TNumber top = ref stack[0];
         ref TNumber bottom = ref stack[0];
         ref int ptrTop = ref ptrStack[0];

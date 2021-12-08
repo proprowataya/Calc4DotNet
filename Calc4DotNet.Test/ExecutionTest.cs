@@ -116,10 +116,8 @@ public class ExecutionTest
 
             object actual = executorType switch
             {
-                ExecutorType.Tree => Evaluator.Evaluate<TNumber>(op,
-                                                                 context,
-                                                                 new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((dynamic)0))),
-                ExecutorType.LowLevel => LowLevelExecutor.Execute((dynamic)module),
+                ExecutorType.Tree => Evaluator.Evaluate<TNumber>(op, context, CreateEvaluationState<TNumber>()),
+                ExecutorType.LowLevel => LowLevelExecutor.Execute((dynamic)module, (dynamic)CreateEvaluationState<TNumber>()),
                 ExecutorType.Jit => ILCompiler.Compile(module).Run(),
                 _ => throw new InvalidOperationException(),
             };
@@ -139,8 +137,9 @@ public class ExecutionTest
             {
                 Assert.Throws<Calc4DotNet.Core.Exceptions.StackOverflowException>(() =>
                 {
-                    dynamic module = CompileGeneric(Source, target, (dynamic)Activator.CreateInstance(valueType)!).Module;
-                    LowLevelExecutor.Execute(module);
+                    dynamic dummy = Activator.CreateInstance(valueType)!;
+                    dynamic module = CompileGeneric(Source, target, dummy).Module;
+                    LowLevelExecutor.Execute(module, CreateEvaluationState(dummy));
                 });
             }
         }
@@ -159,5 +158,10 @@ public class ExecutionTest
         LowLevelModule<TNumber> module = LowLevelCodeGenerator.Generate<TNumber>(op, context);
 
         return new CompilationResult<TNumber>(op, context, module);
+    }
+
+    private static IEvaluationState<TNumber> CreateEvaluationState<TNumber>(TNumber? dummy = default)
+    {
+        return new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((dynamic)0));
     }
 }
