@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Calc4DotNet.Core.Evaluation;
 
@@ -117,6 +118,11 @@ internal sealed class OptimizeTimeEvaluationState<TNumber> : IVariableSource<TNu
         {
             variables[ValueBox.Create(variableName)] = value;
         }
+    }
+
+    public bool TryGetValue(string? variableName, [MaybeNullWhen(false)] out TNumber value)
+    {
+        return variables.TryGetValue(ValueBox.Create(variableName), out value);
     }
 
     public void UnsetVariable(string? variableName)

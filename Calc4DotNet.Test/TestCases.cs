@@ -4428,19 +4428,23 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new UserDefinedOperator(
-                                Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
-                                Operands: new IOperator[]
+                            new ParenthesisOperator(
+                                Operators: new IOperator[]
                                 {
+                                    new StoreOperator(
+                                        Operand: new PreComputedOperator(
+                                            Value: 7
+                                        ),
+                                        SupplementaryText: null
+                                    ),
                                     new PreComputedOperator(
                                         Value: 7
                                     )
                                 }.ToImmutableArray(),
-                                IsTailCall: false,
                                 SupplementaryText: null
                             ),
-                            new LoadOperator(
-                                SupplementaryText: null
+                            new PreComputedOperator(
+                                Value: 7
                             )
                         }.ToImmutableArray(),
                         SupplementaryText: null
@@ -4467,10 +4471,12 @@ internal static class TestCases
                             new LowLevelOperation[]
                             {
                                 /* 00 */ new LowLevelOperation(Opcode.LoadConst, 7),
-                                /* 01 */ new LowLevelOperation(Opcode.Call, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.StoreVariable, 0),
                                 /* 02 */ new LowLevelOperation(Opcode.Pop, 0),
-                                /* 03 */ new LowLevelOperation(Opcode.LoadVariable, 0),
-                                /* 04 */ new LowLevelOperation(Opcode.Halt, 0)
+                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 7),
+                                /* 04 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 05 */ new LowLevelOperation(Opcode.LoadConst, 7),
+                                /* 06 */ new LowLevelOperation(Opcode.Halt, 0)
                             }.ToImmutableArray(),
                             new Int32[]
                             {
@@ -4630,54 +4636,31 @@ internal static class TestCases
                 ),
             ExpectedWhenOptimized:
                 new CompilationResult<Int32>(
-                    Operator: new BinaryOperator(
-                        Left: new ParenthesisOperator(
-                            Operators: new IOperator[]
-                            {
-                                new UserDefinedOperator(
-                                    Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
-                                    Operands: new IOperator[]
-                                    {
-                                        new PreComputedOperator(
-                                            Value: 7
-                                        )
-                                    }.ToImmutableArray(),
-                                    IsTailCall: false,
-                                    SupplementaryText: null
+                    Operator: new ParenthesisOperator(
+                        Operators: new IOperator[]
+                        {
+                            new StoreOperator(
+                                Operand: new PreComputedOperator(
+                                    Value: 3
                                 ),
-                                new StoreOperator(
-                                    Operand: new LoadOperator(
-                                        SupplementaryText: null
-                                    ),
-                                    SupplementaryText: "var1"
+                                SupplementaryText: null
+                            ),
+                            new StoreOperator(
+                                Operand: new PreComputedOperator(
+                                    Value: 7
                                 ),
-                                new UserDefinedOperator(
-                                    Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
-                                    Operands: new IOperator[]
-                                    {
-                                        new PreComputedOperator(
-                                            Value: 3
-                                        )
-                                    }.ToImmutableArray(),
-                                    IsTailCall: false,
-                                    SupplementaryText: null
+                                SupplementaryText: "var1"
+                            ),
+                            new StoreOperator(
+                                Operand: new PreComputedOperator(
+                                    Value: 3
                                 ),
-                                new StoreOperator(
-                                    Operand: new LoadOperator(
-                                        SupplementaryText: null
-                                    ),
-                                    SupplementaryText: "var2"
-                                ),
-                                new LoadOperator(
-                                    SupplementaryText: "var1"
-                                )
-                            }.ToImmutableArray(),
-                            SupplementaryText: null
-                        ),
-                        Right: new LoadOperator(
-                            SupplementaryText: "var2"
-                        ),
-                        Type: BinaryType.Mult,
+                                SupplementaryText: "var2"
+                            ),
+                            new PreComputedOperator(
+                                Value: 21
+                            )
+                        }.ToImmutableArray(),
                         SupplementaryText: null
                     ),
                     Context:
@@ -4701,22 +4684,17 @@ internal static class TestCases
                         new LowLevelModule<Int32>(
                             new LowLevelOperation[]
                             {
-                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 7),
-                                /* 01 */ new LowLevelOperation(Opcode.Call, 0),
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 3),
+                                /* 01 */ new LowLevelOperation(Opcode.StoreVariable, 0),
                                 /* 02 */ new LowLevelOperation(Opcode.Pop, 0),
-                                /* 03 */ new LowLevelOperation(Opcode.LoadVariable, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 7),
                                 /* 04 */ new LowLevelOperation(Opcode.StoreVariable, 1),
                                 /* 05 */ new LowLevelOperation(Opcode.Pop, 0),
                                 /* 06 */ new LowLevelOperation(Opcode.LoadConst, 3),
-                                /* 07 */ new LowLevelOperation(Opcode.Call, 0),
+                                /* 07 */ new LowLevelOperation(Opcode.StoreVariable, 2),
                                 /* 08 */ new LowLevelOperation(Opcode.Pop, 0),
-                                /* 09 */ new LowLevelOperation(Opcode.LoadVariable, 0),
-                                /* 10 */ new LowLevelOperation(Opcode.StoreVariable, 2),
-                                /* 11 */ new LowLevelOperation(Opcode.Pop, 0),
-                                /* 12 */ new LowLevelOperation(Opcode.LoadVariable, 1),
-                                /* 13 */ new LowLevelOperation(Opcode.LoadVariable, 2),
-                                /* 14 */ new LowLevelOperation(Opcode.Mult, 0),
-                                /* 15 */ new LowLevelOperation(Opcode.Halt, 0)
+                                /* 09 */ new LowLevelOperation(Opcode.LoadConst, 21),
+                                /* 10 */ new LowLevelOperation(Opcode.Halt, 0)
                             }.ToImmutableArray(),
                             new Int32[]
                             {
@@ -4824,26 +4802,19 @@ internal static class TestCases
                 ),
             ExpectedWhenOptimized:
                 new CompilationResult<Int32>(
-                    Operator: new BinaryOperator(
-                        Left: new ParenthesisOperator(
-                            Operators: new IOperator[]
-                            {
-                                new StoreOperator(
-                                    Operand: new PreComputedOperator(
-                                        Value: 123
-                                    ),
-                                    SupplementaryText: null
-                                ),
-                                new PreComputedOperator(
+                    Operator: new ParenthesisOperator(
+                        Operators: new IOperator[]
+                        {
+                            new StoreOperator(
+                                Operand: new PreComputedOperator(
                                     Value: 123
-                                )
-                            }.ToImmutableArray(),
-                            SupplementaryText: null
-                        ),
-                        Right: new PreComputedOperator(
-                            Value: 123
-                        ),
-                        Type: BinaryType.Mult,
+                                ),
+                                SupplementaryText: null
+                            ),
+                            new PreComputedOperator(
+                                Value: 15129
+                            )
+                        }.ToImmutableArray(),
                         SupplementaryText: null
                     ),
                     Context:
@@ -4859,10 +4830,8 @@ internal static class TestCases
                                 /* 00 */ new LowLevelOperation(Opcode.LoadConst, 123),
                                 /* 01 */ new LowLevelOperation(Opcode.StoreVariable, 0),
                                 /* 02 */ new LowLevelOperation(Opcode.Pop, 0),
-                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 123),
-                                /* 04 */ new LowLevelOperation(Opcode.LoadConst, 123),
-                                /* 05 */ new LowLevelOperation(Opcode.Mult, 0),
-                                /* 06 */ new LowLevelOperation(Opcode.Halt, 0)
+                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 15129),
+                                /* 04 */ new LowLevelOperation(Opcode.Halt, 0)
                             }.ToImmutableArray(),
                             new Int32[]
                             {
@@ -4959,26 +4928,19 @@ internal static class TestCases
                 ),
             ExpectedWhenOptimized:
                 new CompilationResult<Int32>(
-                    Operator: new BinaryOperator(
-                        Left: new ParenthesisOperator(
-                            Operators: new IOperator[]
-                            {
-                                new StoreOperator(
-                                    Operand: new PreComputedOperator(
-                                        Value: 123
-                                    ),
-                                    SupplementaryText: "var"
-                                ),
-                                new PreComputedOperator(
+                    Operator: new ParenthesisOperator(
+                        Operators: new IOperator[]
+                        {
+                            new StoreOperator(
+                                Operand: new PreComputedOperator(
                                     Value: 123
-                                )
-                            }.ToImmutableArray(),
-                            SupplementaryText: null
-                        ),
-                        Right: new PreComputedOperator(
-                            Value: 123
-                        ),
-                        Type: BinaryType.Mult,
+                                ),
+                                SupplementaryText: "var"
+                            ),
+                            new PreComputedOperator(
+                                Value: 15129
+                            )
+                        }.ToImmutableArray(),
                         SupplementaryText: null
                     ),
                     Context:
@@ -4994,10 +4956,8 @@ internal static class TestCases
                                 /* 00 */ new LowLevelOperation(Opcode.LoadConst, 123),
                                 /* 01 */ new LowLevelOperation(Opcode.StoreVariable, 0),
                                 /* 02 */ new LowLevelOperation(Opcode.Pop, 0),
-                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 123),
-                                /* 04 */ new LowLevelOperation(Opcode.LoadConst, 123),
-                                /* 05 */ new LowLevelOperation(Opcode.Mult, 0),
-                                /* 06 */ new LowLevelOperation(Opcode.Halt, 0)
+                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 15129),
+                                /* 04 */ new LowLevelOperation(Opcode.Halt, 0)
                             }.ToImmutableArray(),
                             new Int32[]
                             {
@@ -5132,26 +5092,19 @@ internal static class TestCases
                 ),
             ExpectedWhenOptimized:
                 new CompilationResult<Int32>(
-                    Operator: new BinaryOperator(
-                        Left: new ParenthesisOperator(
-                            Operators: new IOperator[]
-                            {
-                                new StoreOperator(
-                                    Operand: new PreComputedOperator(
-                                        Value: 123
-                                    ),
-                                    SupplementaryText: null
-                                ),
-                                new PreComputedOperator(
+                    Operator: new ParenthesisOperator(
+                        Operators: new IOperator[]
+                        {
+                            new StoreOperator(
+                                Operand: new PreComputedOperator(
                                     Value: 123
-                                )
-                            }.ToImmutableArray(),
-                            SupplementaryText: null
-                        ),
-                        Right: new PreComputedOperator(
-                            Value: 123
-                        ),
-                        Type: BinaryType.Mult,
+                                ),
+                                SupplementaryText: null
+                            ),
+                            new PreComputedOperator(
+                                Value: 15129
+                            )
+                        }.ToImmutableArray(),
                         SupplementaryText: null
                     ),
                     Context:
@@ -5167,10 +5120,8 @@ internal static class TestCases
                                 /* 00 */ new LowLevelOperation(Opcode.LoadConst, 123),
                                 /* 01 */ new LowLevelOperation(Opcode.StoreVariable, 0),
                                 /* 02 */ new LowLevelOperation(Opcode.Pop, 0),
-                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 123),
-                                /* 04 */ new LowLevelOperation(Opcode.LoadConst, 123),
-                                /* 05 */ new LowLevelOperation(Opcode.Mult, 0),
-                                /* 06 */ new LowLevelOperation(Opcode.Halt, 0)
+                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 15129),
+                                /* 04 */ new LowLevelOperation(Opcode.Halt, 0)
                             }.ToImmutableArray(),
                             new Int32[]
                             {
@@ -5305,26 +5256,19 @@ internal static class TestCases
                 ),
             ExpectedWhenOptimized:
                 new CompilationResult<Int32>(
-                    Operator: new BinaryOperator(
-                        Left: new ParenthesisOperator(
-                            Operators: new IOperator[]
-                            {
-                                new StoreOperator(
-                                    Operand: new PreComputedOperator(
-                                        Value: 123
-                                    ),
-                                    SupplementaryText: "var"
-                                ),
-                                new PreComputedOperator(
+                    Operator: new ParenthesisOperator(
+                        Operators: new IOperator[]
+                        {
+                            new StoreOperator(
+                                Operand: new PreComputedOperator(
                                     Value: 123
-                                )
-                            }.ToImmutableArray(),
-                            SupplementaryText: null
-                        ),
-                        Right: new PreComputedOperator(
-                            Value: 123
-                        ),
-                        Type: BinaryType.Mult,
+                                ),
+                                SupplementaryText: "var"
+                            ),
+                            new PreComputedOperator(
+                                Value: 15129
+                            )
+                        }.ToImmutableArray(),
                         SupplementaryText: null
                     ),
                     Context:
@@ -5340,10 +5284,8 @@ internal static class TestCases
                                 /* 00 */ new LowLevelOperation(Opcode.LoadConst, 123),
                                 /* 01 */ new LowLevelOperation(Opcode.StoreVariable, 0),
                                 /* 02 */ new LowLevelOperation(Opcode.Pop, 0),
-                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 123),
-                                /* 04 */ new LowLevelOperation(Opcode.LoadConst, 123),
-                                /* 05 */ new LowLevelOperation(Opcode.Mult, 0),
-                                /* 06 */ new LowLevelOperation(Opcode.Halt, 0)
+                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 15129),
+                                /* 04 */ new LowLevelOperation(Opcode.Halt, 0)
                             }.ToImmutableArray(),
                             new Int32[]
                             {
@@ -5471,12 +5413,19 @@ internal static class TestCases
                 ),
             ExpectedWhenOptimized:
                 new CompilationResult<Int32>(
-                    Operator: new UserDefinedOperator(
-                        Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
-                        Operands: new IOperator[]
+                    Operator: new ParenthesisOperator(
+                        Operators: new IOperator[]
                         {
+                            new StoreOperator(
+                                Operand: new PreComputedOperator(
+                                    Value: 123
+                                ),
+                                SupplementaryText: null
+                            ),
+                            new PreComputedOperator(
+                                Value: 15129
+                            )
                         }.ToImmutableArray(),
-                        IsTailCall: true,
                         SupplementaryText: null
                     ),
                     Context:
@@ -5486,26 +5435,19 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new BinaryOperator(
-                                        Left: new ParenthesisOperator(
-                                            Operators: new IOperator[]
-                                            {
-                                                new StoreOperator(
-                                                    Operand: new PreComputedOperator(
-                                                        Value: 123
-                                                    ),
-                                                    SupplementaryText: null
-                                                ),
-                                                new PreComputedOperator(
+                                    Operator: new ParenthesisOperator(
+                                        Operators: new IOperator[]
+                                        {
+                                            new StoreOperator(
+                                                Operand: new PreComputedOperator(
                                                     Value: 123
-                                                )
-                                            }.ToImmutableArray(),
-                                            SupplementaryText: null
-                                        ),
-                                        Right: new PreComputedOperator(
-                                            Value: 123
-                                        ),
-                                        Type: BinaryType.Mult,
+                                                ),
+                                                SupplementaryText: null
+                                            ),
+                                            new PreComputedOperator(
+                                                Value: 15129
+                                            )
+                                        }.ToImmutableArray(),
                                         SupplementaryText: null
                                     )
                                 )
@@ -5515,8 +5457,11 @@ internal static class TestCases
                         new LowLevelModule<Int32>(
                             new LowLevelOperation[]
                             {
-                                /* 00 */ new LowLevelOperation(Opcode.Call, 0),
-                                /* 01 */ new LowLevelOperation(Opcode.Halt, 0)
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 123),
+                                /* 01 */ new LowLevelOperation(Opcode.StoreVariable, 0),
+                                /* 02 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 15129),
+                                /* 04 */ new LowLevelOperation(Opcode.Halt, 0)
                             }.ToImmutableArray(),
                             new Int32[]
                             {
@@ -5530,12 +5475,10 @@ internal static class TestCases
                                         /* 00 */ new LowLevelOperation(Opcode.LoadConst, 123),
                                         /* 01 */ new LowLevelOperation(Opcode.StoreVariable, 0),
                                         /* 02 */ new LowLevelOperation(Opcode.Pop, 0),
-                                        /* 03 */ new LowLevelOperation(Opcode.LoadConst, 123),
-                                        /* 04 */ new LowLevelOperation(Opcode.LoadConst, 123),
-                                        /* 05 */ new LowLevelOperation(Opcode.Mult, 0),
-                                        /* 06 */ new LowLevelOperation(Opcode.Return, 0)
+                                        /* 03 */ new LowLevelOperation(Opcode.LoadConst, 15129),
+                                        /* 04 */ new LowLevelOperation(Opcode.Return, 0)
                                     }.ToImmutableArray(),
-                                    2)
+                                    1)
                             }.ToImmutableArray(),
                             new String[]
                             {
@@ -7294,24 +7237,23 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new UserDefinedOperator(
-                                Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
-                                Operands: new IOperator[]
+                            new ParenthesisOperator(
+                                Operators: new IOperator[]
                                 {
+                                    new StoreOperator(
+                                        Operand: new PreComputedOperator(
+                                            Value: 3
+                                        ),
+                                        SupplementaryText: null
+                                    ),
                                     new PreComputedOperator(
                                         Value: 3
                                     )
                                 }.ToImmutableArray(),
-                                IsTailCall: false,
                                 SupplementaryText: null
                             ),
-                            new UserDefinedOperator(
-                                Definition: new OperatorDefinition(Name: "fib2", NumOperands: 0),
-                                Operands: new IOperator[]
-                                {
-                                }.ToImmutableArray(),
-                                IsTailCall: true,
-                                SupplementaryText: null
+                            new PreComputedOperator(
+                                Value: 2
                             )
                         }.ToImmutableArray(),
                         SupplementaryText: null
@@ -7417,10 +7359,12 @@ internal static class TestCases
                             new LowLevelOperation[]
                             {
                                 /* 00 */ new LowLevelOperation(Opcode.LoadConst, 3),
-                                /* 01 */ new LowLevelOperation(Opcode.Call, 2),
+                                /* 01 */ new LowLevelOperation(Opcode.StoreVariable, 0),
                                 /* 02 */ new LowLevelOperation(Opcode.Pop, 0),
-                                /* 03 */ new LowLevelOperation(Opcode.Call, 1),
-                                /* 04 */ new LowLevelOperation(Opcode.Halt, 0)
+                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 3),
+                                /* 04 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 05 */ new LowLevelOperation(Opcode.LoadConst, 2),
+                                /* 06 */ new LowLevelOperation(Opcode.Halt, 0)
                             }.ToImmutableArray(),
                             new Int32[]
                             {
@@ -7717,15 +7661,19 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new UserDefinedOperator(
-                                Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
-                                Operands: new IOperator[]
+                            new ParenthesisOperator(
+                                Operators: new IOperator[]
                                 {
+                                    new StoreOperator(
+                                        Operand: new PreComputedOperator(
+                                            Value: 20
+                                        ),
+                                        SupplementaryText: null
+                                    ),
                                     new PreComputedOperator(
                                         Value: 20
                                     )
                                 }.ToImmutableArray(),
-                                IsTailCall: false,
                                 SupplementaryText: null
                             ),
                             new UserDefinedOperator(
@@ -7840,10 +7788,12 @@ internal static class TestCases
                             new LowLevelOperation[]
                             {
                                 /* 00 */ new LowLevelOperation(Opcode.LoadConst, 20),
-                                /* 01 */ new LowLevelOperation(Opcode.Call, 2),
+                                /* 01 */ new LowLevelOperation(Opcode.StoreVariable, 0),
                                 /* 02 */ new LowLevelOperation(Opcode.Pop, 0),
-                                /* 03 */ new LowLevelOperation(Opcode.Call, 1),
-                                /* 04 */ new LowLevelOperation(Opcode.Halt, 0)
+                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 20),
+                                /* 04 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 05 */ new LowLevelOperation(Opcode.Call, 1),
+                                /* 06 */ new LowLevelOperation(Opcode.Halt, 0)
                             }.ToImmutableArray(),
                             new Int32[]
                             {

@@ -21,40 +21,69 @@ public static partial class Optimizer
 
         private IOperator PreComputeIfPossible(IOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
-            if (GetVariablesToBeWritten(op, compilationContext) is var variables && variables.Count > 0)
+            var variables = GetVariablesToBeWritten(op, compilationContext);
+
+            void UnsetAllVariables()
             {
-                // If this operator writes variables, we cannot eliminate its call.
-                // We unset such variables because their values are unknown.
                 foreach (var variableName in variables)
                 {
                     state.UnsetVariable(variableName);
                 }
-
-                // We will not perform any further optimizations
-                return op;
             }
 
             // Otherwise, we try to execute
+            TNumber preComputedValue;
+            OptimizeTimeEvaluationState<TNumber> stateAferPreCompuation = state.Clone();
             try
             {
-                return new PreComputedOperator(
-                    Evaluator.Evaluate<TNumber>(op,
-                                                compilationContext,
-                                                new SimpleEvaluationState<TNumber>(state),
-                                                maxStep));
+                preComputedValue = Evaluator.Evaluate<TNumber>(op,
+                                                               compilationContext,
+                                                               new SimpleEvaluationState<TNumber>(stateAferPreCompuation),
+                                                               maxStep);
             }
             catch (EvaluationStepLimitExceedException)
             {
+                // If we failed to pre-compute, we must unset all variables to be written by this operator
+                UnsetAllVariables();
                 return op;
             }
             catch (VariableNotSetException)
             {
+                UnsetAllVariables();
                 return op;
             }
             catch (EvaluationArgumentNotSetException)
             {
+                UnsetAllVariables();
                 return op;
             }
+
+            var operators = ImmutableArray.CreateBuilder<IOperator>();
+
+            // If this operator writes variables, we keep StoreOperators
+            foreach (var variableName in variables.OrderBy(x => x))
+            {
+                if (stateAferPreCompuation.TryGetValue(variableName, out var value))
+                {
+                    operators.Add(new StoreOperator(new PreComputedOperator(value), variableName));
+                }
+                else
+                {
+                    // This operator did not touch the variable because of blanch conditions.
+                    // We do not need to change the state.
+                }
+            }
+
+            operators.Add(new PreComputedOperator(preComputedValue));
+
+            // Tell the variables after pre-computation
+            state.Assign(stateAferPreCompuation);
+
+            return operators.Count switch
+            {
+                1 => operators[0],
+                _ => new ParenthesisOperator(operators.ToImmutable())
+            };
         }
 
         public IOperator Visit(ZeroOperator op, OptimizeTimeEvaluationState<TNumber> state) => PreComputeIfPossible(op, state);
@@ -220,5 +249,35 @@ public static partial class Optimizer
 
         Core(op);
         return variables;
+    }
+
+    private static bool HasUserDefinedOperatorCalls(IOperator op, CompilationContext context)
+    {
+        switch (op)
+        {
+            case UserDefinedOperator:
+                return true;
+            case ParenthesisOperator parenthesis:
+                foreach (var inner in parenthesis.Operators)
+                {
+                    if (HasUserDefinedOperatorCalls(inner, context))
+                    {
+                        return true;
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+
+        foreach (var operand in op.GetOperands())
+        {
+            if (HasUserDefinedOperatorCalls(operand, context))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
