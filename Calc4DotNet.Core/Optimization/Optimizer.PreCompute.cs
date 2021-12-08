@@ -96,6 +96,11 @@ public static partial class Optimizer
 
         public IOperator Visit(LoadVariableOperator op, OptimizeTimeEvaluationState<TNumber> state) => PreComputeIfPossible(op, state);
 
+        public IOperator Visit(LoadArrayOperator op, OptimizeTimeEvaluationState<TNumber> state)
+        {
+            throw new NotImplementedException();
+        }
+
         public IOperator Visit(ParenthesisOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
             ImmutableArray<IOperator> operators = op.Operators;
@@ -171,6 +176,11 @@ public static partial class Optimizer
 
             // Do NOT make PreComputedOperator for StoreOperator because it mistakenly eliminates store operation
             return newOp;
+        }
+
+        public IOperator Visit(StoreArrayOperator op, OptimizeTimeEvaluationState<TNumber> state)
+        {
+            throw new NotImplementedException();
         }
 
         public IOperator Visit(BinaryOperator op, OptimizeTimeEvaluationState<TNumber> state)

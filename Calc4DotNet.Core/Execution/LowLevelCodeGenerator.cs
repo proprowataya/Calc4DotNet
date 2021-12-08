@@ -263,6 +263,11 @@ public static class LowLevelCodeGenerator
             AddOperation(new LowLevelOperation(Opcode.LoadVariable, GetOrCreateVariableIndex(op.VariableName)));
         }
 
+        public void Visit(LoadArrayOperator op)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Visit(ParenthesisOperator op)
         {
             ImmutableArray<IOperator> operators = op.Operators;
@@ -287,6 +292,11 @@ public static class LowLevelCodeGenerator
         {
             op.Operand.Accept(this);
             AddOperation(new LowLevelOperation(Opcode.StoreVariable, GetOrCreateVariableIndex(op.VariableName)));
+        }
+
+        public void Visit(StoreArrayOperator op)
+        {
+            throw new NotImplementedException();
         }
 
         public void Visit(BinaryOperator op)

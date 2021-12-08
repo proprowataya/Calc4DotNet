@@ -65,6 +65,17 @@ public sealed record LoadVariableOperator(string? SupplementaryText = null) : IO
     public override string ToString() => this.ToStringImplement();
 }
 
+public sealed record LoadArrayOperator(IOperator Index, string? SupplementaryText = null) : IOperator
+{
+    public string? VariableName => SupplementaryText;
+    public IOperator[] GetOperands() => new[] { Index };
+
+    public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+    public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+    public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+    public override string ToString() => this.ToStringImplement();
+}
+
 public sealed record ParenthesisOperator(ImmutableArray<IOperator> Operators, string? SupplementaryText = null) : IOperator
 {
     public IOperator[] GetOperands() => Array.Empty<IOperator>();
@@ -110,6 +121,17 @@ public sealed record StoreVariableOperator(IOperator Operand, string? Supplement
 {
     public string? VariableName => SupplementaryText;
     public IOperator[] GetOperands() => new[] { Operand };
+
+    public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+    public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+    public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+    public override string ToString() => this.ToStringImplement();
+}
+
+public sealed record StoreArrayOperator(IOperator Value, IOperator Index, string? SupplementaryText = null) : IOperator
+{
+    public string? VariableName => SupplementaryText;
+    public IOperator[] GetOperands() => new[] { Value, Index };
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);

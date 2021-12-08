@@ -93,6 +93,11 @@ public static class Evaluator
         public TNumber Visit(LoadVariableOperator op, TNumber[]? arguments)
             => evaluationState.Variables[op.VariableName];
 
+        public TNumber Visit(LoadArrayOperator op, TNumber[]? arguments)
+        {
+            throw new NotImplementedException();
+        }
+
         public TNumber Visit(ParenthesisOperator op, TNumber[]? arguments)
         {
             TNumber result = default(TNumberComputer).Zero;
@@ -118,6 +123,11 @@ public static class Evaluator
             TNumber value = op.Operand.Accept(this, arguments);
             evaluationState.Variables[op.VariableName] = value;
             return value;
+        }
+
+        public TNumber Visit(StoreArrayOperator op, TNumber[]? arguments)
+        {
+            throw new NotImplementedException();
         }
 
         public TNumber Visit(BinaryOperator op, TNumber[]? arguments)
