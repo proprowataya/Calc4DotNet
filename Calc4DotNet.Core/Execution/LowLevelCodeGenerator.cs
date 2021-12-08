@@ -258,7 +258,7 @@ public static class LowLevelCodeGenerator
             AddOperation(new LowLevelOperation(Opcode.LoadConst, 0));
         }
 
-        public void Visit(LoadOperator op)
+        public void Visit(LoadVariableOperator op)
         {
             AddOperation(new LowLevelOperation(Opcode.LoadVariable, GetOrCreateVariableIndex(op.VariableName)));
         }
@@ -283,7 +283,7 @@ public static class LowLevelCodeGenerator
             AddOperation(new LowLevelOperation(Opcode.Add));
         }
 
-        public void Visit(StoreOperator op)
+        public void Visit(StoreVariableOperator op)
         {
             op.Operand.Accept(this);
             AddOperation(new LowLevelOperation(Opcode.StoreVariable, GetOrCreateVariableIndex(op.VariableName)));

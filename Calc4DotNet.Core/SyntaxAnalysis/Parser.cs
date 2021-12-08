@@ -127,10 +127,10 @@ public static class Parser
             {
                 ArgumentToken arg => new ArgumentOperator(arg.Index, arg.SupplementaryText),
                 DefineToken def => new DefineOperator(def.SupplementaryText),
-                LoadToken load => new LoadOperator(load.SupplementaryText),
+                LoadToken load => new LoadVariableOperator(load.SupplementaryText),
                 ParenthesisToken parenthesis => ParseCore(parenthesis.Tokens, context),
                 DecimalToken dec => new DecimalOperator(operands[0], dec.Value, dec.SupplementaryText),
-                StoreToken store => new StoreOperator(operands[0], store.SupplementaryText),
+                StoreToken store => new StoreVariableOperator(operands[0], store.SupplementaryText),
                 BinaryOperatorToken binary => new BinaryOperator(operands[0], operands[1], binary.Type, binary.SupplementaryText),
                 ConditionalOperatorToken conditional => new ConditionalOperator(operands[0], operands[1], operands[2], conditional.SupplementaryText),
                 UserDefinedOperatorToken userDefined => new UserDefinedOperator(userDefined.Definition, operands.ToImmutableArray(), null, userDefined.SupplementaryText),

@@ -54,7 +54,7 @@ public sealed record DefineOperator(string? SupplementaryText = null) : IOperato
     public override string ToString() => this.ToStringImplement();
 }
 
-public sealed record LoadOperator(string? SupplementaryText = null) : IOperator
+public sealed record LoadVariableOperator(string? SupplementaryText = null) : IOperator
 {
     public string? VariableName => SupplementaryText;
     public IOperator[] GetOperands() => Array.Empty<IOperator>();
@@ -106,7 +106,7 @@ public sealed record DecimalOperator(IOperator Operand, int Value, string? Suppl
     public override string ToString() => this.ToStringImplement();
 }
 
-public sealed record StoreOperator(IOperator Operand, string? SupplementaryText = null) : IOperator
+public sealed record StoreVariableOperator(IOperator Operand, string? SupplementaryText = null) : IOperator
 {
     public string? VariableName => SupplementaryText;
     public IOperator[] GetOperands() => new[] { Operand };

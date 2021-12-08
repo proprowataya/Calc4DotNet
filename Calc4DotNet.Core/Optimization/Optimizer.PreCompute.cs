@@ -65,7 +65,7 @@ public static partial class Optimizer
             {
                 if (stateAferPreCompuation.TryGet(variableName, out var value))
                 {
-                    operators.Add(new StoreOperator(new PreComputedOperator(value), variableName));
+                    operators.Add(new StoreVariableOperator(new PreComputedOperator(value), variableName));
                 }
                 else
                 {
@@ -94,7 +94,7 @@ public static partial class Optimizer
 
         public IOperator Visit(DefineOperator op, OptimizeTimeEvaluationState<TNumber> state) => PreComputeIfPossible(op, state);
 
-        public IOperator Visit(LoadOperator op, OptimizeTimeEvaluationState<TNumber> state) => PreComputeIfPossible(op, state);
+        public IOperator Visit(LoadVariableOperator op, OptimizeTimeEvaluationState<TNumber> state) => PreComputeIfPossible(op, state);
 
         public IOperator Visit(ParenthesisOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
@@ -151,7 +151,7 @@ public static partial class Optimizer
             return PreComputeIfPossible(newOp, state);
         }
 
-        public IOperator Visit(StoreOperator op, OptimizeTimeEvaluationState<TNumber> state)
+        public IOperator Visit(StoreVariableOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
             var operand = op.Operand.Accept(this, state);
             var newOp = op with { Operand = operand };
@@ -232,7 +232,7 @@ public static partial class Optimizer
         {
             switch (op)
             {
-                case StoreOperator store:
+                case StoreVariableOperator store:
                     variables.Add(store.VariableName);
                     break;
                 case UserDefinedOperator userDefined:

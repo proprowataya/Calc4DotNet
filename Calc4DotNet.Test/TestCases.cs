@@ -4200,7 +4200,7 @@ internal static class TestCases
                 ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
-                    Operator: new StoreOperator(
+                    Operator: new StoreVariableOperator(
                         Operand: new DecimalOperator(
                             Operand: new ZeroOperator(),
                             Value: 1,
@@ -4240,7 +4240,7 @@ internal static class TestCases
                 ),
             ExpectedWhenOptimized:
                 new CompilationResult<Int32>(
-                    Operator: new StoreOperator(
+                    Operator: new StoreVariableOperator(
                         Operand: new PreComputedOperator(
                             Value: 1
                         ),
@@ -4285,7 +4285,7 @@ internal static class TestCases
                 ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
-                    Operator: new LoadOperator(
+                    Operator: new LoadVariableOperator(
                         SupplementaryText: null
                     ),
                     Context:
@@ -4356,7 +4356,7 @@ internal static class TestCases
                 ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
-                    Operator: new StoreOperator(
+                    Operator: new StoreVariableOperator(
                         Operand: new DecimalOperator(
                             Operand: new ZeroOperator(),
                             Value: 1,
@@ -4396,7 +4396,7 @@ internal static class TestCases
                 ),
             ExpectedWhenOptimized:
                 new CompilationResult<Int32>(
-                    Operator: new StoreOperator(
+                    Operator: new StoreVariableOperator(
                         Operand: new PreComputedOperator(
                             Value: 1
                         ),
@@ -4441,7 +4441,7 @@ internal static class TestCases
                 ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
-                    Operator: new LoadOperator(
+                    Operator: new LoadVariableOperator(
                         SupplementaryText: "var"
                     ),
                     Context:
@@ -4577,14 +4577,14 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new LoadOperator(
+                                    Operator: new LoadVariableOperator(
                                         SupplementaryText: "var"
                                     )
                                 ),
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -4654,7 +4654,7 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new PreComputedOperator(
                                     Value: 123
                                 ),
@@ -4673,14 +4673,14 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new LoadOperator(
+                                    Operator: new LoadVariableOperator(
                                         SupplementaryText: "var"
                                     )
                                 ),
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -4761,7 +4761,7 @@ internal static class TestCases
                                 IsTailCall: null,
                                 SupplementaryText: null
                             ),
-                            new LoadOperator(
+                            new LoadVariableOperator(
                                 SupplementaryText: null
                             )
                         }.ToImmutableArray(),
@@ -4774,7 +4774,7 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -4824,7 +4824,7 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new PreComputedOperator(
                                     Value: 7
                                 ),
@@ -4843,7 +4843,7 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -4919,8 +4919,8 @@ internal static class TestCases
                                     IsTailCall: null,
                                     SupplementaryText: null
                                 ),
-                                new StoreOperator(
-                                    Operand: new LoadOperator(
+                                new StoreVariableOperator(
+                                    Operand: new LoadVariableOperator(
                                         SupplementaryText: null
                                     ),
                                     SupplementaryText: "var1"
@@ -4930,7 +4930,7 @@ internal static class TestCases
                                     Operands: new IOperator[]
                                     {
                                         new DecimalOperator(
-                                            Operand: new LoadOperator(
+                                            Operand: new LoadVariableOperator(
                                                 SupplementaryText: "zero"
                                             ),
                                             Value: 3,
@@ -4940,19 +4940,19 @@ internal static class TestCases
                                     IsTailCall: null,
                                     SupplementaryText: null
                                 ),
-                                new StoreOperator(
-                                    Operand: new LoadOperator(
+                                new StoreVariableOperator(
+                                    Operand: new LoadVariableOperator(
                                         SupplementaryText: null
                                     ),
                                     SupplementaryText: "var2"
                                 ),
-                                new LoadOperator(
+                                new LoadVariableOperator(
                                     SupplementaryText: "var1"
                                 )
                             }.ToImmutableArray(),
                             SupplementaryText: null
                         ),
-                        Right: new LoadOperator(
+                        Right: new LoadVariableOperator(
                             SupplementaryText: "var2"
                         ),
                         Type: BinaryType.Mult,
@@ -4965,7 +4965,7 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -5033,19 +5033,19 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new PreComputedOperator(
                                     Value: 3
                                 ),
                                 SupplementaryText: null
                             ),
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new PreComputedOperator(
                                     Value: 7
                                 ),
                                 SupplementaryText: "var1"
                             ),
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new PreComputedOperator(
                                     Value: 3
                                 ),
@@ -5064,7 +5064,7 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -5131,7 +5131,7 @@ internal static class TestCases
                         Left: new ParenthesisOperator(
                             Operators: new IOperator[]
                             {
-                                new StoreOperator(
+                                new StoreVariableOperator(
                                     Operand: new DecimalOperator(
                                         Operand: new DecimalOperator(
                                             Operand: new DecimalOperator(
@@ -5147,13 +5147,13 @@ internal static class TestCases
                                     ),
                                     SupplementaryText: null
                                 ),
-                                new LoadOperator(
+                                new LoadVariableOperator(
                                     SupplementaryText: null
                                 )
                             }.ToImmutableArray(),
                             SupplementaryText: null
                         ),
-                        Right: new LoadOperator(
+                        Right: new LoadVariableOperator(
                             SupplementaryText: null
                         ),
                         Type: BinaryType.Mult,
@@ -5206,7 +5206,7 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new PreComputedOperator(
                                     Value: 123
                                 ),
@@ -5264,7 +5264,7 @@ internal static class TestCases
                         Left: new ParenthesisOperator(
                             Operators: new IOperator[]
                             {
-                                new StoreOperator(
+                                new StoreVariableOperator(
                                     Operand: new DecimalOperator(
                                         Operand: new DecimalOperator(
                                             Operand: new DecimalOperator(
@@ -5280,13 +5280,13 @@ internal static class TestCases
                                     ),
                                     SupplementaryText: "var"
                                 ),
-                                new LoadOperator(
+                                new LoadVariableOperator(
                                     SupplementaryText: "var"
                                 )
                             }.ToImmutableArray(),
                             SupplementaryText: null
                         ),
-                        Right: new LoadOperator(
+                        Right: new LoadVariableOperator(
                             SupplementaryText: "var"
                         ),
                         Type: BinaryType.Mult,
@@ -5339,7 +5339,7 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new PreComputedOperator(
                                     Value: 123
                                 ),
@@ -5397,7 +5397,7 @@ internal static class TestCases
                         Left: new ParenthesisOperator(
                             Operators: new IOperator[]
                             {
-                                new StoreOperator(
+                                new StoreVariableOperator(
                                     Operand: new BinaryOperator(
                                         Left: new BinaryOperator(
                                             Left: new DecimalOperator(
@@ -5435,13 +5435,13 @@ internal static class TestCases
                                     ),
                                     SupplementaryText: null
                                 ),
-                                new LoadOperator(
+                                new LoadVariableOperator(
                                     SupplementaryText: null
                                 )
                             }.ToImmutableArray(),
                             SupplementaryText: null
                         ),
-                        Right: new LoadOperator(
+                        Right: new LoadVariableOperator(
                             SupplementaryText: null
                         ),
                         Type: BinaryType.Mult,
@@ -5510,7 +5510,7 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new PreComputedOperator(
                                     Value: 123
                                 ),
@@ -5568,7 +5568,7 @@ internal static class TestCases
                         Left: new ParenthesisOperator(
                             Operators: new IOperator[]
                             {
-                                new StoreOperator(
+                                new StoreVariableOperator(
                                     Operand: new BinaryOperator(
                                         Left: new BinaryOperator(
                                             Left: new DecimalOperator(
@@ -5606,13 +5606,13 @@ internal static class TestCases
                                     ),
                                     SupplementaryText: "var"
                                 ),
-                                new LoadOperator(
+                                new LoadVariableOperator(
                                     SupplementaryText: "var"
                                 )
                             }.ToImmutableArray(),
                             SupplementaryText: null
                         ),
-                        Right: new LoadOperator(
+                        Right: new LoadVariableOperator(
                             SupplementaryText: "var"
                         ),
                         Type: BinaryType.Mult,
@@ -5681,7 +5681,7 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new PreComputedOperator(
                                     Value: 123
                                 ),
@@ -5763,7 +5763,7 @@ internal static class TestCases
                                         Left: new ParenthesisOperator(
                                             Operators: new IOperator[]
                                             {
-                                                new StoreOperator(
+                                                new StoreVariableOperator(
                                                     Operand: new DecimalOperator(
                                                         Operand: new DecimalOperator(
                                                             Operand: new DecimalOperator(
@@ -5779,13 +5779,13 @@ internal static class TestCases
                                                     ),
                                                     SupplementaryText: null
                                                 ),
-                                                new LoadOperator(
+                                                new LoadVariableOperator(
                                                     SupplementaryText: null
                                                 )
                                             }.ToImmutableArray(),
                                             SupplementaryText: null
                                         ),
-                                        Right: new LoadOperator(
+                                        Right: new LoadVariableOperator(
                                             SupplementaryText: null
                                         ),
                                         Type: BinaryType.Mult,
@@ -5845,7 +5845,7 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new PreComputedOperator(
                                     Value: 123
                                 ),
@@ -5867,7 +5867,7 @@ internal static class TestCases
                                     Operator: new ParenthesisOperator(
                                         Operators: new IOperator[]
                                         {
-                                            new StoreOperator(
+                                            new StoreVariableOperator(
                                                 Operand: new PreComputedOperator(
                                                     Value: 123
                                                 ),
@@ -5935,7 +5935,7 @@ internal static class TestCases
                             new DefineOperator(
                                 SupplementaryText: "op||L*L"
                             ),
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new DecimalOperator(
                                     Operand: new DecimalOperator(
                                         Operand: new DecimalOperator(
@@ -5970,10 +5970,10 @@ internal static class TestCases
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: false,
                                     Operator: new BinaryOperator(
-                                        Left: new LoadOperator(
+                                        Left: new LoadVariableOperator(
                                             SupplementaryText: null
                                         ),
-                                        Right: new LoadOperator(
+                                        Right: new LoadVariableOperator(
                                             SupplementaryText: null
                                         ),
                                         Type: BinaryType.Mult,
@@ -6033,7 +6033,7 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new PreComputedOperator(
                                     Value: 123
                                 ),
@@ -6053,10 +6053,10 @@ internal static class TestCases
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: true,
                                     Operator: new BinaryOperator(
-                                        Left: new LoadOperator(
+                                        Left: new LoadVariableOperator(
                                             SupplementaryText: null
                                         ),
-                                        Right: new LoadOperator(
+                                        Right: new LoadVariableOperator(
                                             SupplementaryText: null
                                         ),
                                         Type: BinaryType.Mult,
@@ -6118,7 +6118,7 @@ internal static class TestCases
                                 new DefineOperator(
                                     SupplementaryText: "fib|n|n<=1?n?((n-1){fib}+(n-2){fib})"
                                 ),
-                                new StoreOperator(
+                                new StoreVariableOperator(
                                     Operand: new UserDefinedOperator(
                                         Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                         Operands: new IOperator[]
@@ -6141,7 +6141,7 @@ internal static class TestCases
                             }.ToImmutableArray(),
                             SupplementaryText: null
                         ),
-                        Right: new LoadOperator(
+                        Right: new LoadVariableOperator(
                             SupplementaryText: null
                         ),
                         Type: BinaryType.Add,
@@ -6292,7 +6292,7 @@ internal static class TestCases
             ExpectedWhenOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
-                        Left: new StoreOperator(
+                        Left: new StoreVariableOperator(
                             Operand: new UserDefinedOperator(
                                 Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                 Operands: new IOperator[]
@@ -6306,7 +6306,7 @@ internal static class TestCases
                             ),
                             SupplementaryText: null
                         ),
-                        Right: new LoadOperator(
+                        Right: new LoadVariableOperator(
                             SupplementaryText: null
                         ),
                         Type: BinaryType.Add,
@@ -6443,7 +6443,7 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new ParenthesisOperator(
                                     Operators: new IOperator[]
                                     {
@@ -6604,14 +6604,14 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new LoadOperator(
+                                    Operator: new LoadVariableOperator(
                                         SupplementaryText: null
                                     )
                                 ),
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -6746,7 +6746,7 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new ConditionalOperator(
                                     Condition: new BinaryOperator(
                                         Left: new UserDefinedOperator(
@@ -6858,14 +6858,14 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new LoadOperator(
+                                    Operator: new LoadVariableOperator(
                                         SupplementaryText: null
                                     )
                                 ),
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -7006,7 +7006,7 @@ internal static class TestCases
                                     Type: BinaryType.GreaterThanOrEqual,
                                     SupplementaryText: null
                                 ),
-                                IfTrue: new StoreOperator(
+                                IfTrue: new StoreVariableOperator(
                                     Operand: new DecimalOperator(
                                         Operand: new DecimalOperator(
                                             Operand: new ZeroOperator(),
@@ -7018,7 +7018,7 @@ internal static class TestCases
                                     ),
                                     SupplementaryText: null
                                 ),
-                                IfFalse: new StoreOperator(
+                                IfFalse: new StoreVariableOperator(
                                     Operand: new DecimalOperator(
                                         Operand: new ZeroOperator(),
                                         Value: 5,
@@ -7116,14 +7116,14 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new LoadOperator(
+                                    Operator: new LoadVariableOperator(
                                         SupplementaryText: null
                                     )
                                 ),
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -7278,13 +7278,13 @@ internal static class TestCases
                                     Type: BinaryType.GreaterThanOrEqual,
                                     SupplementaryText: null
                                 ),
-                                IfTrue: new StoreOperator(
+                                IfTrue: new StoreVariableOperator(
                                     Operand: new PreComputedOperator(
                                         Value: 10
                                     ),
                                     SupplementaryText: null
                                 ),
-                                IfFalse: new StoreOperator(
+                                IfFalse: new StoreVariableOperator(
                                     Operand: new PreComputedOperator(
                                         Value: 5
                                     ),
@@ -7374,14 +7374,14 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new LoadOperator(
+                                    Operator: new LoadVariableOperator(
                                         SupplementaryText: null
                                     )
                                 ),
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -7594,7 +7594,7 @@ internal static class TestCases
                                         Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                         Operands: new IOperator[]
                                         {
-                                            new LoadOperator(
+                                            new LoadVariableOperator(
                                                 SupplementaryText: null
                                             )
                                         }.ToImmutableArray(),
@@ -7605,7 +7605,7 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -7701,7 +7701,7 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new PreComputedOperator(
                                     Value: 3
                                 ),
@@ -7788,7 +7788,7 @@ internal static class TestCases
                                         Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                         Operands: new IOperator[]
                                         {
-                                            new LoadOperator(
+                                            new LoadVariableOperator(
                                                 SupplementaryText: null
                                             )
                                         }.ToImmutableArray(),
@@ -7799,7 +7799,7 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -8010,7 +8010,7 @@ internal static class TestCases
                                         Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                         Operands: new IOperator[]
                                         {
-                                            new LoadOperator(
+                                            new LoadVariableOperator(
                                                 SupplementaryText: null
                                             )
                                         }.ToImmutableArray(),
@@ -8021,7 +8021,7 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -8121,7 +8121,7 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new PreComputedOperator(
                                     Value: 20
                                 ),
@@ -8213,7 +8213,7 @@ internal static class TestCases
                                         Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                         Operands: new IOperator[]
                                         {
-                                            new LoadOperator(
+                                            new LoadVariableOperator(
                                                 SupplementaryText: null
                                             )
                                         }.ToImmutableArray(),
@@ -8224,7 +8224,7 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -8312,7 +8312,7 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new DecimalOperator(
                                     Operand: new ParenthesisOperator(
                                         Operators: new IOperator[]
@@ -8426,7 +8426,7 @@ internal static class TestCases
                                         Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                         Operands: new IOperator[]
                                         {
-                                            new LoadOperator(
+                                            new LoadVariableOperator(
                                                 SupplementaryText: null
                                             )
                                         }.ToImmutableArray(),
@@ -8437,7 +8437,7 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -8533,7 +8533,7 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new PreComputedOperator(
                                     Value: 3
                                 ),
@@ -8620,7 +8620,7 @@ internal static class TestCases
                                         Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                         Operands: new IOperator[]
                                         {
-                                            new LoadOperator(
+                                            new LoadVariableOperator(
                                                 SupplementaryText: null
                                             )
                                         }.ToImmutableArray(),
@@ -8631,7 +8631,7 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -8719,7 +8719,7 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new DecimalOperator(
                                     Operand: new DecimalOperator(
                                         Operand: new ParenthesisOperator(
@@ -8837,7 +8837,7 @@ internal static class TestCases
                                         Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                         Operands: new IOperator[]
                                         {
-                                            new LoadOperator(
+                                            new LoadVariableOperator(
                                                 SupplementaryText: null
                                             )
                                         }.ToImmutableArray(),
@@ -8848,7 +8848,7 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -8948,7 +8948,7 @@ internal static class TestCases
                     Operator: new ParenthesisOperator(
                         Operators: new IOperator[]
                         {
-                            new StoreOperator(
+                            new StoreVariableOperator(
                                 Operand: new PreComputedOperator(
                                     Value: 20
                                 ),
@@ -9040,7 +9040,7 @@ internal static class TestCases
                                         Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                         Operands: new IOperator[]
                                         {
-                                            new LoadOperator(
+                                            new LoadVariableOperator(
                                                 SupplementaryText: null
                                             )
                                         }.ToImmutableArray(),
@@ -9051,7 +9051,7 @@ internal static class TestCases
                                 new OperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreOperator(
+                                    Operator: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -9158,7 +9158,7 @@ internal static class TestCases
                                 IsTailCall: null,
                                 SupplementaryText: null
                             ),
-                            new LoadOperator(
+                            new LoadVariableOperator(
                                 SupplementaryText: null
                             )
                         }.ToImmutableArray(),
@@ -9174,7 +9174,7 @@ internal static class TestCases
                                     Operator: new ParenthesisOperator(
                                         Operators: new IOperator[]
                                         {
-                                            new StoreOperator(
+                                            new StoreVariableOperator(
                                                 Operand: new DecimalOperator(
                                                     Operand: new DecimalOperator(
                                                         Operand: new ZeroOperator(),
@@ -9186,7 +9186,7 @@ internal static class TestCases
                                                 ),
                                                 SupplementaryText: null
                                             ),
-                                            new StoreOperator(
+                                            new StoreVariableOperator(
                                                 Operand: new ConditionalOperator(
                                                     Condition: new BinaryOperator(
                                                         Left: new ArgumentOperator(
@@ -9352,7 +9352,7 @@ internal static class TestCases
                                 IsTailCall: false,
                                 SupplementaryText: null
                             ),
-                            new LoadOperator(
+                            new LoadVariableOperator(
                                 SupplementaryText: null
                             )
                         }.ToImmutableArray(),
@@ -9368,13 +9368,13 @@ internal static class TestCases
                                     Operator: new ParenthesisOperator(
                                         Operators: new IOperator[]
                                         {
-                                            new StoreOperator(
+                                            new StoreVariableOperator(
                                                 Operand: new PreComputedOperator(
                                                     Value: 10
                                                 ),
                                                 SupplementaryText: null
                                             ),
-                                            new StoreOperator(
+                                            new StoreVariableOperator(
                                                 Operand: new ConditionalOperator(
                                                     Condition: new BinaryOperator(
                                                         Left: new ArgumentOperator(

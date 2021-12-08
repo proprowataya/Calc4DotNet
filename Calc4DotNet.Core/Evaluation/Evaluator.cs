@@ -90,7 +90,7 @@ public static class Evaluator
         public TNumber Visit(DefineOperator op, TNumber[]? arguments)
             => default(TNumberComputer).Zero;
 
-        public TNumber Visit(LoadOperator op, TNumber[]? arguments)
+        public TNumber Visit(LoadVariableOperator op, TNumber[]? arguments)
             => evaluationState.Variables[op.VariableName];
 
         public TNumber Visit(ParenthesisOperator op, TNumber[]? arguments)
@@ -113,7 +113,7 @@ public static class Evaluator
             return c.Add(c.Multiply(operand, c.Ten), c.FromInt(op.Value));
         }
 
-        public TNumber Visit(StoreOperator op, TNumber[]? arguments)
+        public TNumber Visit(StoreVariableOperator op, TNumber[]? arguments)
         {
             TNumber value = op.Operand.Accept(this, arguments);
             evaluationState.Variables[op.VariableName] = value;

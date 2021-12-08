@@ -100,10 +100,10 @@ public static partial class Optimizer
 
             switch (op)
             {
-                case LoadOperator load:
+                case LoadVariableOperator load:
                     variables.Add(load.VariableName);
                     break;
-                case StoreOperator store:
+                case StoreVariableOperator store:
                     variables.Add(store.VariableName);
                     break;
                 case ParenthesisOperator parenthesis:

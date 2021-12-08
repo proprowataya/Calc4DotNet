@@ -27,7 +27,7 @@ public static partial class Optimizer
             return op;
         }
 
-        public IOperator Visit(LoadOperator op, bool isTailCall)
+        public IOperator Visit(LoadVariableOperator op, bool isTailCall)
         {
             return op;
         }
@@ -50,7 +50,7 @@ public static partial class Optimizer
             return op with { Operand = op.Operand.Accept(this, false) };
         }
 
-        public IOperator Visit(StoreOperator op, bool isTailCall)
+        public IOperator Visit(StoreVariableOperator op, bool isTailCall)
         {
             return op with { Operand = op.Operand.Accept(this, true) };
         }
