@@ -248,13 +248,31 @@ public static class Lexer
                 return null;
 
             Index++;
-            (int begin, int end) = (Index, text.IndexOf(']', Index));
-            if (end < 0)
+            int begin = Index;
+            int depth = 1;
+
+            while (Index < text.Length && depth > 0)
+            {
+                char c = text[Index];
+
+                if (c == '[')
+                {
+                    depth++;
+                }
+                else if (c == ']')
+                {
+                    depth--;
+                }
+
+                Index++;
+            }
+
+            if (depth != 0)
             {
                 throw new Calc4DotNet.Core.Exceptions.TokenExpectedException("]");
             }
-            Index = end + 1;
 
+            int end = Index - 1;
             return text[begin..end];
         }
     }

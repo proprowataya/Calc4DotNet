@@ -42,6 +42,7 @@ var testCaseInputs = new (string Source, Type[]? SkipTypes)[]
     ("L", null),
     ("1S[var]", null),
     ("L[var]", null),
+    ("D[get||L[var]] D[set|x|xS[var]] 123{set} {get} * {get}", null),
     ("D[set|x|xS] 7{set}L", null),
     ("D[set|x|xS] 7{set}LS[var1] L[zero]3{set}LS[var2] L[var1]*L[var2]", null),
     ("(123S)L*L", null),
