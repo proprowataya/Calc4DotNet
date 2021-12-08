@@ -13,6 +13,12 @@ internal static class TestCases
         new TestCase(
             Source: "1<2",
             ExpectedValue: 1,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -100,6 +106,12 @@ internal static class TestCases
         new TestCase(
             Source: "1<=2",
             ExpectedValue: 1,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -187,6 +199,12 @@ internal static class TestCases
         new TestCase(
             Source: "1>=2",
             ExpectedValue: 0,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -274,6 +292,12 @@ internal static class TestCases
         new TestCase(
             Source: "1>2",
             ExpectedValue: 0,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -361,6 +385,12 @@ internal static class TestCases
         new TestCase(
             Source: "2<1",
             ExpectedValue: 0,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -448,6 +478,12 @@ internal static class TestCases
         new TestCase(
             Source: "2<=1",
             ExpectedValue: 0,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -535,6 +571,12 @@ internal static class TestCases
         new TestCase(
             Source: "2>=1",
             ExpectedValue: 1,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -622,6 +664,12 @@ internal static class TestCases
         new TestCase(
             Source: "2>1",
             ExpectedValue: 1,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -709,6 +757,12 @@ internal static class TestCases
         new TestCase(
             Source: "1<1",
             ExpectedValue: 0,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -796,6 +850,12 @@ internal static class TestCases
         new TestCase(
             Source: "1<=1",
             ExpectedValue: 1,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -883,6 +943,12 @@ internal static class TestCases
         new TestCase(
             Source: "1>=1",
             ExpectedValue: 1,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -970,6 +1036,12 @@ internal static class TestCases
         new TestCase(
             Source: "1>1",
             ExpectedValue: 0,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -1057,6 +1129,12 @@ internal static class TestCases
         new TestCase(
             Source: "12345678",
             ExpectedValue: 12345678,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new DecimalOperator(
@@ -1183,6 +1261,12 @@ internal static class TestCases
         new TestCase(
             Source: "1+2*3-10",
             ExpectedValue: -1,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -1305,6 +1389,12 @@ internal static class TestCases
         new TestCase(
             Source: "0?1?2?3?4",
             ExpectedValue: 3,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new ConditionalOperator(
@@ -1424,6 +1514,12 @@ internal static class TestCases
         new TestCase(
             Source: "D[add|x,y|x+y] 12{add}23",
             ExpectedValue: 35,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new UserDefinedOperator(
@@ -1582,6 +1678,12 @@ internal static class TestCases
         new TestCase(
             Source: "D[get12345||12345] {get12345}+{get12345}",
             ExpectedValue: 24690,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -1743,6 +1845,12 @@ internal static class TestCases
         new TestCase(
             Source: "D[fact|x,y|x==0?y?(x-1){fact}(x*y)] 10{fact}1",
             ExpectedValue: 3628800,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new UserDefinedOperator(
@@ -1999,6 +2107,12 @@ internal static class TestCases
         new TestCase(
             Source: "D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}] 10{fib}",
             ExpectedValue: 55,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new UserDefinedOperator(
@@ -2284,6 +2398,12 @@ internal static class TestCases
         new TestCase(
             Source: "D[fibImpl|x,a,b|x ? ((x-1) ? ((x-1){fibImpl}(a+b){fibImpl}a) ? a) ? b] D[fib|x|x{fibImpl}1{fibImpl}0] 10{fib}",
             ExpectedValue: 55,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new UserDefinedOperator(
@@ -2662,6 +2782,12 @@ internal static class TestCases
         new TestCase(
             Source: "D[f|a,b,p,q,c|c < 2 ? ((a*p) + (b*q)) ? (c % 2 ? ((a*p) + (b*q) {f} (a*q) + (b*q) + (b*p) {f} (p*p) + (q*q) {f} (2*p+q)*q {f} c/2) ? (a {f} b {f} (p*p) + (q*q) {f} (2*p+q)*q {f} c/2))] D[fib|n|0{f}1{f}0{f}1{f}n] 10{fib}",
             ExpectedValue: 55,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new UserDefinedOperator(
@@ -3645,6 +3771,12 @@ internal static class TestCases
         new TestCase(
             Source: "D[tarai|x,y,z|x <= y ? y ? (((x - 1){tarai}y{tarai}z){tarai}((y - 1){tarai}z{tarai}x){tarai}((z - 1){tarai}x{tarai}y))] 10{tarai}5{tarai}5",
             ExpectedValue: 5,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new UserDefinedOperator(
@@ -4059,6 +4191,13 @@ internal static class TestCases
         new TestCase(
             Source: "1S",
             ExpectedValue: 1,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create((String)null), 1),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new StoreOperator(
@@ -4138,6 +4277,12 @@ internal static class TestCases
         new TestCase(
             Source: "L",
             ExpectedValue: 0,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new LoadOperator(
@@ -4202,6 +4347,13 @@ internal static class TestCases
         new TestCase(
             Source: "1S[var]",
             ExpectedValue: 1,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create("var"), 1),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new StoreOperator(
@@ -4281,6 +4433,12 @@ internal static class TestCases
         new TestCase(
             Source: "L[var]",
             ExpectedValue: 0,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new LoadOperator(
@@ -4345,6 +4503,13 @@ internal static class TestCases
         new TestCase(
             Source: "D[set|x|xS] 7{set}L",
             ExpectedValue: 7,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create((String)null), 7),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new ParenthesisOperator(
@@ -4493,6 +4658,15 @@ internal static class TestCases
         new TestCase(
             Source: "D[set|x|xS] 7{set}LS[var1] L[zero]3{set}LS[var2] L[var1]*L[var2]",
             ExpectedValue: 21,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create((String)null), 3),
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create("var1"), 7),
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create("var2"), 3),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -4713,6 +4887,13 @@ internal static class TestCases
         new TestCase(
             Source: "(123S)L*L",
             ExpectedValue: 15129,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create((String)null), 123),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -4839,6 +5020,13 @@ internal static class TestCases
         new TestCase(
             Source: "(123S[var])L[var]*L[var]",
             ExpectedValue: 15129,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create("var"), 123),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -4965,6 +5153,13 @@ internal static class TestCases
         new TestCase(
             Source: "((100+20+3)S)L*L",
             ExpectedValue: 15129,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create((String)null), 123),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -5129,6 +5324,13 @@ internal static class TestCases
         new TestCase(
             Source: "((100+20+3)S[var])L[var]*L[var]",
             ExpectedValue: 15129,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create("var"), 123),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -5293,6 +5495,13 @@ internal static class TestCases
         new TestCase(
             Source: "D[op||(123S)L*L]{op}",
             ExpectedValue: 15129,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create((String)null), 123),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new ParenthesisOperator(
@@ -5480,6 +5689,13 @@ internal static class TestCases
         new TestCase(
             Source: "D[op||L*L](123S){op}",
             ExpectedValue: 15129,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create((String)null), 123),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new ParenthesisOperator(
@@ -5655,6 +5871,13 @@ internal static class TestCases
         new TestCase(
             Source: "D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] (20{fib}S)+L",
             ExpectedValue: 13530,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create((String)null), 6765),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new BinaryOperator(
@@ -5977,6 +6200,13 @@ internal static class TestCases
         new TestCase(
             Source: "D[get||L] D[set|x|xS] D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] (20{fib}>=1000?10?5)S {get}",
             ExpectedValue: 10,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create((String)null), 10),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new ParenthesisOperator(
@@ -6485,6 +6715,13 @@ internal static class TestCases
         new TestCase(
             Source: "D[get||L] D[set|x|xS] D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] (20{fib}>=1000?10S?5S) {get}",
             ExpectedValue: 10,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create((String)null), 10),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new ParenthesisOperator(
@@ -6995,6 +7232,13 @@ internal static class TestCases
         new TestCase(
             Source: "D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] D[fib2||L{fib}] D[set|x|xS] 3{set} {fib2}",
             ExpectedValue: 2,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create((String)null), 3),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new ParenthesisOperator(
@@ -7400,6 +7644,13 @@ internal static class TestCases
         new TestCase(
             Source: "D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] D[fib2||L{fib}] D[set|x|xS] 20{set} {fib2}",
             ExpectedValue: 6765,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create((String)null), 20),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new ParenthesisOperator(
@@ -7818,6 +8069,13 @@ internal static class TestCases
         new TestCase(
             Source: "D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] D[fib2||L{fib}] D[set|x|xS] 3S {fib2}",
             ExpectedValue: 2,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create((String)null), 3),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new ParenthesisOperator(
@@ -8218,6 +8476,13 @@ internal static class TestCases
         new TestCase(
             Source: "D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] D[fib2||L{fib}] D[set|x|xS] 20S {fib2}",
             ExpectedValue: 6765,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create((String)null), 20),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new ParenthesisOperator(
@@ -8631,6 +8896,13 @@ internal static class TestCases
         new TestCase(
             Source: "D[fib|n|10S(n<=1?n?((n-1){fib}+(n-2){fib}))S] 20{fib} L",
             ExpectedValue: 6765,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create((String)null), 6765),
+                    }
+                ),
             ExpectedWhenNotOptimized:
                 new CompilationResult<Int32>(
                     Operator: new ParenthesisOperator(

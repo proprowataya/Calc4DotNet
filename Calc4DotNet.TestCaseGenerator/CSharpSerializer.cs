@@ -29,6 +29,12 @@ internal struct CSharpSerializer
 
         WriteLine($"{nameof(TestCase.ExpectedValue)}: {testCase.ExpectedValue},");
 
+        WriteLine($"{nameof(TestCase.VariablesAfterExecution)}:");
+        indent++;
+        Serialize(testCase.VariablesAfterExecution);
+        WriteLine(",", insertIndent: false);
+        indent--;
+
         WriteLine($"{nameof(TestCase.ExpectedWhenNotOptimized)}:");
         indent++;
         Serialize(testCase.ExpectedWhenNotOptimized);
@@ -209,6 +215,41 @@ internal struct CSharpSerializer
         Write($"}}.{nameof(ImmutableArray.ToImmutableArray)}()");
     }
 
+    public void Serialize<TNumber>(ImmutableDictionary<ValueBox<string>, TNumber> dictionary, bool insertIndentFirst = true)
+    {
+        const string ValueBoxTypeName = $"{nameof(ValueBox)}<string>";
+
+        WriteLine($"{nameof(ImmutableDictionary)}.{nameof(ImmutableDictionary.CreateRange)}(", insertIndentFirst);
+
+        indent++;
+        WriteLine($"new {nameof(KeyValuePair<ValueBox<string>, TNumber>)}<{ValueBoxTypeName}, {typeof(TNumber).Name}>[]");
+        WriteLine("{");
+        indent++;
+
+        foreach (var (key, value) in dictionary.OrderBy(pair => pair.Key.Value))
+        {
+            Write($"new {nameof(KeyValuePair<ValueBox<string>, TNumber>)}<{ValueBoxTypeName}, {typeof(TNumber).Name}>(");
+            Serialize((dynamic)key, insertIndentFirst: false);
+            Write(", ", insertIndent: false);
+
+            if (value is null)
+            {
+                Write("null", insertIndent: false);
+            }
+            else
+            {
+                Serialize((dynamic)value, insertIndentFirst: false);
+            }
+
+            WriteLine("),", insertIndent: false);
+        }
+
+        indent--;
+        WriteLine("}");
+        indent--;
+        Write(")");
+    }
+
     public void Serialize(LowLevelUserDefinedOperator op, bool insertIndentFirst = true)
     {
         WriteLine($"new {nameof(LowLevelUserDefinedOperator)}(", insertIndentFirst);
@@ -235,6 +276,22 @@ internal struct CSharpSerializer
     public void Serialize(OperatorDefinition definition, bool insertIndentFirst = true)
     {
         Write($"new {nameof(OperatorDefinition)}({nameof(OperatorDefinition.Name)}: \"{definition.Name}\", {nameof(OperatorDefinition.NumOperands)}: {definition.NumOperands})", insertIndentFirst);
+    }
+
+    public void Serialize<T>(ValueBox<T> box, bool insertIndentFirst = true)
+    {
+        Write($"{nameof(ValueBox)}.{nameof(ValueBox.Create)}(", insertIndentFirst);
+
+        if (box.Value is null)
+        {
+            Write($"({typeof(T).Name})null", insertIndent: false);
+        }
+        else
+        {
+            Serialize((dynamic)box.Value, insertIndentFirst: false);
+        }
+
+        Write(")", insertIndent: false);
     }
 
     public void Serialize(int value, bool insertIndentFirst = true)

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Calc4DotNet.Core.Evaluation;
@@ -56,6 +57,11 @@ public sealed class DefaultVariableSource<TNumber> : IVariableSource<TNumber>
     {
         get => variables.TryGetValue(ValueBox.Create(variableName), out var value) ? value : defaultValue;
         set => variables[ValueBox.Create(variableName)] = value;
+    }
+
+    public ImmutableDictionary<ValueBox<string>, TNumber> ToImmutableDictionary()
+    {
+        return variables.ToImmutableDictionary();
     }
 
     public DefaultVariableSource<TNumber> Clone()

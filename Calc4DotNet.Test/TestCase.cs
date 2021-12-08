@@ -1,4 +1,5 @@
-﻿using Calc4DotNet.Core;
+﻿using System.Collections.Immutable;
+using Calc4DotNet.Core;
 using Calc4DotNet.Core.Execution;
 using Calc4DotNet.Core.Operators;
 
@@ -6,6 +7,7 @@ namespace Calc4DotNet.Test;
 
 internal sealed record TestCase(string Source,
                                 int ExpectedValue,
+                                ImmutableDictionary<ValueBox<string>, Int32> VariablesAfterExecution,
                                 CompilationResult<Int32> ExpectedWhenOptimized,
                                 CompilationResult<Int32> ExpectedWhenNotOptimized,
                                 Type[]? SkipTypes);

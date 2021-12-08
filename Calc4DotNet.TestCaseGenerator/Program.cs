@@ -99,12 +99,18 @@ static TestCase GenerateTestCase(string source, Type[]? skipTypes)
     CompilationContext context = CompilationContext.Empty;
     List<IToken> tokens = Lexer.Lex(source, ref context);
     IOperator op = Parser.Parse(tokens, ref context);
-    int expectedValue = Evaluator.Evaluate(op, context, new SimpleEvaluationState<int>(new DefaultVariableSource<int>(0)));
+    DefaultVariableSource<int> variables = new(0);
+    int expectedValue = Evaluator.Evaluate(op, context, new SimpleEvaluationState<int>(variables));
 
     CompilationResult<Int32> expectedWhenNotOptimized = new(op, context, LowLevelCodeGenerator.Generate<Int32>(op, context));
 
     Optimizer.Optimize<int>(ref op, ref context, OptimizeTarget.All);
     CompilationResult<Int32> expectedWhenOptimized = new(op, context, LowLevelCodeGenerator.Generate<Int32>(op, context));
 
-    return new TestCase(source, expectedValue, expectedWhenOptimized, expectedWhenNotOptimized, skipTypes);
+    return new TestCase(source,
+                        expectedValue,
+                        variables.ToImmutableDictionary(),
+                        expectedWhenOptimized,
+                        expectedWhenNotOptimized,
+                        skipTypes);
 }
