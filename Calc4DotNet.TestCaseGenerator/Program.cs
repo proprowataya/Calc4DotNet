@@ -104,7 +104,7 @@ static TestCase GenerateTestCase(string source, Type[]? skipTypes)
 
     CompilationResult<Int32> expectedWhenNotOptimized = new(op, context, LowLevelCodeGenerator.Generate<Int32>(op, context));
 
-    Optimizer.Optimize<int>(ref op, ref context, OptimizeTarget.All);
+    Optimizer.Optimize<int>(ref op, ref context, OptimizeTarget.All, new DefaultVariableSource<Int32>(0));
     CompilationResult<Int32> expectedWhenOptimized = new(op, context, LowLevelCodeGenerator.Generate<Int32>(op, context));
 
     return new TestCase(source,

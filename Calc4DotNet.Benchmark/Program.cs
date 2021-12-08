@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using Calc4DotNet.Core;
+using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Execution;
 using Calc4DotNet.Core.Operators;
 using Calc4DotNet.Core.Optimization;
@@ -33,7 +34,7 @@ public class Program
         CompilationContext context = CompilationContext.Empty;
         List<IToken> tokens = Lexer.Lex(Source!, ref context);
         IOperator op = Parser.Parse(tokens, ref context);
-        Optimizer.Optimize<NumberType>(ref op, ref context, OptimizeTarget.All);
+        Optimizer.Optimize<NumberType>(ref op, ref context, OptimizeTarget.All, new DefaultVariableSource<NumberType>((NumberType)0));
         LowLevelModule<NumberType> module = LowLevelCodeGenerator.Generate<NumberType>(op, context);
 
         // Run

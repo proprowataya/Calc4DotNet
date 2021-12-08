@@ -90,19 +90,8 @@ internal sealed class OptimizeTimeEvaluationState<TNumber> : IVariableSource<TNu
     private readonly Dictionary<ValueBox<string>, TNumber> variables;
     private readonly HashSet<string?> knownVariables;
 
-    // Do NOT moify the given 'knownVariables' after construction
-    public OptimizeTimeEvaluationState(HashSet<string?> knownVariables, IEnumerable<string?>? variablesWithDefaultValue, TNumber defaultValue)
-    {
-        // Assert that all variables in 'variablesWithDefaultValue' exist in 'knownVariables'
-        Debug.Assert(variablesWithDefaultValue is null || !variablesWithDefaultValue.Except(knownVariables).Any());
-
-        variablesWithDefaultValue ??= Enumerable.Empty<string>();
-        this.variables = variablesWithDefaultValue.Select(variableName => ValueBox.Create(variableName))
-                                                  .ToDictionary(variableName => variableName, _ => defaultValue);
-        this.knownVariables = knownVariables;
-    }
-
-    private OptimizeTimeEvaluationState(Dictionary<ValueBox<string>, TNumber> variables, HashSet<string?> knownVariables)
+    // Do NOT moify the given parameters after construction
+    public OptimizeTimeEvaluationState(Dictionary<ValueBox<string>, TNumber> variables, HashSet<string?> knownVariables)
     {
         this.variables = variables;
         this.knownVariables = knownVariables;

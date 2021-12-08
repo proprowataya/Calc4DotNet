@@ -17,7 +17,10 @@ public static partial class Optimizer
 {
     private const int MaxPreEvaluationStep = 100;
 
-    public static void Optimize<TNumber>(ref IOperator op, ref CompilationContext context, OptimizeTarget target)
+    public static void Optimize<TNumber>(ref IOperator op,
+                                         ref CompilationContext context,
+                                         OptimizeTarget target,
+                                         IVariableSource<TNumber>? initalVariableValues = null)
         where TNumber : notnull
     {
         if (target == OptimizeTarget.None)
@@ -26,7 +29,7 @@ public static partial class Optimizer
             return;
         }
 
-        HashSet<string?> variables = GatherVariableNames(op, context);
+        HashSet<string?> allVariableNames = GatherVariableNames(op, context);
 
         if (target.HasFlag(OptimizeTarget.UserDefinedOperators))
         {
@@ -35,7 +38,7 @@ public static partial class Optimizer
             {
                 if (!implement.IsOptimized)
                 {
-                    OptimizeUserDefinedOperator<TNumber>(implement, ref context, variables);
+                    OptimizeUserDefinedOperator<TNumber>(implement, ref context, allVariableNames);
                 }
             }
         }
@@ -43,28 +46,45 @@ public static partial class Optimizer
         if (target.HasFlag(OptimizeTarget.MainOperator))
         {
             // Optimize main operator
-            op = OptimizeCore<TNumber>(op, context, variables, inMain: true);
+            op = OptimizeCore<TNumber>(op, context, allVariableNames, initalVariableValues);
         }
     }
 
-    private static void OptimizeUserDefinedOperator<TNumber>(OperatorImplement implement, ref CompilationContext context, HashSet<string?> variables)
+    private static void OptimizeUserDefinedOperator<TNumber>(OperatorImplement implement,
+                                                             ref CompilationContext context,
+                                                             HashSet<string?> allVariableNames)
         where TNumber : notnull
     {
         Debug.Assert(!implement.IsOptimized);
 
         var op = implement.Operator;
         Debug.Assert(op is not null);
-        var newRoot = OptimizeCore<TNumber>(op, context, variables, inMain: false);
+        var newRoot = OptimizeCore<TNumber>(op, context, allVariableNames, initalVariableValues: null);
         context = context.WithAddOrUpdateOperatorImplement(implement with { Operator = newRoot, IsOptimized = true });
     }
 
-    private static IOperator OptimizeCore<TNumber>(IOperator op, CompilationContext context, HashSet<string?> variables, bool inMain)
+    private static IOperator OptimizeCore<TNumber>(IOperator op,
+                                                   CompilationContext context,
+                                                   HashSet<string?> allVariableNames,
+                                                   IVariableSource<TNumber>? initalVariableValues)
         where TNumber : notnull
     {
+        // Create a dictionary given to OptimizeTimeEvaluationState
+        Dictionary<ValueBox<string>, TNumber> dictionary = new();
+
+        if (initalVariableValues is not null)
+        {
+            foreach (var variableName in allVariableNames)
+            {
+                if (initalVariableValues.TryGet(variableName, out var value))
+                {
+                    dictionary[ValueBox.Create(variableName)] = value;
+                }
+            }
+        }
+
         op = op.Accept(new PreComputeVisitor<TNumber>(context, MaxPreEvaluationStep),
-                       new OptimizeTimeEvaluationState<TNumber>(variables,
-                                                                inMain ? variables : null,  // If we are in main operator, all variables have default value. Otherwise, their values are unknown.
-                                                                (TNumber)(dynamic)0));
+                       new OptimizeTimeEvaluationState<TNumber>(dictionary, allVariableNames));
         op = op.Accept(new TailCallVisitor(), /* isTailCall */ true);
         return op;
     }
