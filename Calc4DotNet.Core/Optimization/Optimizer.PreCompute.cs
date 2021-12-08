@@ -104,7 +104,20 @@ public static partial class Optimizer
             // Optimize all operators in the ParenthesisOperator
             for (int i = 0; i < operators.Length; i++)
             {
-                optimized.Add(operators[i].Accept(this, state));
+                IOperator processed = operators[i].Accept(this, state);
+
+                if (processed is ParenthesisOperator parenthesis)
+                {
+                    // Extract contents
+                    foreach (var inner in parenthesis.Operators)
+                    {
+                        optimized.Add(inner);
+                    }
+                }
+                else
+                {
+                    optimized.Add(processed);
+                }
             }
 
             // Eliminate unnecessary PreComputed operators
