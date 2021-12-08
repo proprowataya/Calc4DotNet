@@ -13,6 +13,7 @@ public interface IEvaluationState<TNumber>
 public interface IVariableSource<TNumber>
 {
     TNumber this[string? variableName] { get; set; }
+    bool TryGet(string? variableName, [MaybeNullWhen(false)] out TNumber value);
     IVariableSource<TNumber> Clone();
 }
 
@@ -57,6 +58,12 @@ public sealed class DefaultVariableSource<TNumber> : IVariableSource<TNumber>
     {
         get => variables.TryGetValue(ValueBox.Create(variableName), out var value) ? value : defaultValue;
         set => variables[ValueBox.Create(variableName)] = value;
+    }
+
+    public bool TryGet(string? variableName, [MaybeNullWhen(false)] out TNumber value)
+    {
+        value = this[variableName];
+        return true;
     }
 
     public ImmutableDictionary<ValueBox<string>, TNumber> ToImmutableDictionary()
@@ -126,7 +133,7 @@ internal sealed class OptimizeTimeEvaluationState<TNumber> : IVariableSource<TNu
         }
     }
 
-    public bool TryGetValue(string? variableName, [MaybeNullWhen(false)] out TNumber value)
+    public bool TryGet(string? variableName, [MaybeNullWhen(false)] out TNumber value)
     {
         return variables.TryGetValue(ValueBox.Create(variableName), out value);
     }

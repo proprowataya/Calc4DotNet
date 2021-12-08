@@ -63,7 +63,7 @@ public static partial class Optimizer
             // If this operator writes variables, we keep StoreOperators
             foreach (var variableName in variables.OrderBy(x => x))
             {
-                if (stateAferPreCompuation.TryGetValue(variableName, out var value))
+                if (stateAferPreCompuation.TryGet(variableName, out var value))
                 {
                     operators.Add(new StoreOperator(new PreComputedOperator(value), variableName));
                 }
