@@ -38,8 +38,34 @@ class Program
             Environment.Exit(1);
             return;
         }
+        if (setting.NumberType == typeof(Int32))
+        {
+            ReplCore<Int32>(setting);
+        }
+        else if (setting.NumberType == typeof(Int64))
+        {
+            ReplCore<Int64>(setting);
+        }
+        else if (setting.NumberType == typeof(Double))
+        {
+            ReplCore<Double>(setting);
+        }
+        else if (setting.NumberType == typeof(BigInteger))
+        {
+            ReplCore<BigInteger>(setting);
+        }
+        else
+        {
+            Console.WriteLine($"Error: Type {setting.NumberType} is not supported.");
+            Console.WriteLine();
+        }
+    }
 
+    private static void ReplCore<TNumber>(Setting setting)
+        where TNumber : notnull
+    {
         CompilationContext context = CompilationContext.Empty;
+        var state = new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((dynamic)0));
 
         while (true)
         {
@@ -52,86 +78,58 @@ class Program
 
             Console.WriteLine();
 
-            if (setting.NumberType == typeof(Int32))
+            try
             {
-                ReplCore<Int32>(text, ref context, setting);
-            }
-            else if (setting.NumberType == typeof(Int64))
-            {
-                ReplCore<Int64>(text, ref context, setting);
-            }
-            else if (setting.NumberType == typeof(Double))
-            {
-                ReplCore<Double>(text, ref context, setting);
-            }
-            else if (setting.NumberType == typeof(BigInteger))
-            {
-                ReplCore<BigInteger>(text, ref context, setting);
-            }
-            else
-            {
-                Console.WriteLine($"Error: Type {setting.NumberType} is not supported.");
+                // Create a Stopwatch instance
+                Stopwatch sw = Stopwatch.StartNew();
+
+                // Compile
+                List<IToken> tokens = Lexer.Lex(text, ref context);
+                IOperator op = Parser.Parse(tokens, ref context);
+
+                // Optimize
+                if (setting.Optimize)
+                {
+                    Optimizer.Optimize<TNumber>(ref op, ref context, OptimizeTarget.All, state.Variables);
+                }
+
+                // Generate low-level code and IL module
+                LowLevelModule<TNumber> module = LowLevelCodeGenerator.Generate<TNumber>(op, context);
+
+                // Print detail information of operators and low-level module
+                if (setting.PrintDetailInformation)
+                {
+                    PrintDetailInformation<TNumber>(op, context, module);
+                }
+
+                // Execute
+                TNumber result;
+                if (setting.ExecutorType == ExecutorType.LowLevel)
+                {
+                    result = LowLevelExecutor.Execute((dynamic)module, (dynamic)state);
+                }
+                else if (setting.ExecutorType == ExecutorType.JIT)
+                {
+                    ICompiledModule<TNumber> ilModule = ILCompiler.Compile(module);
+                    result = ilModule.Run();
+                }
+                else
+                {
+                    throw new InvalidOperationException();
+                }
+
+                TimeSpan elapsed = sw.Elapsed;
+
+                // Print
+                Console.WriteLine(result);
+                Console.WriteLine($"Elapsed: {elapsed}");
                 Console.WriteLine();
             }
-        }
-    }
-
-    private static void ReplCore<TNumber>(string text, ref CompilationContext context, Setting setting)
-        where TNumber : notnull
-    {
-        try
-        {
-            // Create a Stopwatch instance
-            Stopwatch sw = Stopwatch.StartNew();
-
-            // Compile
-            List<IToken> tokens = Lexer.Lex(text, ref context);
-            IOperator op = Parser.Parse(tokens, ref context);
-
-            // Optimize
-            if (setting.Optimize)
+            catch (Calc4Exception e)
             {
-                Optimizer.Optimize<TNumber>(ref op, ref context, OptimizeTarget.All);
+                Console.WriteLine($"Error: {e.Message}");
+                Console.WriteLine();
             }
-
-            // Generate low-level code and IL module
-            LowLevelModule<TNumber> module = LowLevelCodeGenerator.Generate<TNumber>(op, context);
-
-            // Print detail information of operators and low-level module
-            if (setting.PrintDetailInformation)
-            {
-                PrintDetailInformation<TNumber>(op, context, module);
-            }
-
-            // Execute
-            var state = new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((dynamic)0));
-            TNumber result;
-
-            if (setting.ExecutorType == ExecutorType.LowLevel)
-            {
-                result = LowLevelExecutor.Execute((dynamic)module, (dynamic)state);
-            }
-            else if (setting.ExecutorType == ExecutorType.JIT)
-            {
-                ICompiledModule<TNumber> ilModule = ILCompiler.Compile(module);
-                result = ilModule.Run();
-            }
-            else
-            {
-                throw new InvalidOperationException();
-            }
-
-            TimeSpan elapsed = sw.Elapsed;
-
-            // Print
-            Console.WriteLine(result);
-            Console.WriteLine($"Elapsed: {elapsed}");
-            Console.WriteLine();
-        }
-        catch (Calc4Exception e)
-        {
-            Console.WriteLine($"Error: {e.Message}");
-            Console.WriteLine();
         }
     }
 
