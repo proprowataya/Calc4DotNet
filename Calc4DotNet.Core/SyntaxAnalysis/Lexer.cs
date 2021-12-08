@@ -60,9 +60,13 @@ public static class Lexer
                 case 'D':
                     return LexDefineToken();
                 case 'L':
-                    return LexLoadToken();
+                    return LexLoadVariableToken();
                 case 'S':
-                    return LexStoreToken();
+                    return LexStoreVariableToken();
+                case 'l':
+                    return LexLoadArrayToken();
+                case 's':
+                    return LexStoreArrayToken();
                 case '0':
                 case '1':
                 case '2':
@@ -114,18 +118,32 @@ public static class Lexer
             return new DefineToken(name, arguments.ToImmutableArray(), tokens.ToImmutableArray(), supplementaryText);
         }
 
-        private LoadToken LexLoadToken()
+        private LoadVariableToken LexLoadVariableToken()
         {
             Debug.Assert(text[Index] == 'L');
             Index++;
-            return new LoadToken(LexSupplementaryText());
+            return new LoadVariableToken(LexSupplementaryText());
         }
 
-        private StoreToken LexStoreToken()
+        private StoreVariableToken LexStoreVariableToken()
         {
             Debug.Assert(text[Index] == 'S');
             Index++;
-            return new StoreToken(LexSupplementaryText());
+            return new StoreVariableToken(LexSupplementaryText());
+        }
+
+        private LoadArrayToken LexLoadArrayToken()
+        {
+            Debug.Assert(text[Index] == 'l');
+            Index++;
+            return new LoadArrayToken(LexSupplementaryText());
+        }
+
+        private StoreArrayToken LexStoreArrayToken()
+        {
+            Debug.Assert(text[Index] == 's');
+            Index++;
+            return new StoreArrayToken(LexSupplementaryText());
         }
 
         private DecimalToken LexDecimalToken()
