@@ -63,10 +63,8 @@ public static class Lexer
                     return LexLoadVariableToken();
                 case 'S':
                     return LexStoreVariableToken();
-                case 'l':
+                case '@':
                     return LexLoadArrayToken();
-                case 's':
-                    return LexStoreArrayToken();
                 case '0':
                 case '1':
                 case '2':
@@ -134,16 +132,9 @@ public static class Lexer
 
         private LoadArrayToken LexLoadArrayToken()
         {
-            Debug.Assert(text[Index] == 'l');
+            Debug.Assert(text[Index] == '@');
             Index++;
             return new LoadArrayToken(LexSupplementaryText());
-        }
-
-        private StoreArrayToken LexStoreArrayToken()
-        {
-            Debug.Assert(text[Index] == 's');
-            Index++;
-            return new StoreArrayToken(LexSupplementaryText());
         }
 
         private DecimalToken LexDecimalToken()
@@ -210,6 +201,9 @@ public static class Lexer
                     case "<=":
                         Index += 2;
                         return new BinaryOperatorToken(BinaryType.LessThanOrEqual, LexSupplementaryText());
+                    case "->":
+                        Index += 2;
+                        return new StoreArrayToken(LexSupplementaryText());
                     default:
                         break;
                 }

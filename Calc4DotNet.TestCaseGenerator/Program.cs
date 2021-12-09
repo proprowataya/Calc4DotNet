@@ -61,14 +61,14 @@ var testCaseInputs = new (string Source, Type[]? SkipTypes)[]
     ("D[fib|n|10S(n<=1?n?((n-1){fib}+(n-2){fib}))S] 20{fib} L", null),
 
     // Array accesses
-    ("0l", null),
-    ("5s0", null),
-    ("(10s20)L[zero]20l", null),
-    ("((4+6)s(10+10))(20l)", null),
-    ("D[func||(10s20)L[zero]20l] {func} (20l)", null),
-    ("D[func||((4+6)s(10+10))(20l)] {func} (20l)", null),
-    ("D[func||(10s20)L[zero]20l] D[get||20l] {func} (20l)", null),
-    ("D[func||((4+6)s(10+10))(20l)] D[get||20l] {func} {get}", null),
+    ("0@", null),
+    ("5->0", null),
+    ("(10->20)L[zero]20@", null),
+    ("((4+6)->(10+10))(20@)", null),
+    ("D[func||(10->20)L[zero]20@] {func} (20@)", null),
+    ("D[func||((4+6)->(10+10))(20@)] {func} (20@)", null),
+    ("D[func||(10->20)L[zero]20@] D[get||20@] {func} (20@)", null),
+    ("D[func||((4+6)->(10+10))(20@)] D[get||20@] {func} {get}", null),
 };
 
 string outputPath = Path.GetFullPath(Path.Join(new[] { Assembly.GetExecutingAssembly().Location, "..", "..", "..", "..", "..", "Calc4DotNet.Test", "TestCases.cs" }));

@@ -9493,7 +9493,7 @@ internal static class TestCases
             SkipTypes: null
         ),
         new TestCase(
-            Source: "0l",
+            Source: "0@",
             ExpectedValue: 0,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -9576,7 +9576,7 @@ internal static class TestCases
             SkipTypes: null
         ),
         new TestCase(
-            Source: "5s0",
+            Source: "5->0",
             ExpectedValue: 5,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -9673,7 +9673,7 @@ internal static class TestCases
             SkipTypes: null
         ),
         new TestCase(
-            Source: "(10s20)L[zero]20l",
+            Source: "(10->20)L[zero]20@",
             ExpectedValue: 10,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -9849,7 +9849,7 @@ internal static class TestCases
             SkipTypes: null
         ),
         new TestCase(
-            Source: "((4+6)s(10+10))(20l)",
+            Source: "((4+6)->(10+10))(20@)",
             ExpectedValue: 10,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -10036,7 +10036,7 @@ internal static class TestCases
             SkipTypes: null
         ),
         new TestCase(
-            Source: "D[func||(10s20)L[zero]20l] {func} (20l)",
+            Source: "D[func||(10->20)L[zero]20@] {func} (20@)",
             ExpectedValue: 10,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -10050,7 +10050,7 @@ internal static class TestCases
                         Operators: new IOperator[]
                         {
                             new DefineOperator(
-                                SupplementaryText: "func||(10s20)L[zero]20l"
+                                SupplementaryText: "func||(10->20)L[zero]20@"
                             ),
                             new UserDefinedOperator(
                                 Definition: new OperatorDefinition(Name: "func", NumOperands: 0),
@@ -10302,7 +10302,7 @@ internal static class TestCases
             SkipTypes: null
         ),
         new TestCase(
-            Source: "D[func||((4+6)s(10+10))(20l)] {func} (20l)",
+            Source: "D[func||((4+6)->(10+10))(20@)] {func} (20@)",
             ExpectedValue: 10,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -10316,7 +10316,7 @@ internal static class TestCases
                         Operators: new IOperator[]
                         {
                             new DefineOperator(
-                                SupplementaryText: "func||((4+6)s(10+10))(20l)"
+                                SupplementaryText: "func||((4+6)->(10+10))(20@)"
                             ),
                             new UserDefinedOperator(
                                 Definition: new OperatorDefinition(Name: "func", NumOperands: 0),
@@ -10578,7 +10578,7 @@ internal static class TestCases
             SkipTypes: null
         ),
         new TestCase(
-            Source: "D[func||(10s20)L[zero]20l] D[get||20l] {func} (20l)",
+            Source: "D[func||(10->20)L[zero]20@] D[get||20@] {func} (20@)",
             ExpectedValue: 10,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -10592,10 +10592,10 @@ internal static class TestCases
                         Operators: new IOperator[]
                         {
                             new DefineOperator(
-                                SupplementaryText: "func||(10s20)L[zero]20l"
+                                SupplementaryText: "func||(10->20)L[zero]20@"
                             ),
                             new DefineOperator(
-                                SupplementaryText: "get||20l"
+                                SupplementaryText: "get||20@"
                             ),
                             new UserDefinedOperator(
                                 Definition: new OperatorDefinition(Name: "func", NumOperands: 0),
@@ -10901,7 +10901,7 @@ internal static class TestCases
             SkipTypes: null
         ),
         new TestCase(
-            Source: "D[func||((4+6)s(10+10))(20l)] D[get||20l] {func} {get}",
+            Source: "D[func||((4+6)->(10+10))(20@)] D[get||20@] {func} {get}",
             ExpectedValue: 10,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -10915,10 +10915,10 @@ internal static class TestCases
                         Operators: new IOperator[]
                         {
                             new DefineOperator(
-                                SupplementaryText: "func||((4+6)s(10+10))(20l)"
+                                SupplementaryText: "func||((4+6)->(10+10))(20@)"
                             ),
                             new DefineOperator(
-                                SupplementaryText: "get||20l"
+                                SupplementaryText: "get||20@"
                             ),
                             new UserDefinedOperator(
                                 Definition: new OperatorDefinition(Name: "func", NumOperands: 0),
