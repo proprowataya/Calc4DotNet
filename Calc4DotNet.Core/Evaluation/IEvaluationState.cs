@@ -7,6 +7,7 @@ namespace Calc4DotNet.Core.Evaluation;
 public interface IEvaluationState<TNumber>
 {
     IVariableSource<TNumber> Variables { get; }
+    IGlobalArraySource<TNumber> GlobalArray { get; }
     IEvaluationState<TNumber> Clone();
 }
 
@@ -20,15 +21,17 @@ public interface IVariableSource<TNumber>
 public sealed class SimpleEvaluationState<TNumber> : IEvaluationState<TNumber>
 {
     public IVariableSource<TNumber> Variables { get; }
+    public IGlobalArraySource<TNumber> GlobalArray { get; }
 
-    public SimpleEvaluationState(IVariableSource<TNumber> variables)
+    public SimpleEvaluationState(IVariableSource<TNumber> variables, IGlobalArraySource<TNumber> globalArray)
     {
         Variables = variables;
+        GlobalArray = globalArray;
     }
 
     public SimpleEvaluationState<TNumber> Clone()
     {
-        return new SimpleEvaluationState<TNumber>(Variables.Clone());
+        return new SimpleEvaluationState<TNumber>(Variables.Clone(), GlobalArray.Clone());
     }
 
     IEvaluationState<TNumber> IEvaluationState<TNumber>.Clone()

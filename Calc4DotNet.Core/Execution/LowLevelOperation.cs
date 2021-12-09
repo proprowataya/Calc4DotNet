@@ -39,7 +39,7 @@ public readonly struct LowLevelOperation : IEquatable<LowLevelOperation>
 
 public enum Opcode : byte
 {
-    Push, Pop, LoadConst, LoadConstTable, LoadArg, StoreArg, LoadVariable, StoreVariable, Input,
+    Push, Pop, LoadConst, LoadConstTable, LoadArg, StoreArg, LoadVariable, StoreVariable, LoadArrayElement, StoreArrayElement, Input,
     Add, Sub, Mult, Div, Mod,
     Goto, GotoIfTrue, GotoIfEqual, GotoIfLessThan, GotoIfLessThanOrEqual,
     Call, Return, Halt,

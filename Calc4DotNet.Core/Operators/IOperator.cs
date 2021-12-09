@@ -67,7 +67,6 @@ public sealed record LoadVariableOperator(string? SupplementaryText = null) : IO
 
 public sealed record LoadArrayOperator(IOperator Index, string? SupplementaryText = null) : IOperator
 {
-    public string? VariableName => SupplementaryText;
     public IOperator[] GetOperands() => new[] { Index };
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
@@ -130,7 +129,6 @@ public sealed record StoreVariableOperator(IOperator Operand, string? Supplement
 
 public sealed record StoreArrayOperator(IOperator Value, IOperator Index, string? SupplementaryText = null) : IOperator
 {
-    public string? VariableName => SupplementaryText;
     public IOperator[] GetOperands() => new[] { Value, Index };
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);

@@ -65,7 +65,8 @@ class Program
         where TNumber : notnull
     {
         CompilationContext context = CompilationContext.Empty;
-        var state = new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((dynamic)0));
+        var array = new Calc4GlobalArraySource<TNumber>();
+        var state = new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((dynamic)0), array);
 
         while (true)
         {
@@ -111,7 +112,7 @@ class Program
                 else if (setting.ExecutorType == ExecutorType.JIT)
                 {
                     ICompiledModule<TNumber> ilModule = ILCompiler.Compile(module);
-                    result = ilModule.Run();
+                    result = ilModule.Run(array);
                 }
                 else
                 {

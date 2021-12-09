@@ -2,5 +2,5 @@
 
 public interface ICompiledModule<TNumber>
 {
-    TNumber Run();
+    TNumber Run(Calc4GlobalArraySource<TNumber> array);
 }

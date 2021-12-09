@@ -95,7 +95,9 @@ public static class Evaluator
 
         public TNumber Visit(LoadArrayOperator op, TNumber[]? arguments)
         {
-            throw new NotImplementedException();
+            TNumberComputer c = default;
+            TNumber index = op.Index.Accept(this, arguments);
+            return evaluationState.GlobalArray[c.ToInt(index)];
         }
 
         public TNumber Visit(ParenthesisOperator op, TNumber[]? arguments)
@@ -127,7 +129,10 @@ public static class Evaluator
 
         public TNumber Visit(StoreArrayOperator op, TNumber[]? arguments)
         {
-            throw new NotImplementedException();
+            TNumberComputer c = default;
+            TNumber value = op.Value.Accept(this, arguments);
+            TNumber index = op.Index.Accept(this, arguments);
+            return evaluationState.GlobalArray[c.ToInt(index)] = value;
         }
 
         public TNumber Visit(BinaryOperator op, TNumber[]? arguments)

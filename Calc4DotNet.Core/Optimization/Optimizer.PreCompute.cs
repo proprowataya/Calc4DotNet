@@ -38,7 +38,8 @@ public static partial class Optimizer
             {
                 preComputedValue = Evaluator.Evaluate<TNumber>(op,
                                                                compilationContext,
-                                                               new SimpleEvaluationState<TNumber>(stateAferPreCompuation),
+                                                               new SimpleEvaluationState<TNumber>(stateAferPreCompuation,
+                                                                                                  AlwaysThrowGlobalArraySource<TNumber>.Instance),
                                                                maxStep);
             }
             catch (EvaluationStepLimitExceedException)
@@ -48,6 +49,11 @@ public static partial class Optimizer
                 return op;
             }
             catch (VariableNotSetException)
+            {
+                UnsetAllVariables();
+                return op;
+            }
+            catch (ArrayElementNotSetException)
             {
                 UnsetAllVariables();
                 return op;
@@ -98,7 +104,9 @@ public static partial class Optimizer
 
         public IOperator Visit(LoadArrayOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
-            throw new NotImplementedException();
+            var index = op.Index.Accept(this, state);
+            var newOp = op with { Index = index };
+            return PreComputeIfPossible(newOp, state);
         }
 
         public IOperator Visit(ParenthesisOperator op, OptimizeTimeEvaluationState<TNumber> state)
@@ -180,7 +188,11 @@ public static partial class Optimizer
 
         public IOperator Visit(StoreArrayOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
-            throw new NotImplementedException();
+            var value = op.Value.Accept(this, state);
+            var index = op.Index.Accept(this, state);
+
+            // Do NOT make PreComputedOperator for StoreArrayOperator because it mistakenly eliminates store operation
+            return op with { Value = value, Index = index };
         }
 
         public IOperator Visit(BinaryOperator op, OptimizeTimeEvaluationState<TNumber> state)

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -36,7 +35,7 @@ public static class ILCompiler
             = typeBuilder.DefineMethod(nameof(ICompiledModule<TNumber>.Run),
                                        MethodAttributes.Public | MethodAttributes.Virtual,
                                        typeof(TNumber),
-                                       Type.EmptyTypes);
+                                       new[] { typeof(Calc4GlobalArraySource<TNumber>) });
         typeBuilder.DefineMethodOverride(runMethod,
                                          typeof(ICompiledModule<TNumber>).GetMethod(nameof(ICompiledModule<TNumber>.Run))!);
 
@@ -49,7 +48,7 @@ public static class ILCompiler
                 = typeBuilder.DefineMethod(op.Definition.Name,
                                            MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig,
                                            typeof(TNumber),
-                                           Enumerable.Repeat(typeof(TNumber), op.Definition.NumOperands).ToArray());
+                                           Enumerable.Repeat(typeof(TNumber), op.Definition.NumOperands).Append(typeof(Calc4GlobalArraySource<TNumber>)).ToArray());
             methods[i] = (methodBuilder, op.Definition.NumOperands);
         }
 
@@ -62,16 +61,16 @@ public static class ILCompiler
         where TNumber : notnull
     {
         // Emit Main(Run) operator
-        EmitILCore(module, module.EntryPoint, fieldBuilders, runMethod, 0, methods);
+        EmitILCore(module, module.EntryPoint, fieldBuilders, runMethod, 0, methods, isMain: true);
 
         // Emit user-defined operators
         for (int i = 0; i < module.UserDefinedOperators.Length; i++)
         {
-            EmitILCore(module, module.UserDefinedOperators[i].Operations, fieldBuilders, methods[i].Method, methods[i].NumOperands, methods);
+            EmitILCore(module, module.UserDefinedOperators[i].Operations, fieldBuilders, methods[i].Method, methods[i].NumOperands, methods, isMain: false);
         }
     }
 
-    private static void EmitILCore<TNumber>(LowLevelModule<TNumber> module, ImmutableArray<LowLevelOperation> operations, FieldBuilder[] fieldBuilders, MethodBuilder method, int numOperands, (MethodBuilder Method, int NumOperands)[] methods)
+    private static void EmitILCore<TNumber>(LowLevelModule<TNumber> module, ImmutableArray<LowLevelOperation> operations, FieldBuilder[] fieldBuilders, MethodBuilder method, int numOperands, (MethodBuilder Method, int NumOperands)[] methods, bool isMain)
         where TNumber : notnull
     {
         /* Local method */
@@ -79,7 +78,9 @@ public static class ILCompiler
 
         ILGenerator il = method.GetILGenerator();
         Dictionary<int, Label> labels = new Dictionary<int, Label>();
-        LocalBuilder? temp = null;
+        LocalBuilder? temp = null, value = null, index = null;
+        int arraySourceIndex = numOperands + (isMain ? 1 : 0);
+
         for (int i = 0; i < operations.Length; i++)
         {
             labels[i] = il.DefineLabel();
@@ -116,6 +117,29 @@ public static class ILCompiler
                 case Opcode.StoreVariable:
                     il.Emit(OpCodes.Dup);
                     il.Emit(OpCodes.Stsfld, fieldBuilders[op.Value]);
+                    break;
+                case Opcode.LoadArrayElement:
+                    index ??= il.DeclareLocal(typeof(int));
+                    il.EmitConvToInt32<TNumber>();
+                    il.Emit(OpCodes.Stloc_S, index.LocalIndex);
+
+                    il.Emit(OpCodes.Ldarg_S, arraySourceIndex);
+                    il.Emit(OpCodes.Ldloc_S, index.LocalIndex);
+                    il.Emit(OpCodes.Call, typeof(Calc4GlobalArraySource<TNumber>).GetMethod("get_Item", new[] { typeof(int) })!);
+                    break;
+                case Opcode.StoreArrayElement:
+                    value ??= il.DeclareLocal(typeof(TNumber));
+                    index ??= il.DeclareLocal(typeof(int));
+
+                    il.EmitConvToInt32<TNumber>();
+                    il.Emit(OpCodes.Stloc_S, index.LocalIndex);
+                    il.Emit(OpCodes.Stloc_S, value.LocalIndex);
+
+                    il.Emit(OpCodes.Ldarg_S, arraySourceIndex);
+                    il.Emit(OpCodes.Ldloc_S, index.LocalIndex);
+                    il.Emit(OpCodes.Ldloc_S, value.LocalIndex);
+                    il.Emit(OpCodes.Call, typeof(Calc4GlobalArraySource<TNumber>).GetMethod("set_Item", new[] { typeof(int), typeof(TNumber) })!);
+                    il.Emit(OpCodes.Ldloc_S, value.LocalIndex);
                     break;
                 case Opcode.Input:
                     throw new NotImplementedException();
@@ -176,10 +200,9 @@ public static class ILCompiler
                     if (typeof(TNumber) == typeof(BigInteger))
                     {
                         temp ??= il.DeclareLocal(typeof(TNumber));
-                        Debug.Assert(temp.LocalIndex == 0); // Temp variable must be first variable in this method.
 
-                        il.Emit(OpCodes.Stloc_0);
-                        il.Emit(OpCodes.Ldloca_S, 0);
+                        il.Emit(OpCodes.Stloc_S, temp.LocalIndex);
+                        il.Emit(OpCodes.Ldloca_S, temp.LocalIndex);
                         il.Emit(OpCodes.Call, typeof(BigInteger).GetProperty(nameof(BigInteger.IsZero))!.GetMethod!);
                         il.Emit(OpCodes.Brfalse, labels[op.Value + 1]);
                     }
@@ -222,6 +245,7 @@ public static class ILCompiler
                     }
                     break;
                 case Opcode.Call:
+                    il.Emit(OpCodes.Ldarg_S, arraySourceIndex);
                     il.Emit(OpCodes.Call, methods[op.Value].Method);
                     break;
                 case Opcode.Return:
