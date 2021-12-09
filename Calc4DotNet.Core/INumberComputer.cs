@@ -11,6 +11,7 @@ internal interface INumberComputer<T>
     T Ten { get; }
 
     T FromInt(int value);
+    int ToInt(T value);
 
     T Negate(T value);
     T Add(T a, T b);
@@ -36,6 +37,9 @@ internal readonly struct Int32Computer : INumberComputer<Int32>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Int32 FromInt(int value) => (Int32)value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int ToInt(Int32 value) => (int)value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Int32 Negate(Int32 value) => -value;
@@ -85,6 +89,9 @@ internal readonly struct Int64Computer : INumberComputer<Int64>
     public Int64 FromInt(int value) => (Int64)value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int ToInt(Int64 value) => (int)value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Int64 Negate(Int64 value) => -value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -132,6 +139,9 @@ internal readonly struct DoubleComputer : INumberComputer<Double>
     public Double FromInt(int value) => (Double)value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int ToInt(Double value) => (int)value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Double Negate(Double value) => -value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -177,6 +187,9 @@ internal readonly struct BigIntegerComputer : INumberComputer<BigInteger>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BigInteger FromInt(int value) => (BigInteger)value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int ToInt(BigInteger value) => (int)value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BigInteger Negate(BigInteger value) => -value;

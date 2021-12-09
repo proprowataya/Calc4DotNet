@@ -38,7 +38,8 @@ public class Program
         LowLevelModule<NumberType> module = LowLevelCodeGenerator.Generate<NumberType>(op, context);
 
         // Run
-        var state = new SimpleEvaluationState<NumberType>(new DefaultVariableSource<NumberType>((NumberType)0));
+        var state = new SimpleEvaluationState<NumberType>(new DefaultVariableSource<NumberType>((NumberType)0),
+                                                          new Calc4GlobalArraySource<NumberType>());
         LowLevelExecutor.Execute(module, state);
     }
 }

@@ -19,7 +19,7 @@ public sealed record DefineToken(string Name, ImmutableArray<string> Arguments, 
     public int NumOperands => 0;
 }
 
-public sealed record LoadToken(string? SupplementaryText = null) : IToken
+public sealed record LoadVariableToken(string? SupplementaryText = null) : IToken
 {
     public string? VariableName => SupplementaryText;
     public int NumOperands => 0;
@@ -35,13 +35,23 @@ public sealed record DecimalToken(int Value, string? SupplementaryText = null) :
     public int NumOperands => 1;
 }
 
-public sealed record StoreToken(string? SupplementaryText = null) : IToken
+public sealed record StoreVariableToken(string? SupplementaryText = null) : IToken
 {
     public string? VariableName => SupplementaryText;
     public int NumOperands => 1;
 }
 
+public sealed record LoadArrayToken(string? SupplementaryText = null) : IToken
+{
+    public int NumOperands => 1;
+}
+
 public sealed record BinaryOperatorToken(BinaryType Type, string? SupplementaryText = null) : IToken
+{
+    public int NumOperands => 2;
+}
+
+public sealed record StoreArrayToken(string? SupplementaryText = null) : IToken
 {
     public int NumOperands => 2;
 }

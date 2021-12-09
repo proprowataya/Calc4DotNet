@@ -59,6 +59,16 @@ var testCaseInputs = new (string Source, Type[]? SkipTypes)[]
     ("D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] D[fib2||L{fib}] D[set|x|xS] 3S {fib2}", null),
     ("D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] D[fib2||L{fib}] D[set|x|xS] 20S {fib2}", null),
     ("D[fib|n|10S(n<=1?n?((n-1){fib}+(n-2){fib}))S] 20{fib} L", null),
+
+    // Array accesses
+    ("0@", null),
+    ("5->0", null),
+    ("(10->20)L[zero]20@", null),
+    ("((4+6)->(10+10))(20@)", null),
+    ("D[func||(10->20)L[zero]20@] {func} (20@)", null),
+    ("D[func||((4+6)->(10+10))(20@)] {func} (20@)", null),
+    ("D[func||(10->20)L[zero]20@] D[get||20@] {func} (20@)", null),
+    ("D[func||((4+6)->(10+10))(20@)] D[get||20@] {func} {get}", null),
 };
 
 string outputPath = Path.GetFullPath(Path.Join(new[] { Assembly.GetExecutingAssembly().Location, "..", "..", "..", "..", "..", "Calc4DotNet.Test", "TestCases.cs" }));
@@ -101,7 +111,7 @@ static TestCase GenerateTestCase(string source, Type[]? skipTypes)
     List<IToken> tokens = Lexer.Lex(source, ref context);
     IOperator op = Parser.Parse(tokens, ref context);
     DefaultVariableSource<int> variables = new(0);
-    int expectedValue = Evaluator.Evaluate(op, context, new SimpleEvaluationState<int>(variables));
+    int expectedValue = Evaluator.Evaluate(op, context, new SimpleEvaluationState<int>(variables, new Calc4GlobalArraySource<Int32>()));
 
     CompilationResult<Int32> expectedWhenNotOptimized = new(op, context, LowLevelCodeGenerator.Generate<Int32>(op, context));
 

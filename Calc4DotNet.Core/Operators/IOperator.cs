@@ -54,10 +54,20 @@ public sealed record DefineOperator(string? SupplementaryText = null) : IOperato
     public override string ToString() => this.ToStringImplement();
 }
 
-public sealed record LoadOperator(string? SupplementaryText = null) : IOperator
+public sealed record LoadVariableOperator(string? SupplementaryText = null) : IOperator
 {
     public string? VariableName => SupplementaryText;
     public IOperator[] GetOperands() => Array.Empty<IOperator>();
+
+    public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+    public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+    public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+    public override string ToString() => this.ToStringImplement();
+}
+
+public sealed record LoadArrayOperator(IOperator Index, string? SupplementaryText = null) : IOperator
+{
+    public IOperator[] GetOperands() => new[] { Index };
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
@@ -106,10 +116,20 @@ public sealed record DecimalOperator(IOperator Operand, int Value, string? Suppl
     public override string ToString() => this.ToStringImplement();
 }
 
-public sealed record StoreOperator(IOperator Operand, string? SupplementaryText = null) : IOperator
+public sealed record StoreVariableOperator(IOperator Operand, string? SupplementaryText = null) : IOperator
 {
     public string? VariableName => SupplementaryText;
     public IOperator[] GetOperands() => new[] { Operand };
+
+    public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+    public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+    public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+    public override string ToString() => this.ToStringImplement();
+}
+
+public sealed record StoreArrayOperator(IOperator Value, IOperator Index, string? SupplementaryText = null) : IOperator
+{
+    public IOperator[] GetOperands() => new[] { Value, Index };
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);

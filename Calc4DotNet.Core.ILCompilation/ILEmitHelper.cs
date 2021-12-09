@@ -122,4 +122,28 @@ internal static class ILEmitHelper
                 break;
         }
     }
+
+    public static void EmitConvToInt32<TFrom>(this ILGenerator il)
+    {
+        if (typeof(TFrom) == typeof(Int32))
+        {
+            // Do nothing 
+        }
+        else if (typeof(TFrom) == typeof(Int64))
+        {
+            il.Emit(OpCodes.Conv_I4);
+        }
+        else if (typeof(TFrom) == typeof(Double))
+        {
+            il.Emit(OpCodes.Conv_I4);
+        }
+        else if (typeof(TFrom) == typeof(BigInteger))
+        {
+            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethods().Single(m => m.Name == "op_Explicit" && m.ReturnType == typeof(int)));
+        }
+        else
+        {
+            throw new InvalidOperationException();
+        }
+    }
 }

@@ -60,9 +60,11 @@ public static class Lexer
                 case 'D':
                     return LexDefineToken();
                 case 'L':
-                    return LexLoadToken();
+                    return LexLoadVariableToken();
                 case 'S':
-                    return LexStoreToken();
+                    return LexStoreVariableToken();
+                case '@':
+                    return LexLoadArrayToken();
                 case '0':
                 case '1':
                 case '2':
@@ -114,18 +116,25 @@ public static class Lexer
             return new DefineToken(name, arguments.ToImmutableArray(), tokens.ToImmutableArray(), supplementaryText);
         }
 
-        private LoadToken LexLoadToken()
+        private LoadVariableToken LexLoadVariableToken()
         {
             Debug.Assert(text[Index] == 'L');
             Index++;
-            return new LoadToken(LexSupplementaryText());
+            return new LoadVariableToken(LexSupplementaryText());
         }
 
-        private StoreToken LexStoreToken()
+        private StoreVariableToken LexStoreVariableToken()
         {
             Debug.Assert(text[Index] == 'S');
             Index++;
-            return new StoreToken(LexSupplementaryText());
+            return new StoreVariableToken(LexSupplementaryText());
+        }
+
+        private LoadArrayToken LexLoadArrayToken()
+        {
+            Debug.Assert(text[Index] == '@');
+            Index++;
+            return new LoadArrayToken(LexSupplementaryText());
         }
 
         private DecimalToken LexDecimalToken()
@@ -192,6 +201,9 @@ public static class Lexer
                     case "<=":
                         Index += 2;
                         return new BinaryOperatorToken(BinaryType.LessThanOrEqual, LexSupplementaryText());
+                    case "->":
+                        Index += 2;
+                        return new StoreArrayToken(LexSupplementaryText());
                     default:
                         break;
                 }

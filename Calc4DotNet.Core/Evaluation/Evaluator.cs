@@ -90,8 +90,15 @@ public static class Evaluator
         public TNumber Visit(DefineOperator op, TNumber[]? arguments)
             => default(TNumberComputer).Zero;
 
-        public TNumber Visit(LoadOperator op, TNumber[]? arguments)
+        public TNumber Visit(LoadVariableOperator op, TNumber[]? arguments)
             => evaluationState.Variables[op.VariableName];
+
+        public TNumber Visit(LoadArrayOperator op, TNumber[]? arguments)
+        {
+            TNumberComputer c = default;
+            TNumber index = op.Index.Accept(this, arguments);
+            return evaluationState.GlobalArray[c.ToInt(index)];
+        }
 
         public TNumber Visit(ParenthesisOperator op, TNumber[]? arguments)
         {
@@ -113,11 +120,19 @@ public static class Evaluator
             return c.Add(c.Multiply(operand, c.Ten), c.FromInt(op.Value));
         }
 
-        public TNumber Visit(StoreOperator op, TNumber[]? arguments)
+        public TNumber Visit(StoreVariableOperator op, TNumber[]? arguments)
         {
             TNumber value = op.Operand.Accept(this, arguments);
             evaluationState.Variables[op.VariableName] = value;
             return value;
+        }
+
+        public TNumber Visit(StoreArrayOperator op, TNumber[]? arguments)
+        {
+            TNumberComputer c = default;
+            TNumber value = op.Value.Accept(this, arguments);
+            TNumber index = op.Index.Accept(this, arguments);
+            return evaluationState.GlobalArray[c.ToInt(index)] = value;
         }
 
         public TNumber Visit(BinaryOperator op, TNumber[]? arguments)

@@ -118,7 +118,7 @@ public class ExecutionTest
             {
                 ExecutorType.Tree => Evaluator.Evaluate<TNumber>(op, context, CreateEvaluationState<TNumber>()),
                 ExecutorType.LowLevel => LowLevelExecutor.Execute((dynamic)module, (dynamic)CreateEvaluationState<TNumber>()),
-                ExecutorType.Jit => ILCompiler.Compile(module).Run(),
+                ExecutorType.Jit => ILCompiler.Compile(module).Run(new Calc4GlobalArraySource<TNumber>()),
                 _ => throw new InvalidOperationException(),
             };
 
@@ -162,6 +162,7 @@ public class ExecutionTest
 
     private static IEvaluationState<TNumber> CreateEvaluationState<TNumber>(TNumber? dummy = default)
     {
-        return new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((dynamic)0));
+        return new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((dynamic)0),
+                                                  new Calc4GlobalArraySource<TNumber>());
     }
 }

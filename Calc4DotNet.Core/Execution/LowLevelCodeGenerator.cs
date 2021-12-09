@@ -178,6 +178,7 @@ public static class LowLevelCodeGenerator
                     break;
                 case Opcode.Pop:
                 case Opcode.StoreArg:
+                case Opcode.StoreArrayElement:
                 case Opcode.Add:
                 case Opcode.Sub:
                 case Opcode.Mult:
@@ -189,6 +190,7 @@ public static class LowLevelCodeGenerator
                     StackSize--;
                     break;
                 case Opcode.StoreVariable:
+                case Opcode.LoadArrayElement:
                 case Opcode.Goto:
                     // Stacksize will not change
                     break;
@@ -258,9 +260,15 @@ public static class LowLevelCodeGenerator
             AddOperation(new LowLevelOperation(Opcode.LoadConst, 0));
         }
 
-        public void Visit(LoadOperator op)
+        public void Visit(LoadVariableOperator op)
         {
             AddOperation(new LowLevelOperation(Opcode.LoadVariable, GetOrCreateVariableIndex(op.VariableName)));
+        }
+
+        public void Visit(LoadArrayOperator op)
+        {
+            op.Index.Accept(this);
+            AddOperation(new LowLevelOperation(Opcode.LoadArrayElement));
         }
 
         public void Visit(ParenthesisOperator op)
@@ -283,10 +291,17 @@ public static class LowLevelCodeGenerator
             AddOperation(new LowLevelOperation(Opcode.Add));
         }
 
-        public void Visit(StoreOperator op)
+        public void Visit(StoreVariableOperator op)
         {
             op.Operand.Accept(this);
             AddOperation(new LowLevelOperation(Opcode.StoreVariable, GetOrCreateVariableIndex(op.VariableName)));
+        }
+
+        public void Visit(StoreArrayOperator op)
+        {
+            op.Value.Accept(this);
+            op.Index.Accept(this);
+            AddOperation(new LowLevelOperation(Opcode.StoreArrayElement));
         }
 
         public void Visit(BinaryOperator op)

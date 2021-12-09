@@ -19,7 +19,7 @@ public class EqualityTest
                             0),
                         BinaryType.Sub,
                         "dummy"),
-                    new StoreOperator(
+                    new StoreVariableOperator(
                         new ZeroOperator(),
                         "var")));
 
@@ -33,7 +33,7 @@ public class EqualityTest
                             0),
                         BinaryType.Sub,
                         "dummy"),
-                    new StoreOperator(
+                    new StoreVariableOperator(
                         new ZeroOperator(),
                         "var")));
 
@@ -56,7 +56,7 @@ public class EqualityTest
                 new OperatorDefinition("testfunc", 1),  // Difference
                 ImmutableArray.Create<IOperator>(
                     new ZeroOperator(),
-                    new LoadOperator("var")),
+                    new LoadVariableOperator("var")),
                 true,
                 "testfunc");
 
@@ -65,7 +65,7 @@ public class EqualityTest
                 new OperatorDefinition("testfunc", 2),  // Difference
                 ImmutableArray.Create<IOperator>(
                     new ZeroOperator(),
-                    new LoadOperator("var")),
+                    new LoadVariableOperator("var")),
                 true,
                 "testfunc");
 

@@ -41,7 +41,12 @@ public static class LowLevelExecutor
             variables[i] = state.Variables[module.Variables[i]];
         }
 
-        TNumber result = ExecuteCoreCore<TNumber, TNumberComputer>(module, variables);
+        if (state.GlobalArray is not Calc4GlobalArraySource<TNumber> array)
+        {
+            throw new InvalidOperationException($"LowLevelExecutor only supports {nameof(Calc4GlobalArraySource<TNumber>)}, but {state.GlobalArray.GetType()} was given.");
+        }
+
+        TNumber result = ExecuteCoreCore<TNumber, TNumberComputer>(module, variables, array);
 
         // Store variable's values to IEvaluationState
         for (int i = 0; i < variables.Length; i++)
@@ -52,7 +57,7 @@ public static class LowLevelExecutor
         return result;
     }
 
-    private static TNumber ExecuteCoreCore<TNumber, TNumberComputer>(LowLevelModule<TNumber> module, TNumber[] variables)
+    private static TNumber ExecuteCoreCore<TNumber, TNumberComputer>(LowLevelModule<TNumber> module, TNumber[] variables, Calc4GlobalArraySource<TNumber> array)
         where TNumber : notnull
         where TNumberComputer : struct, INumberComputer<TNumber>
     {
@@ -121,6 +126,16 @@ public static class LowLevelExecutor
                     VerifyRange(stack, ref Unsafe.Add(ref top, -1));
                     VerifyRange(variables, ref Unsafe.Add(ref firstVariable, op.Value));
                     Unsafe.Add(ref firstVariable, op.Value) = Unsafe.Add(ref top, -1);
+                    break;
+                case Opcode.LoadArrayElement:
+                    VerifyRange(stack, ref Unsafe.Add(ref top, -1));
+                    Unsafe.Add(ref top, -1) = array[c.ToInt(Unsafe.Add(ref top, -1))];
+                    break;
+                case Opcode.StoreArrayElement:
+                    top = ref Unsafe.Add(ref top, -1);
+                    VerifyRange(stack, ref top);
+                    VerifyRange(stack, ref Unsafe.Add(ref top, -1));
+                    array[c.ToInt(top)] = Unsafe.Add(ref top, -1);
                     break;
                 case Opcode.Input:
                     throw new NotImplementedException();

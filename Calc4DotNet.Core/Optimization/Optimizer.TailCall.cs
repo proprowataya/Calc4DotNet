@@ -27,9 +27,15 @@ public static partial class Optimizer
             return op;
         }
 
-        public IOperator Visit(LoadOperator op, bool isTailCall)
+        public IOperator Visit(LoadVariableOperator op, bool isTailCall)
         {
             return op;
+        }
+
+        public IOperator Visit(LoadArrayOperator op, bool isTailCall)
+        {
+            var index = op.Index.Accept(this, isTailCall);
+            return op with { Index = index };
         }
 
         public IOperator Visit(ParenthesisOperator op, bool isTailCall)
@@ -50,9 +56,16 @@ public static partial class Optimizer
             return op with { Operand = op.Operand.Accept(this, false) };
         }
 
-        public IOperator Visit(StoreOperator op, bool isTailCall)
+        public IOperator Visit(StoreVariableOperator op, bool isTailCall)
         {
             return op with { Operand = op.Operand.Accept(this, true) };
+        }
+
+        public IOperator Visit(StoreArrayOperator op, bool isTailCall)
+        {
+            var value = op.Value.Accept(this, isTailCall);
+            var index = op.Index.Accept(this, isTailCall);
+            return op with { Value = value, Index = index };
         }
 
         public IOperator Visit(BinaryOperator op, bool isTailCall)

@@ -38,7 +38,8 @@ public static partial class Optimizer
             {
                 preComputedValue = Evaluator.Evaluate<TNumber>(op,
                                                                compilationContext,
-                                                               new SimpleEvaluationState<TNumber>(stateAferPreCompuation),
+                                                               new SimpleEvaluationState<TNumber>(stateAferPreCompuation,
+                                                                                                  AlwaysThrowGlobalArraySource<TNumber>.Instance),
                                                                maxStep);
             }
             catch (EvaluationStepLimitExceedException)
@@ -48,6 +49,11 @@ public static partial class Optimizer
                 return op;
             }
             catch (VariableNotSetException)
+            {
+                UnsetAllVariables();
+                return op;
+            }
+            catch (ArrayElementNotSetException)
             {
                 UnsetAllVariables();
                 return op;
@@ -65,7 +71,7 @@ public static partial class Optimizer
             {
                 if (stateAferPreCompuation.TryGet(variableName, out var value))
                 {
-                    operators.Add(new StoreOperator(new PreComputedOperator(value), variableName));
+                    operators.Add(new StoreVariableOperator(new PreComputedOperator(value), variableName));
                 }
                 else
                 {
@@ -94,7 +100,14 @@ public static partial class Optimizer
 
         public IOperator Visit(DefineOperator op, OptimizeTimeEvaluationState<TNumber> state) => PreComputeIfPossible(op, state);
 
-        public IOperator Visit(LoadOperator op, OptimizeTimeEvaluationState<TNumber> state) => PreComputeIfPossible(op, state);
+        public IOperator Visit(LoadVariableOperator op, OptimizeTimeEvaluationState<TNumber> state) => PreComputeIfPossible(op, state);
+
+        public IOperator Visit(LoadArrayOperator op, OptimizeTimeEvaluationState<TNumber> state)
+        {
+            var index = op.Index.Accept(this, state);
+            var newOp = op with { Index = index };
+            return PreComputeIfPossible(newOp, state);
+        }
 
         public IOperator Visit(ParenthesisOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
@@ -151,7 +164,7 @@ public static partial class Optimizer
             return PreComputeIfPossible(newOp, state);
         }
 
-        public IOperator Visit(StoreOperator op, OptimizeTimeEvaluationState<TNumber> state)
+        public IOperator Visit(StoreVariableOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
             var operand = op.Operand.Accept(this, state);
             var newOp = op with { Operand = operand };
@@ -171,6 +184,15 @@ public static partial class Optimizer
 
             // Do NOT make PreComputedOperator for StoreOperator because it mistakenly eliminates store operation
             return newOp;
+        }
+
+        public IOperator Visit(StoreArrayOperator op, OptimizeTimeEvaluationState<TNumber> state)
+        {
+            var value = op.Value.Accept(this, state);
+            var index = op.Index.Accept(this, state);
+
+            // Do NOT make PreComputedOperator for StoreArrayOperator because it mistakenly eliminates store operation
+            return op with { Value = value, Index = index };
         }
 
         public IOperator Visit(BinaryOperator op, OptimizeTimeEvaluationState<TNumber> state)
@@ -232,7 +254,7 @@ public static partial class Optimizer
         {
             switch (op)
             {
-                case StoreOperator store:
+                case StoreVariableOperator store:
                     variables.Add(store.VariableName);
                     break;
                 case UserDefinedOperator userDefined:
