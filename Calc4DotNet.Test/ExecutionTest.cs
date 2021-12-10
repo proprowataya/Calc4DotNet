@@ -113,16 +113,24 @@ public class ExecutionTest
 
         {
             TNumber expected = (TNumber)(dynamic)testCase.ExpectedValue;
+            IEvaluationState<TNumber> state = CreateEvaluationState<TNumber>();
 
             object actual = executorType switch
             {
-                ExecutorType.Tree => Evaluator.Evaluate<TNumber>(op, context, CreateEvaluationState<TNumber>()),
-                ExecutorType.LowLevel => LowLevelExecutor.Execute((dynamic)module, (dynamic)CreateEvaluationState<TNumber>()),
+                ExecutorType.Tree => Evaluator.Evaluate<TNumber>(op, context, state),
+                ExecutorType.LowLevel => LowLevelExecutor.Execute((dynamic)module, (dynamic)state),
                 ExecutorType.Jit => ILCompiler.Compile(module).Run(new Calc4GlobalArraySource<TNumber>()),
                 _ => throw new InvalidOperationException(),
             };
 
+            // Test result
             Assert.Equal(expected, actual);
+
+            // Test variables after execution
+            foreach (var (name, value) in testCase.VariablesAfterExecution)
+            {
+                Assert.Equal((TNumber)(dynamic)value, state.Variables[name.Value]);
+            }
         }
     }
 
