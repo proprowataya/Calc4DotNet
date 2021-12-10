@@ -323,6 +323,11 @@ public static class LowLevelCodeGenerator
                 AddOperation(new LowLevelOperation(Opcode.Lavel, ifFalse));
                 AddOperation(new LowLevelOperation(Opcode.LoadConst, reverse ? 0 : 1));
                 AddOperation(new LowLevelOperation(Opcode.Lavel, end));
+
+                // StackSize increased by two due to two LoadConst operations.
+                // However, only one of them will be executed.
+                // We modify StackSize here.
+                StackSize--;
             }
 
             /* ******************** */
