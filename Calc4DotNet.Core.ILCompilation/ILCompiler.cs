@@ -2,6 +2,7 @@
 using System.Numerics;
 using System.Reflection;
 using System.Reflection.Emit;
+using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Execution;
 
 namespace Calc4DotNet.Core.ILCompilation;
@@ -28,14 +29,14 @@ public static class ILCompiler
         FieldBuilder[] fieldBuilders = new FieldBuilder[module.Variables.Length];
         for (int i = 0; i < fieldBuilders.Length; i++)
         {
-            fieldBuilders[i] = typeBuilder.DefineField($"Field{i}", typeof(TNumber), FieldAttributes.Private | FieldAttributes.Static);
+            fieldBuilders[i] = typeBuilder.DefineField(GetVariableIlName(module.Variables[i], i), typeof(TNumber), FieldAttributes.Private | FieldAttributes.Static);
         }
         // Define Run Method
         MethodBuilder runMethod
             = typeBuilder.DefineMethod(nameof(ICompiledModule<TNumber>.Run),
                                        MethodAttributes.Public | MethodAttributes.Virtual,
                                        typeof(TNumber),
-                                       new[] { typeof(Calc4GlobalArraySource<TNumber>) });
+                                       new[] { typeof(IEvaluationState<TNumber>) });
         typeBuilder.DefineMethodOverride(runMethod,
                                          typeof(ICompiledModule<TNumber>).GetMethod(nameof(ICompiledModule<TNumber>.Run))!);
 
@@ -73,17 +74,64 @@ public static class ILCompiler
     private static void EmitILCore<TNumber>(LowLevelModule<TNumber> module, ImmutableArray<LowLevelOperation> operations, FieldBuilder[] fieldBuilders, MethodBuilder method, int numOperands, (MethodBuilder Method, int NumOperands)[] methods, bool isMain)
         where TNumber : notnull
     {
+        /* Locals */
+        ILGenerator il = method.GetILGenerator();
+        Dictionary<int, Label> labels = new Dictionary<int, Label>();
+        Label methodEnd = il.DefineLabel();
+        LocalBuilder? temp = null, value = null, index = null;
+        int stateOrArraySourceIndex = numOperands + (isMain ? 1 : 0);
+
         /* Local method */
         int RestoreMethodParameterIndex(int value) => numOperands - value;
 
-        ILGenerator il = method.GetILGenerator();
-        Dictionary<int, Label> labels = new Dictionary<int, Label>();
-        LocalBuilder? temp = null, value = null, index = null;
-        int arraySourceIndex = numOperands + (isMain ? 1 : 0);
+        void EmitLoadCalc4GlobalArraySource()
+        {
+            // The last argument of this method contains variables.
+            // However, its type is Calc4GlobalArraySource<> if this is user defined function, otherwise IEvaluationState<>.
+            if (isMain)
+            {
+                il.Emit(OpCodes.Ldarg_S, stateOrArraySourceIndex);
+                il.Emit(OpCodes.Callvirt, typeof(IEvaluationState<TNumber>).GetProperty(nameof(IEvaluationState<TNumber>.GlobalArray))!.GetGetMethod()!);
+                il.Emit(OpCodes.Castclass, typeof(Calc4GlobalArraySource<TNumber>));
+            }
+            else
+            {
+                il.Emit(OpCodes.Ldarg_S, stateOrArraySourceIndex);
+            }
+        }
+
+        /* Start emit code */
 
         for (int i = 0; i < operations.Length; i++)
         {
             labels[i] = il.DefineLabel();
+        }
+
+        if (isMain && module.Variables.Length > 0)
+        {
+            // Restore all variables from state
+            il.Emit(OpCodes.Ldarg_S, stateOrArraySourceIndex);
+            il.Emit(OpCodes.Callvirt, typeof(IEvaluationState<TNumber>).GetProperty(nameof(IEvaluationState<TNumber>.Variables))!.GetGetMethod()!);
+
+            for (int i = 0; i < module.Variables.Length; i++)
+            {
+                if (i < module.Variables.Length - 1)
+                {
+                    il.Emit(OpCodes.Dup);
+                }
+
+                if (module.Variables[i] is string notnullName)
+                {
+                    il.Emit(OpCodes.Ldstr, notnullName);
+                }
+                else
+                {
+                    il.Emit(OpCodes.Ldnull);
+                }
+
+                il.Emit(OpCodes.Callvirt, typeof(IVariableSource<TNumber>).GetMethod("get_Item", new[] { typeof(string) })!);
+                il.Emit(OpCodes.Stsfld, fieldBuilders[i]);
+            }
         }
 
         for (int i = 0; i < operations.Length; i++)
@@ -123,7 +171,7 @@ public static class ILCompiler
                     il.EmitConvToInt32<TNumber>();
                     il.Emit(OpCodes.Stloc_S, index.LocalIndex);
 
-                    il.Emit(OpCodes.Ldarg_S, arraySourceIndex);
+                    EmitLoadCalc4GlobalArraySource();
                     il.Emit(OpCodes.Ldloc_S, index.LocalIndex);
                     il.Emit(OpCodes.Call, typeof(Calc4GlobalArraySource<TNumber>).GetMethod("get_Item", new[] { typeof(int) })!);
                     break;
@@ -135,7 +183,7 @@ public static class ILCompiler
                     il.Emit(OpCodes.Stloc_S, index.LocalIndex);
                     il.Emit(OpCodes.Stloc_S, value.LocalIndex);
 
-                    il.Emit(OpCodes.Ldarg_S, arraySourceIndex);
+                    EmitLoadCalc4GlobalArraySource();
                     il.Emit(OpCodes.Ldloc_S, index.LocalIndex);
                     il.Emit(OpCodes.Ldloc_S, value.LocalIndex);
                     il.Emit(OpCodes.Call, typeof(Calc4GlobalArraySource<TNumber>).GetMethod("set_Item", new[] { typeof(int), typeof(TNumber) })!);
@@ -245,17 +293,62 @@ public static class ILCompiler
                     }
                     break;
                 case Opcode.Call:
-                    il.Emit(OpCodes.Ldarg_S, arraySourceIndex);
+                    EmitLoadCalc4GlobalArraySource();
                     il.Emit(OpCodes.Call, methods[op.Value].Method);
                     break;
                 case Opcode.Return:
-                case Opcode.Halt:
                     il.Emit(OpCodes.Ret);
+                    break;
+                case Opcode.Halt:
+                    if (!isMain)
+                    {
+                        throw new InvalidOperationException();
+                    }
+                    il.Emit(OpCodes.Br, methodEnd);
                     break;
                 case Opcode.Lavel:
                 default:
                     throw new InvalidOperationException();
             }
         }
+
+        if (isMain)
+        {
+            il.MarkLabel(methodEnd);
+
+            if (module.Variables.Length > 0)
+            {
+                // Save all variables to state
+                il.Emit(OpCodes.Ldarg_S, stateOrArraySourceIndex);
+                il.Emit(OpCodes.Callvirt, typeof(IEvaluationState<TNumber>).GetProperty(nameof(IEvaluationState<TNumber>.Variables))!.GetGetMethod()!);
+
+                for (int i = 0; i < module.Variables.Length; i++)
+                {
+                    if (i < module.Variables.Length - 1)
+                    {
+                        il.Emit(OpCodes.Dup);
+                    }
+
+                    if (module.Variables[i] is string notnullName)
+                    {
+                        il.Emit(OpCodes.Ldstr, notnullName);
+                    }
+                    else
+                    {
+                        il.Emit(OpCodes.Ldnull);
+                    }
+
+                    il.Emit(OpCodes.Ldsfld, fieldBuilders[i]);
+                    il.Emit(OpCodes.Callvirt, typeof(IVariableSource<TNumber>).GetMethod("set_Item", new[] { typeof(string), typeof(TNumber) })!);
+                }
+            }
+
+            il.Emit(OpCodes.Ret);
+        }
+    }
+
+    private static string GetVariableIlName(string? name, int index)
+    {
+        return $"Field_{index}_{name ?? "default"}";
     }
 }

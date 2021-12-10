@@ -119,7 +119,7 @@ public class ExecutionTest
             {
                 ExecutorType.Tree => Evaluator.Evaluate<TNumber>(op, context, state),
                 ExecutorType.LowLevel => LowLevelExecutor.Execute((dynamic)module, (dynamic)state),
-                ExecutorType.Jit => ILCompiler.Compile(module).Run(new Calc4GlobalArraySource<TNumber>()),
+                ExecutorType.Jit => ILCompiler.Compile(module).Run(state),
                 _ => throw new InvalidOperationException(),
             };
 

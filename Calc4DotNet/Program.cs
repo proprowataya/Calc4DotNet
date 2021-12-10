@@ -112,7 +112,7 @@ class Program
                 else if (setting.ExecutorType == ExecutorType.JIT)
                 {
                     ICompiledModule<TNumber> ilModule = ILCompiler.Compile(module);
-                    result = ilModule.Run(array);
+                    result = ilModule.Run(state);
                 }
                 else
                 {
