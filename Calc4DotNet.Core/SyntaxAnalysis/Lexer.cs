@@ -41,7 +41,7 @@ public static class Lexer
 
             while (Index < text.Length && text[Index] != ')')
             {
-                if (char.IsWhiteSpace(text[Index]))
+                if (IsWhiteSpace(text[Index]))
                 {
                     Index++;
                     continue;
@@ -295,6 +295,11 @@ public static class Lexer
 
             int end = Index - 1;
             return text[begin..end];
+        }
+
+        private static bool IsWhiteSpace(char c)
+        {
+            return char.IsWhiteSpace(c) || c == '\n' || c == '\n';
         }
     }
 }
