@@ -100,6 +100,14 @@ public static class Evaluator
             return evaluationState.GlobalArray[c.ToInt(index)];
         }
 
+        public TNumber Visit(PrintCharOperator op, TNumber[]? arguments)
+        {
+            TNumberComputer c = default;
+            TNumber character = op.Character.Accept(this, arguments);
+            evaluationState.IOService.PrintChar((char)c.ToInt(character));
+            return c.Zero;
+        }
+
         public TNumber Visit(ParenthesisOperator op, TNumber[]? arguments)
         {
             TNumber result = default(TNumberComputer).Zero;

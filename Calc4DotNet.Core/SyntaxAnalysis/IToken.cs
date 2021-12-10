@@ -46,6 +46,11 @@ public sealed record LoadArrayToken(string? SupplementaryText = null) : IToken
     public int NumOperands => 1;
 }
 
+public sealed record PrintCharToken(string? SupplementaryText = null) : IToken
+{
+    public int NumOperands => 1;
+}
+
 public sealed record BinaryOperatorToken(BinaryType Type, string? SupplementaryText = null) : IToken
 {
     public int NumOperands => 2;

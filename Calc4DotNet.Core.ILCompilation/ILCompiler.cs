@@ -49,7 +49,7 @@ public static class ILCompiler
                 = typeBuilder.DefineMethod(op.Definition.Name,
                                            MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig,
                                            typeof(TNumber),
-                                           Enumerable.Repeat(typeof(TNumber), op.Definition.NumOperands).Append(typeof(Calc4GlobalArraySource<TNumber>)).ToArray());
+                                           Enumerable.Repeat(typeof(TNumber), op.Definition.NumOperands).Append(typeof(IEvaluationState<TNumber>)).ToArray());
             methods[i] = (methodBuilder, op.Definition.NumOperands);
         }
 
@@ -78,26 +78,22 @@ public static class ILCompiler
         ILGenerator il = method.GetILGenerator();
         Dictionary<int, Label> labels = new Dictionary<int, Label>();
         Label methodEnd = il.DefineLabel();
-        LocalBuilder? temp = null, value = null, index = null;
-        int stateOrArraySourceIndex = numOperands + (isMain ? 1 : 0);
+        LocalBuilder? temp = null, value = null, index = null, character = null;
+        int stateIndex = numOperands + (isMain ? 1 : 0);
 
         /* Local method */
         int RestoreMethodParameterIndex(int value) => numOperands - value;
 
-        void EmitLoadCalc4GlobalArraySource()
+        void EmitLoadArraySource()
         {
-            // The last argument of this method contains variables.
-            // However, its type is Calc4GlobalArraySource<> if this is user defined function, otherwise IEvaluationState<>.
-            if (isMain)
-            {
-                il.Emit(OpCodes.Ldarg_S, stateOrArraySourceIndex);
-                il.Emit(OpCodes.Callvirt, typeof(IEvaluationState<TNumber>).GetProperty(nameof(IEvaluationState<TNumber>.GlobalArray))!.GetGetMethod()!);
-                il.Emit(OpCodes.Castclass, typeof(Calc4GlobalArraySource<TNumber>));
-            }
-            else
-            {
-                il.Emit(OpCodes.Ldarg_S, stateOrArraySourceIndex);
-            }
+            il.Emit(OpCodes.Ldarg_S, stateIndex);
+            il.Emit(OpCodes.Callvirt, typeof(IEvaluationState<TNumber>).GetProperty(nameof(IEvaluationState<TNumber>.GlobalArray))!.GetGetMethod()!);
+        }
+
+        void EmitLoadIOService()
+        {
+            il.Emit(OpCodes.Ldarg_S, stateIndex);
+            il.Emit(OpCodes.Callvirt, typeof(IEvaluationState<TNumber>).GetProperty(nameof(IEvaluationState<TNumber>.IOService))!.GetGetMethod()!);
         }
 
         /* Start emit code */
@@ -110,7 +106,7 @@ public static class ILCompiler
         if (isMain && module.Variables.Length > 0)
         {
             // Restore all variables from state
-            il.Emit(OpCodes.Ldarg_S, stateOrArraySourceIndex);
+            il.Emit(OpCodes.Ldarg_S, stateIndex);
             il.Emit(OpCodes.Callvirt, typeof(IEvaluationState<TNumber>).GetProperty(nameof(IEvaluationState<TNumber>.Variables))!.GetGetMethod()!);
 
             for (int i = 0; i < module.Variables.Length; i++)
@@ -171,9 +167,9 @@ public static class ILCompiler
                     il.EmitConvToInt32<TNumber>();
                     il.Emit(OpCodes.Stloc_S, index.LocalIndex);
 
-                    EmitLoadCalc4GlobalArraySource();
+                    EmitLoadArraySource();
                     il.Emit(OpCodes.Ldloc_S, index.LocalIndex);
-                    il.Emit(OpCodes.Call, typeof(Calc4GlobalArraySource<TNumber>).GetMethod("get_Item", new[] { typeof(int) })!);
+                    il.Emit(OpCodes.Callvirt, typeof(IGlobalArraySource<TNumber>).GetMethod("get_Item", new[] { typeof(int) })!);
                     break;
                 case Opcode.StoreArrayElement:
                     value ??= il.DeclareLocal(typeof(TNumber));
@@ -183,14 +179,24 @@ public static class ILCompiler
                     il.Emit(OpCodes.Stloc_S, index.LocalIndex);
                     il.Emit(OpCodes.Stloc_S, value.LocalIndex);
 
-                    EmitLoadCalc4GlobalArraySource();
+                    EmitLoadArraySource();
                     il.Emit(OpCodes.Ldloc_S, index.LocalIndex);
                     il.Emit(OpCodes.Ldloc_S, value.LocalIndex);
-                    il.Emit(OpCodes.Call, typeof(Calc4GlobalArraySource<TNumber>).GetMethod("set_Item", new[] { typeof(int), typeof(TNumber) })!);
+                    il.Emit(OpCodes.Callvirt, typeof(IGlobalArraySource<TNumber>).GetMethod("set_Item", new[] { typeof(int), typeof(TNumber) })!);
                     il.Emit(OpCodes.Ldloc_S, value.LocalIndex);
                     break;
                 case Opcode.Input:
                     throw new NotImplementedException();
+                case Opcode.PrintChar:
+                    character ??= il.DeclareLocal(typeof(char));
+                    il.EmitConvToInt16<TNumber>();
+                    il.Emit(OpCodes.Stloc_S, character.LocalIndex);
+
+                    EmitLoadIOService();
+                    il.Emit(OpCodes.Ldloc_S, character.LocalIndex);
+                    il.Emit(OpCodes.Callvirt, typeof(IIOService).GetMethod(nameof(IIOService.PrintChar))!);
+                    il.EmitLdc((TNumber)(dynamic)0);
+                    break;
                 case Opcode.Add:
                     if (typeof(TNumber) == typeof(BigInteger))
                     {
@@ -293,7 +299,7 @@ public static class ILCompiler
                     }
                     break;
                 case Opcode.Call:
-                    EmitLoadCalc4GlobalArraySource();
+                    il.Emit(OpCodes.Ldarg_S, stateIndex);
                     il.Emit(OpCodes.Call, methods[op.Value].Method);
                     break;
                 case Opcode.Return:
@@ -319,7 +325,7 @@ public static class ILCompiler
             if (module.Variables.Length > 0)
             {
                 // Save all variables to state
-                il.Emit(OpCodes.Ldarg_S, stateOrArraySourceIndex);
+                il.Emit(OpCodes.Ldarg_S, stateIndex);
                 il.Emit(OpCodes.Callvirt, typeof(IEvaluationState<TNumber>).GetProperty(nameof(IEvaluationState<TNumber>.Variables))!.GetGetMethod()!);
 
                 for (int i = 0; i < module.Variables.Length; i++)

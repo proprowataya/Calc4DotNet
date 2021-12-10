@@ -1512,6 +1512,672 @@ internal static class TestCases
             SkipTypes: null
         ),
         new TestCase(
+            Source: "72P101P108P108P111P10P",
+            ExpectedValue: 0,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
+            ExpectedWhenNotOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new PrintCharOperator(
+                        Character: new DecimalOperator(
+                            Operand: new DecimalOperator(
+                                Operand: new PrintCharOperator(
+                                    Character: new DecimalOperator(
+                                        Operand: new DecimalOperator(
+                                            Operand: new DecimalOperator(
+                                                Operand: new PrintCharOperator(
+                                                    Character: new DecimalOperator(
+                                                        Operand: new DecimalOperator(
+                                                            Operand: new DecimalOperator(
+                                                                Operand: new PrintCharOperator(
+                                                                    Character: new DecimalOperator(
+                                                                        Operand: new DecimalOperator(
+                                                                            Operand: new DecimalOperator(
+                                                                                Operand: new PrintCharOperator(
+                                                                                    Character: new DecimalOperator(
+                                                                                        Operand: new DecimalOperator(
+                                                                                            Operand: new DecimalOperator(
+                                                                                                Operand: new PrintCharOperator(
+                                                                                                    Character: new DecimalOperator(
+                                                                                                        Operand: new DecimalOperator(
+                                                                                                            Operand: new ZeroOperator(),
+                                                                                                            Value: 7,
+                                                                                                            SupplementaryText: null
+                                                                                                        ),
+                                                                                                        Value: 2,
+                                                                                                        SupplementaryText: null
+                                                                                                    ),
+                                                                                                    SupplementaryText: null
+                                                                                                ),
+                                                                                                Value: 1,
+                                                                                                SupplementaryText: null
+                                                                                            ),
+                                                                                            Value: 0,
+                                                                                            SupplementaryText: null
+                                                                                        ),
+                                                                                        Value: 1,
+                                                                                        SupplementaryText: null
+                                                                                    ),
+                                                                                    SupplementaryText: null
+                                                                                ),
+                                                                                Value: 1,
+                                                                                SupplementaryText: null
+                                                                            ),
+                                                                            Value: 0,
+                                                                            SupplementaryText: null
+                                                                        ),
+                                                                        Value: 8,
+                                                                        SupplementaryText: null
+                                                                    ),
+                                                                    SupplementaryText: null
+                                                                ),
+                                                                Value: 1,
+                                                                SupplementaryText: null
+                                                            ),
+                                                            Value: 0,
+                                                            SupplementaryText: null
+                                                        ),
+                                                        Value: 8,
+                                                        SupplementaryText: null
+                                                    ),
+                                                    SupplementaryText: null
+                                                ),
+                                                Value: 1,
+                                                SupplementaryText: null
+                                            ),
+                                            Value: 1,
+                                            SupplementaryText: null
+                                        ),
+                                        Value: 1,
+                                        SupplementaryText: null
+                                    ),
+                                    SupplementaryText: null
+                                ),
+                                Value: 1,
+                                SupplementaryText: null
+                            ),
+                            Value: 0,
+                            SupplementaryText: null
+                        ),
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 02 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 7),
+                                /* 04 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 05 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 06 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 07 */ new LowLevelOperation(Opcode.LoadConst, 2),
+                                /* 08 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 09 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 10 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 11 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 12 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                /* 13 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 14 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 15 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 16 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 17 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 18 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 19 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 20 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                /* 21 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 22 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 23 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 24 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 25 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                /* 26 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 27 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 28 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 29 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 30 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 31 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 32 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 33 */ new LowLevelOperation(Opcode.LoadConst, 8),
+                                /* 34 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 35 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 36 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 37 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 38 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                /* 39 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 40 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 41 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 42 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 43 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 44 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 45 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 46 */ new LowLevelOperation(Opcode.LoadConst, 8),
+                                /* 47 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 48 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 49 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 50 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 51 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                /* 52 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 53 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 54 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 55 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                /* 56 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 57 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 58 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 59 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                /* 60 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 61 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 62 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 63 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 64 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                /* 65 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 66 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 67 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 68 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 69 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 70 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 71 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            ExpectedWhenOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new ParenthesisOperator(
+                        Operators: new IOperator[]
+                        {
+                            new PrintCharOperator(
+                                Character: new PreComputedOperator(
+                                    Value: 72
+                                ),
+                                SupplementaryText: null
+                            ),
+                            new PrintCharOperator(
+                                Character: new PreComputedOperator(
+                                    Value: 101
+                                ),
+                                SupplementaryText: null
+                            ),
+                            new PrintCharOperator(
+                                Character: new PreComputedOperator(
+                                    Value: 108
+                                ),
+                                SupplementaryText: null
+                            ),
+                            new PrintCharOperator(
+                                Character: new PreComputedOperator(
+                                    Value: 108
+                                ),
+                                SupplementaryText: null
+                            ),
+                            new PrintCharOperator(
+                                Character: new PreComputedOperator(
+                                    Value: 111
+                                ),
+                                SupplementaryText: null
+                            ),
+                            new PrintCharOperator(
+                                Character: new PreComputedOperator(
+                                    Value: 10
+                                ),
+                                SupplementaryText: null
+                            ),
+                            new PreComputedOperator(
+                                Value: 0
+                            )
+                        }.ToImmutableArray(),
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 72),
+                                /* 01 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 02 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 101),
+                                /* 04 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 05 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 06 */ new LowLevelOperation(Opcode.LoadConst, 108),
+                                /* 07 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 08 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 09 */ new LowLevelOperation(Opcode.LoadConst, 108),
+                                /* 10 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 11 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 12 */ new LowLevelOperation(Opcode.LoadConst, 111),
+                                /* 13 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 14 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 15 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 16 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 17 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 18 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 19 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            SkipTypes: null,
+            ExpectedConsoleOutput: "Hello\n"
+        ),
+        new TestCase(
+            Source: "D[print||72P101P108P108P111P10P] {print}",
+            ExpectedValue: 0,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
+            ExpectedWhenNotOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new ParenthesisOperator(
+                        Operators: new IOperator[]
+                        {
+                            new DefineOperator(
+                                SupplementaryText: "print||72P101P108P108P111P10P"
+                            ),
+                            new UserDefinedOperator(
+                                Definition: new OperatorDefinition(Name: "print", NumOperands: 0),
+                                Operands: new IOperator[]
+                                {
+                                }.ToImmutableArray(),
+                                IsTailCall: null,
+                                SupplementaryText: null
+                            )
+                        }.ToImmutableArray(),
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                                new OperatorImplement(
+                                    Definition: new OperatorDefinition(Name: "print", NumOperands: 0),
+                                    IsOptimized: false,
+                                    Operator: new PrintCharOperator(
+                                        Character: new DecimalOperator(
+                                            Operand: new DecimalOperator(
+                                                Operand: new PrintCharOperator(
+                                                    Character: new DecimalOperator(
+                                                        Operand: new DecimalOperator(
+                                                            Operand: new DecimalOperator(
+                                                                Operand: new PrintCharOperator(
+                                                                    Character: new DecimalOperator(
+                                                                        Operand: new DecimalOperator(
+                                                                            Operand: new DecimalOperator(
+                                                                                Operand: new PrintCharOperator(
+                                                                                    Character: new DecimalOperator(
+                                                                                        Operand: new DecimalOperator(
+                                                                                            Operand: new DecimalOperator(
+                                                                                                Operand: new PrintCharOperator(
+                                                                                                    Character: new DecimalOperator(
+                                                                                                        Operand: new DecimalOperator(
+                                                                                                            Operand: new DecimalOperator(
+                                                                                                                Operand: new PrintCharOperator(
+                                                                                                                    Character: new DecimalOperator(
+                                                                                                                        Operand: new DecimalOperator(
+                                                                                                                            Operand: new ZeroOperator(),
+                                                                                                                            Value: 7,
+                                                                                                                            SupplementaryText: null
+                                                                                                                        ),
+                                                                                                                        Value: 2,
+                                                                                                                        SupplementaryText: null
+                                                                                                                    ),
+                                                                                                                    SupplementaryText: null
+                                                                                                                ),
+                                                                                                                Value: 1,
+                                                                                                                SupplementaryText: null
+                                                                                                            ),
+                                                                                                            Value: 0,
+                                                                                                            SupplementaryText: null
+                                                                                                        ),
+                                                                                                        Value: 1,
+                                                                                                        SupplementaryText: null
+                                                                                                    ),
+                                                                                                    SupplementaryText: null
+                                                                                                ),
+                                                                                                Value: 1,
+                                                                                                SupplementaryText: null
+                                                                                            ),
+                                                                                            Value: 0,
+                                                                                            SupplementaryText: null
+                                                                                        ),
+                                                                                        Value: 8,
+                                                                                        SupplementaryText: null
+                                                                                    ),
+                                                                                    SupplementaryText: null
+                                                                                ),
+                                                                                Value: 1,
+                                                                                SupplementaryText: null
+                                                                            ),
+                                                                            Value: 0,
+                                                                            SupplementaryText: null
+                                                                        ),
+                                                                        Value: 8,
+                                                                        SupplementaryText: null
+                                                                    ),
+                                                                    SupplementaryText: null
+                                                                ),
+                                                                Value: 1,
+                                                                SupplementaryText: null
+                                                            ),
+                                                            Value: 1,
+                                                            SupplementaryText: null
+                                                        ),
+                                                        Value: 1,
+                                                        SupplementaryText: null
+                                                    ),
+                                                    SupplementaryText: null
+                                                ),
+                                                Value: 1,
+                                                SupplementaryText: null
+                                            ),
+                                            Value: 0,
+                                            SupplementaryText: null
+                                        ),
+                                        SupplementaryText: null
+                                    )
+                                )
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 02 */ new LowLevelOperation(Opcode.Call, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                                new LowLevelUserDefinedOperator(
+                                    new OperatorDefinition(Name: "print", NumOperands: 0),
+                                    new LowLevelOperation[]
+                                    {
+                                        /* 00 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 01 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 02 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 03 */ new LowLevelOperation(Opcode.LoadConst, 7),
+                                        /* 04 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 05 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 06 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 07 */ new LowLevelOperation(Opcode.LoadConst, 2),
+                                        /* 08 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 09 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                        /* 10 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 11 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 12 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 13 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 14 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 15 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 16 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 17 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 18 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 19 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 20 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 21 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 22 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                        /* 23 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 24 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 25 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 26 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 27 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 28 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 29 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 30 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 31 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 32 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 33 */ new LowLevelOperation(Opcode.LoadConst, 8),
+                                        /* 34 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 35 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                        /* 36 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 37 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 38 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 39 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 40 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 41 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 42 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 43 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 44 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 45 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 46 */ new LowLevelOperation(Opcode.LoadConst, 8),
+                                        /* 47 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 48 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                        /* 49 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 50 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 51 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 52 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 53 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 54 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 55 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 56 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 57 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 58 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 59 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 60 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 61 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                        /* 62 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 63 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 64 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 65 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 66 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 67 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 68 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 69 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 70 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                        /* 71 */ new LowLevelOperation(Opcode.Return, 0)
+                                    }.ToImmutableArray(),
+                                    2)
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            ExpectedWhenOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new ParenthesisOperator(
+                        Operators: new IOperator[]
+                        {
+                            new PrintCharOperator(
+                                Character: new PreComputedOperator(
+                                    Value: 72
+                                ),
+                                SupplementaryText: null
+                            ),
+                            new PrintCharOperator(
+                                Character: new PreComputedOperator(
+                                    Value: 101
+                                ),
+                                SupplementaryText: null
+                            ),
+                            new PrintCharOperator(
+                                Character: new PreComputedOperator(
+                                    Value: 108
+                                ),
+                                SupplementaryText: null
+                            ),
+                            new PrintCharOperator(
+                                Character: new PreComputedOperator(
+                                    Value: 108
+                                ),
+                                SupplementaryText: null
+                            ),
+                            new PrintCharOperator(
+                                Character: new PreComputedOperator(
+                                    Value: 111
+                                ),
+                                SupplementaryText: null
+                            ),
+                            new PrintCharOperator(
+                                Character: new PreComputedOperator(
+                                    Value: 10
+                                ),
+                                SupplementaryText: null
+                            ),
+                            new PreComputedOperator(
+                                Value: 0
+                            )
+                        }.ToImmutableArray(),
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                                new OperatorImplement(
+                                    Definition: new OperatorDefinition(Name: "print", NumOperands: 0),
+                                    IsOptimized: true,
+                                    Operator: new ParenthesisOperator(
+                                        Operators: new IOperator[]
+                                        {
+                                            new PrintCharOperator(
+                                                Character: new PreComputedOperator(
+                                                    Value: 72
+                                                ),
+                                                SupplementaryText: null
+                                            ),
+                                            new PrintCharOperator(
+                                                Character: new PreComputedOperator(
+                                                    Value: 101
+                                                ),
+                                                SupplementaryText: null
+                                            ),
+                                            new PrintCharOperator(
+                                                Character: new PreComputedOperator(
+                                                    Value: 108
+                                                ),
+                                                SupplementaryText: null
+                                            ),
+                                            new PrintCharOperator(
+                                                Character: new PreComputedOperator(
+                                                    Value: 108
+                                                ),
+                                                SupplementaryText: null
+                                            ),
+                                            new PrintCharOperator(
+                                                Character: new PreComputedOperator(
+                                                    Value: 111
+                                                ),
+                                                SupplementaryText: null
+                                            ),
+                                            new PrintCharOperator(
+                                                Character: new PreComputedOperator(
+                                                    Value: 10
+                                                ),
+                                                SupplementaryText: null
+                                            ),
+                                            new PreComputedOperator(
+                                                Value: 0
+                                            )
+                                        }.ToImmutableArray(),
+                                        SupplementaryText: null
+                                    )
+                                )
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 72),
+                                /* 01 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 02 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 101),
+                                /* 04 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 05 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 06 */ new LowLevelOperation(Opcode.LoadConst, 108),
+                                /* 07 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 08 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 09 */ new LowLevelOperation(Opcode.LoadConst, 108),
+                                /* 10 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 11 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 12 */ new LowLevelOperation(Opcode.LoadConst, 111),
+                                /* 13 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 14 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 15 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 16 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                /* 17 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 18 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 19 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                                new LowLevelUserDefinedOperator(
+                                    new OperatorDefinition(Name: "print", NumOperands: 0),
+                                    new LowLevelOperation[]
+                                    {
+                                        /* 00 */ new LowLevelOperation(Opcode.LoadConst, 72),
+                                        /* 01 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                        /* 02 */ new LowLevelOperation(Opcode.Pop, 0),
+                                        /* 03 */ new LowLevelOperation(Opcode.LoadConst, 101),
+                                        /* 04 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                        /* 05 */ new LowLevelOperation(Opcode.Pop, 0),
+                                        /* 06 */ new LowLevelOperation(Opcode.LoadConst, 108),
+                                        /* 07 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                        /* 08 */ new LowLevelOperation(Opcode.Pop, 0),
+                                        /* 09 */ new LowLevelOperation(Opcode.LoadConst, 108),
+                                        /* 10 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                        /* 11 */ new LowLevelOperation(Opcode.Pop, 0),
+                                        /* 12 */ new LowLevelOperation(Opcode.LoadConst, 111),
+                                        /* 13 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                        /* 14 */ new LowLevelOperation(Opcode.Pop, 0),
+                                        /* 15 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 16 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                        /* 17 */ new LowLevelOperation(Opcode.Pop, 0),
+                                        /* 18 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 19 */ new LowLevelOperation(Opcode.Return, 0)
+                                    }.ToImmutableArray(),
+                                    1)
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            SkipTypes: null,
+            ExpectedConsoleOutput: "Hello\n"
+        ),
+        new TestCase(
             Source: "D[add|x,y|x+y] 12{add}23",
             ExpectedValue: 35,
             VariablesAfterExecution:

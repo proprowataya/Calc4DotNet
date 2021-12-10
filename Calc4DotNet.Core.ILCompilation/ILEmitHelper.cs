@@ -123,6 +123,31 @@ internal static class ILEmitHelper
         }
     }
 
+    public static void EmitConvToInt16<TFrom>(this ILGenerator il)
+    {
+        if (typeof(TFrom) == typeof(Int32))
+        {
+            il.Emit(OpCodes.Conv_I2);
+        }
+        else if (typeof(TFrom) == typeof(Int64))
+        {
+            il.Emit(OpCodes.Conv_I2);
+        }
+        else if (typeof(TFrom) == typeof(Double))
+        {
+            il.Emit(OpCodes.Conv_I2);
+        }
+        else if (typeof(TFrom) == typeof(BigInteger))
+        {
+            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethods().Single(m => m.Name == "op_Explicit" && m.ReturnType == typeof(int)));
+            il.Emit(OpCodes.Conv_I2);
+        }
+        else
+        {
+            throw new InvalidOperationException();
+        }
+    }
+
     public static void EmitConvToInt32<TFrom>(this ILGenerator il)
     {
         if (typeof(TFrom) == typeof(Int32))

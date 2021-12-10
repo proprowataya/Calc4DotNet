@@ -25,6 +25,8 @@ var testCaseInputs = new (string Source, Type[]? SkipTypes)[]
     ("12345678", null),
     ("1+2*3-10", null),
     ("0?1?2?3?4", null),
+    ("72P101P108P108P111P10P", null),
+    ("D[print||72P101P108P108P111P10P] {print}", null),
     ("D[add|x,y|x+y] 12{add}23", null),
     ("D[get12345||12345] {get12345}+{get12345}", null),
     ("D[fact|x,y|x==0?y?(x-1){fact}(x*y)] 10{fact}1", null),
@@ -111,7 +113,11 @@ static TestCase GenerateTestCase(string source, Type[]? skipTypes)
     List<IToken> tokens = Lexer.Lex(source, ref context);
     IOperator op = Parser.Parse(tokens, ref context);
     DefaultVariableSource<int> variables = new(0);
-    int expectedValue = Evaluator.Evaluate(op, context, new SimpleEvaluationState<int>(variables, new Calc4GlobalArraySource<Int32>()));
+    MemoryIOService ioService = new();
+    int expectedValue = Evaluator.Evaluate(op, context, new SimpleEvaluationState<int>(variables,
+                                                                                       new Calc4GlobalArraySource<Int32>(),
+                                                                                       ioService));
+    string? expectedConsoleOutput = ioService.GetHistory() is string output && output.Length > 0 ? output : null;
 
     CompilationResult<Int32> expectedWhenNotOptimized = new(op, context, LowLevelCodeGenerator.Generate<Int32>(op, context));
 
@@ -123,5 +129,6 @@ static TestCase GenerateTestCase(string source, Type[]? skipTypes)
                         variables.ToImmutableDictionary(),
                         expectedWhenOptimized,
                         expectedWhenNotOptimized,
-                        skipTypes);
+                        skipTypes,
+                        expectedConsoleOutput);
 }

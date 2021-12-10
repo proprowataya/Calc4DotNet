@@ -47,7 +47,16 @@ internal struct CSharpSerializer
         WriteLine(",", insertIndent: false);
         indent--;
 
-        WriteLine($"{nameof(TestCase.SkipTypes)}: {(testCase.SkipTypes is null ? "null" : $"new[] {{ {string.Join(", ", testCase.SkipTypes.Select(t => $"typeof({t.Name})"))} }}")}");
+        Write($"{nameof(TestCase.SkipTypes)}: {(testCase.SkipTypes is null ? "null" : $"new[] {{ {string.Join(", ", testCase.SkipTypes.Select(t => $"typeof({t.Name})"))} }}")}");
+
+        if (testCase.ExpectedConsoleOutput is { } consoleOutput)
+        {
+            WriteLine(",", insertIndent: false);
+            Write($"{nameof(TestCase.ExpectedConsoleOutput)}: ");
+            Serialize(consoleOutput, insertIndentFirst: false);
+        }
+
+        WriteLine(null, insertIndent: false);
         indent--;
         Write(")");
     }
@@ -301,7 +310,7 @@ internal struct CSharpSerializer
 
     public void Serialize(string str, bool insertIndentFirst = true)
     {
-        Write($"\"{str}\"", insertIndentFirst);
+        Write($"\"{str.Replace("\n", "\\n")}\"", insertIndentFirst);
     }
 
     public void Serialize(bool b, bool insertIndentFirst = true)

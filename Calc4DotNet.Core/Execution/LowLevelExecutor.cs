@@ -46,7 +46,7 @@ public static class LowLevelExecutor
             throw new InvalidOperationException($"LowLevelExecutor only supports {nameof(Calc4GlobalArraySource<TNumber>)}, but {state.GlobalArray.GetType()} was given.");
         }
 
-        TNumber result = ExecuteCoreCore<TNumber, TNumberComputer>(module, variables, array);
+        TNumber result = ExecuteCoreCore<TNumber, TNumberComputer>(module, variables, array, state.IOService);
 
         // Store variable's values to IEvaluationState
         for (int i = 0; i < variables.Length; i++)
@@ -57,7 +57,7 @@ public static class LowLevelExecutor
         return result;
     }
 
-    private static TNumber ExecuteCoreCore<TNumber, TNumberComputer>(LowLevelModule<TNumber> module, TNumber[] variables, Calc4GlobalArraySource<TNumber> array)
+    private static TNumber ExecuteCoreCore<TNumber, TNumberComputer>(LowLevelModule<TNumber> module, TNumber[] variables, Calc4GlobalArraySource<TNumber> array, IIOService ioService)
         where TNumber : notnull
         where TNumberComputer : struct, INumberComputer<TNumber>
     {
@@ -139,6 +139,11 @@ public static class LowLevelExecutor
                     break;
                 case Opcode.Input:
                     throw new NotImplementedException();
+                case Opcode.PrintChar:
+                    VerifyRange(stack, ref Unsafe.Add(ref top, -1));
+                    ioService.PrintChar((char)c.ToInt(Unsafe.Add(ref top, -1)));
+                    Unsafe.Add(ref top, -1) = c.Zero;
+                    break;
                 case Opcode.Add:
                     top = ref Unsafe.Add(ref top, -1);
                     VerifyRange(stack, ref top);

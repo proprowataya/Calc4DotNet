@@ -191,6 +191,7 @@ public static class LowLevelCodeGenerator
                     break;
                 case Opcode.StoreVariable:
                 case Opcode.LoadArrayElement:
+                case Opcode.PrintChar:
                 case Opcode.Goto:
                     // Stacksize will not change
                     break;
@@ -269,6 +270,12 @@ public static class LowLevelCodeGenerator
         {
             op.Index.Accept(this);
             AddOperation(new LowLevelOperation(Opcode.LoadArrayElement));
+        }
+
+        public void Visit(PrintCharOperator op)
+        {
+            op.Character.Accept(this);
+            AddOperation(new LowLevelOperation(Opcode.PrintChar));
         }
 
         public void Visit(ParenthesisOperator op)

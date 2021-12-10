@@ -63,6 +63,8 @@ public static class Lexer
                     return LexLoadVariableToken();
                 case 'S':
                     return LexStoreVariableToken();
+                case 'P':
+                    return LexPrintCharToken();
                 case '@':
                     return LexLoadArrayToken();
                 case '0':
@@ -128,6 +130,13 @@ public static class Lexer
             Debug.Assert(text[Index] == 'S');
             Index++;
             return new StoreVariableToken(LexSupplementaryText());
+        }
+
+        private PrintCharToken LexPrintCharToken()
+        {
+            Debug.Assert(text[Index] == 'P');
+            Index++;
+            return new PrintCharToken(LexSupplementaryText());
         }
 
         private LoadArrayToken LexLoadArrayToken()

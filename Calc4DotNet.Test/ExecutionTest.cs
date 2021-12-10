@@ -131,6 +131,10 @@ public class ExecutionTest
             {
                 Assert.Equal((TNumber)(dynamic)value, state.Variables[name.Value]);
             }
+
+            // Test console output
+            string actualConsoleOutput = ((MemoryIOService)state.IOService).GetHistory();
+            Assert.Equal(testCase.ExpectedConsoleOutput ?? "", actualConsoleOutput);
         }
     }
 
@@ -171,6 +175,7 @@ public class ExecutionTest
     private static IEvaluationState<TNumber> CreateEvaluationState<TNumber>(TNumber? dummy = default)
     {
         return new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((dynamic)0),
-                                                  new Calc4GlobalArraySource<TNumber>());
+                                                  new Calc4GlobalArraySource<TNumber>(),
+                                                  new MemoryIOService());
     }
 }

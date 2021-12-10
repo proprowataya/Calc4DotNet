@@ -66,7 +66,7 @@ class Program
     {
         CompilationContext context = CompilationContext.Empty;
         var array = new Calc4GlobalArraySource<TNumber>();
-        var state = new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((dynamic)0), array);
+        var state = new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((dynamic)0), array, new TextWriterIOService(Console.Out));
 
         while (true)
         {

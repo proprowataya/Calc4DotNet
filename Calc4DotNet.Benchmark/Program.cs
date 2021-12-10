@@ -39,7 +39,8 @@ public class Program
 
         // Run
         var state = new SimpleEvaluationState<NumberType>(new DefaultVariableSource<NumberType>((NumberType)0),
-                                                          new Calc4GlobalArraySource<NumberType>());
+                                                          new Calc4GlobalArraySource<NumberType>(),
+                                                          new MemoryIOService());
         LowLevelExecutor.Execute(module, state);
     }
 }

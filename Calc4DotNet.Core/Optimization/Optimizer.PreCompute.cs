@@ -34,12 +34,14 @@ public static partial class Optimizer
             // Otherwise, we try to execute
             TNumber preComputedValue;
             OptimizeTimeEvaluationState<TNumber> stateAferPreCompuation = state.Clone();
+            MemoryIOService ioService = new();
             try
             {
                 preComputedValue = Evaluator.Evaluate<TNumber>(op,
                                                                compilationContext,
                                                                new SimpleEvaluationState<TNumber>(stateAferPreCompuation,
-                                                                                                  AlwaysThrowGlobalArraySource<TNumber>.Instance),
+                                                                                                  AlwaysThrowGlobalArraySource<TNumber>.Instance,
+                                                                                                  ioService),
                                                                maxStep);
             }
             catch (EvaluationStepLimitExceedException)
@@ -80,6 +82,12 @@ public static partial class Optimizer
                 }
             }
 
+            // Keep PrintCharOperators
+            foreach (var c in ioService.GetHistory())
+            {
+                operators.Add(new PrintCharOperator(new PreComputedOperator((TNumber)(dynamic)c)));
+            }
+
             operators.Add(new PreComputedOperator(preComputedValue));
 
             // Tell the variables after pre-computation
@@ -106,6 +114,13 @@ public static partial class Optimizer
         {
             var index = op.Index.Accept(this, state);
             var newOp = op with { Index = index };
+            return PreComputeIfPossible(newOp, state);
+        }
+
+        public IOperator Visit(PrintCharOperator op, OptimizeTimeEvaluationState<TNumber> state)
+        {
+            var character = op.Character.Accept(this, state);
+            var newOp = op with { Character = character };
             return PreComputeIfPossible(newOp, state);
         }
 

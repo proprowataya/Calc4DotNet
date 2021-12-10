@@ -10,7 +10,8 @@ internal sealed record TestCase(string Source,
                                 ImmutableDictionary<ValueBox<string>, Int32> VariablesAfterExecution,
                                 CompilationResult<Int32> ExpectedWhenOptimized,
                                 CompilationResult<Int32> ExpectedWhenNotOptimized,
-                                Type[]? SkipTypes);
+                                Type[]? SkipTypes,
+                                string? ExpectedConsoleOutput = null);
 
 internal sealed record CompilationResult<TNumber>(IOperator Operator, CompilationContext Context, LowLevelModule<TNumber> Module)
     where TNumber : notnull;

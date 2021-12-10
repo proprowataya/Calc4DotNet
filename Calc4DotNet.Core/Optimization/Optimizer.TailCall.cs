@@ -38,6 +38,12 @@ public static partial class Optimizer
             return op with { Index = index };
         }
 
+        public IOperator Visit(PrintCharOperator op, bool isTailCall)
+        {
+            var character = op.Character.Accept(this, isTailCall);
+            return op with { Character = character };
+        }
+
         public IOperator Visit(ParenthesisOperator op, bool isTailCall)
         {
             ImmutableArray<IOperator> operators = op.Operators;

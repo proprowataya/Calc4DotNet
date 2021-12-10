@@ -75,6 +75,16 @@ public sealed record LoadArrayOperator(IOperator Index, string? SupplementaryTex
     public override string ToString() => this.ToStringImplement();
 }
 
+public sealed record PrintCharOperator(IOperator Character, string? SupplementaryText = null) : IOperator
+{
+    public IOperator[] GetOperands() => new[] { Character };
+
+    public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+    public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+    public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+    public override string ToString() => this.ToStringImplement();
+}
+
 public sealed record ParenthesisOperator(ImmutableArray<IOperator> Operators, string? SupplementaryText = null) : IOperator
 {
     public IOperator[] GetOperands() => Array.Empty<IOperator>();
