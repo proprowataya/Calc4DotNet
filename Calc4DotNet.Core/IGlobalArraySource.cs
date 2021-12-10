@@ -31,7 +31,7 @@ public sealed class Calc4GlobalArraySource<TNumber> : IGlobalArraySource<TNumber
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
-            if (index - BaseOffset is int arrayIndex && arrayIndex < array.Length)
+            if (index - BaseOffset is int arrayIndex && (uint)arrayIndex < (uint)array.Length)
             {
                 return array[arrayIndex];
             }
@@ -51,7 +51,7 @@ public sealed class Calc4GlobalArraySource<TNumber> : IGlobalArraySource<TNumber
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         set
         {
-            if (index - BaseOffset is int arrayIndex && arrayIndex < array.Length)
+            if (index - BaseOffset is int arrayIndex && (uint)arrayIndex < (uint)array.Length)
             {
                 array[arrayIndex] = value;
             }
