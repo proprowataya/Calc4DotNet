@@ -299,7 +299,7 @@ public static class Lexer
 
         private static bool IsWhiteSpace(char c)
         {
-            return char.IsWhiteSpace(c) || c == '\n' || c == '\n';
+            return char.IsWhiteSpace(c) || c == '\n' || c == '\r';
         }
     }
 }
