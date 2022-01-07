@@ -26,6 +26,8 @@ var testCaseInputs = new (string Source, Type[]? SkipTypes)[]
     ("1+2*3-10", null),
     ("0?1?2?3?4", null),
     ("72P101P108P108P111P10P", null),
+    ("1+// C++ style comment\n2", null),
+    ("1+/* C style comment*/2", null),
     ("D[print||72P101P108P108P111P10P] {print}", null),
     ("D[add|x,y|x+y] 12{add}23", null),
     ("D[get12345||12345] {get12345}+{get12345}", null),

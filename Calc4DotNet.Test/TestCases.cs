@@ -1792,6 +1792,186 @@ internal static class TestCases
             ExpectedConsoleOutput: "Hello\n"
         ),
         new TestCase(
+            Source: "1+// C++ style comment\n2",
+            ExpectedValue: 3,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
+            ExpectedWhenNotOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new BinaryOperator(
+                        Left: new DecimalOperator(
+                            Operand: new ZeroOperator(),
+                            Value: 1,
+                            SupplementaryText: null
+                        ),
+                        Right: new DecimalOperator(
+                            Operand: new ZeroOperator(),
+                            Value: 2,
+                            SupplementaryText: null
+                        ),
+                        Type: BinaryType.Add,
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 02 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                /* 04 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 05 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 06 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 07 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 08 */ new LowLevelOperation(Opcode.LoadConst, 2),
+                                /* 09 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 10 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 11 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            ExpectedWhenOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new PreComputedOperator(
+                        Value: 3
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 3),
+                                /* 01 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            SkipTypes: null
+        ),
+        new TestCase(
+            Source: "1+/* C style comment*/2",
+            ExpectedValue: 3,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
+            ExpectedWhenNotOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new BinaryOperator(
+                        Left: new DecimalOperator(
+                            Operand: new ZeroOperator(),
+                            Value: 1,
+                            SupplementaryText: null
+                        ),
+                        Right: new DecimalOperator(
+                            Operand: new ZeroOperator(),
+                            Value: 2,
+                            SupplementaryText: null
+                        ),
+                        Type: BinaryType.Add,
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 02 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                /* 04 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 05 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 06 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 07 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 08 */ new LowLevelOperation(Opcode.LoadConst, 2),
+                                /* 09 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 10 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 11 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            ExpectedWhenOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new PreComputedOperator(
+                        Value: 3
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 3),
+                                /* 01 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            SkipTypes: null
+        ),
+        new TestCase(
             Source: "D[print||72P101P108P108P111P10P] {print}",
             ExpectedValue: 0,
             VariablesAfterExecution:

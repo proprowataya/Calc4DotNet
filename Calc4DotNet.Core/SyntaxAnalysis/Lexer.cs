@@ -41,10 +41,49 @@ public static class Lexer
 
             while (Index < text.Length && text[Index] != ')')
             {
-                if (IsWhiteSpace(text[Index]))
+                char c = text[Index];
+
+                if (IsWhiteSpace(c))
                 {
                     Index++;
                     continue;
+                }
+                else if (c == '/' && Index + 1 < text.Length)
+                {
+                    if (text[Index + 1] == '*')
+                    {
+                        // C style comment
+                        Index += 2;
+
+                        char previous = '\0';
+                        while (Index < text.Length)
+                        {
+                            char current = text[Index++];
+                            if ((previous, current) == ('*', '/'))
+                            {
+                                break;
+                            }
+
+                            previous = current;
+                        }
+
+                        continue;
+                    }
+                    else if (text[Index + 1] == '/')
+                    {
+                        // C++ style comment
+                        Index += 2;
+
+                        while (Index < text.Length)
+                        {
+                            if (text[Index++] is '\r' or '\n')
+                            {
+                                break;
+                            }
+                        }
+
+                        continue;
+                    }
                 }
 
                 list.Add(NextToken());
