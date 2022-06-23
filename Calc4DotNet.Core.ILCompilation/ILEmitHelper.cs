@@ -42,8 +42,8 @@ internal static class ILEmitHelper
                     case 8:
                         il.Emit(OpCodes.Ldc_I4_8);
                         break;
-                    case int i when i < 256:
-                        il.Emit(OpCodes.Ldc_I4_S, (byte)i);
+                    case int i when (sbyte)i == i:
+                        il.Emit(OpCodes.Ldc_I4_S, (sbyte)i);
                         break;
                     default:
                         il.Emit(OpCodes.Ldc_I4, i32);

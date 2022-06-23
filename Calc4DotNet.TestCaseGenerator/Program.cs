@@ -10,6 +10,7 @@ using Calc4DotNet.Test;
 
 var testCaseInputs = new (string Source, Type[]? SkipTypes)[]
 {
+    ("200", null),
     ("1<2", null),
     ("1<=2", null),
     ("1>=2", null),
