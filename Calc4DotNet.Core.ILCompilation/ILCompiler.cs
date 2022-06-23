@@ -11,10 +11,10 @@ public static class ILCompiler
 {
     private static readonly AssemblyName AsmName = new AssemblyName("Calc4Assembly");
     private const string ClassName = "<Calc4Implement>";
-    private const string RunMethodName = nameof(ICompiledModule<object>.Run);
+    private const string RunMethodName = nameof(ICompiledModule<int>.Run);
 
     public static ICompiledModule<TNumber> Compile<TNumber>(LowLevelModule<TNumber> module)
-        where TNumber : notnull
+        where TNumber : INumber<TNumber>
     {
         AssemblyBuilder assemblyBuilder
             = AssemblyBuilder.DefineDynamicAssembly(AsmName, AssemblyBuilderAccess.Run);
@@ -59,7 +59,7 @@ public static class ILCompiler
     }
 
     private static void EmitIL<TNumber>(LowLevelModule<TNumber> module, FieldBuilder[] fieldBuilders, MethodBuilder runMethod, (MethodBuilder Method, int NumOperands)[] methods)
-        where TNumber : notnull
+        where TNumber : INumber<TNumber>
     {
         // Emit Main(Run) operator
         EmitILCore(module, module.EntryPoint, fieldBuilders, runMethod, 0, methods, isMain: true);
@@ -72,7 +72,7 @@ public static class ILCompiler
     }
 
     private static void EmitILCore<TNumber>(LowLevelModule<TNumber> module, ImmutableArray<LowLevelOperation> operations, FieldBuilder[] fieldBuilders, MethodBuilder method, int numOperands, (MethodBuilder Method, int NumOperands)[] methods, bool isMain)
-        where TNumber : notnull
+        where TNumber : INumber<TNumber>
     {
         /* Locals */
         ILGenerator il = method.GetILGenerator();
@@ -138,16 +138,16 @@ public static class ILCompiler
             switch (op.Opcode)
             {
                 case Opcode.Push:
-                    il.EmitLdc((TNumber)(dynamic)0);
+                    il.EmitLdc(TNumber.Zero);
                     break;
                 case Opcode.Pop:
                     il.Emit(OpCodes.Pop);
                     break;
                 case Opcode.LoadConst:
-                    il.EmitLdc((TNumber)(dynamic)op.Value);
+                    il.EmitLdc(TNumber.CreateTruncating(op.Value));
                     break;
                 case Opcode.LoadConstTable:
-                    il.EmitLdc((TNumber)(dynamic)module.ConstTable[op.Value]);
+                    il.EmitLdc(TNumber.CreateTruncating(module.ConstTable[op.Value]));
                     break;
                 case Opcode.LoadArg:
                     il.EmitLdarg(RestoreMethodParameterIndex(op.Value));
@@ -195,7 +195,7 @@ public static class ILCompiler
                     EmitLoadIOService();
                     il.Emit(OpCodes.Ldloc_S, character.LocalIndex);
                     il.Emit(OpCodes.Callvirt, typeof(IIOService).GetMethod(nameof(IIOService.PrintChar))!);
-                    il.EmitLdc((TNumber)(dynamic)0);
+                    il.EmitLdc(TNumber.Zero);
                     break;
                 case Opcode.Add:
                     if (typeof(TNumber) == typeof(BigInteger))

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Numerics;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Execution;
 using Calc4DotNet.Core.Operators;
@@ -14,4 +15,4 @@ internal sealed record TestCase(string Source,
                                 string? ExpectedConsoleOutput = null);
 
 internal sealed record CompilationResult<TNumber>(IOperator Operator, CompilationContext Context, LowLevelModule<TNumber> Module)
-    where TNumber : notnull;
+    where TNumber : INumber<TNumber>;

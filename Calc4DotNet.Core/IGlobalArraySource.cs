@@ -1,14 +1,17 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Calc4DotNet.Core;
 
 public interface IGlobalArraySource<TNumber>
+    where TNumber : INumber<TNumber>
 {
     TNumber this[int index] { get; set; }
     IGlobalArraySource<TNumber> Clone();
 }
 
 public sealed class Calc4GlobalArraySource<TNumber> : IGlobalArraySource<TNumber>
+    where TNumber : INumber<TNumber>
 {
     private const int ArrayLength = 2048;
     private const int BaseOffset = -1024;
@@ -43,7 +46,7 @@ public sealed class Calc4GlobalArraySource<TNumber> : IGlobalArraySource<TNumber
                 }
                 else
                 {
-                    return default!;    // TODO
+                    return TNumber.Zero;
                 }
             }
         }
@@ -78,6 +81,7 @@ internal sealed class ArrayElementNotSetException : Exception
 { }
 
 internal sealed class AlwaysThrowGlobalArraySource<TNumber> : IGlobalArraySource<TNumber>
+    where TNumber : INumber<TNumber>
 {
     public static readonly AlwaysThrowGlobalArraySource<TNumber> Instance = new();
 

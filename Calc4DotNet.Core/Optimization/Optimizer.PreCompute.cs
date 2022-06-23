@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Numerics;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Operators;
 
@@ -8,7 +9,7 @@ namespace Calc4DotNet.Core.Optimization;
 public static partial class Optimizer
 {
     private sealed class PreComputeVisitor<TNumber> : IOperatorVisitor<IOperator, OptimizeTimeEvaluationState<TNumber>>
-        where TNumber : notnull
+        where TNumber : INumber<TNumber>
     {
         private readonly CompilationContext compilationContext;
         private readonly int maxStep;
@@ -85,7 +86,7 @@ public static partial class Optimizer
             // Keep PrintCharOperators
             foreach (var c in ioService.GetHistory())
             {
-                operators.Add(new PrintCharOperator(new PreComputedOperator((TNumber)(dynamic)c)));
+                operators.Add(new PrintCharOperator(new PreComputedOperator(TNumber.CreateTruncating(c))));
             }
 
             operators.Add(new PreComputedOperator(preComputedValue));
@@ -243,8 +244,7 @@ public static partial class Optimizer
 
             if (PreComputeIfPossible(condition, state) is PreComputedOperator preComputed)
             {
-                // TODO: More wise determination method of whether the value is zero or not
-                return (dynamic)preComputed.Value != 0 ? ifTrue : ifFalse;
+                return !TNumber.IsZero((TNumber)preComputed.Value) ? ifTrue : ifFalse;
             }
             else
             {

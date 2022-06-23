@@ -44,7 +44,7 @@ catch (Exception e)
 }
 
 void Start<TNumber>()
-    where TNumber : notnull
+    where TNumber : INumber<TNumber>
 {
     if (sourcePaths.Length > 0)
     {

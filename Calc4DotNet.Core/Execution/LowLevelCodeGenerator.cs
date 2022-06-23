@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Numerics;
 using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.Execution;
@@ -7,7 +8,7 @@ namespace Calc4DotNet.Core.Execution;
 public static class LowLevelCodeGenerator
 {
     public static LowLevelModule<TNumber> Generate<TNumber>(IOperator op, CompilationContext context)
-        where TNumber : notnull
+        where TNumber : INumber<TNumber>
     {
         var constTable = new List<TNumber>();
         var userDefinedOperators = ImmutableArray.CreateBuilder<LowLevelUserDefinedOperator>();
@@ -54,7 +55,7 @@ public static class LowLevelCodeGenerator
     }
 
     private sealed class Visitor<TNumber> : IOperatorVisitor
-        where TNumber : notnull
+        where TNumber : INumber<TNumber>
     {
         private const int OperatorBeginLabel = 0;
 
@@ -221,11 +222,16 @@ public static class LowLevelCodeGenerator
 
         public void Visit(PreComputedOperator op)
         {
+            static T ConvertChecked<T>(TNumber value) where T : INumber<T>
+            {
+                return T.CreateChecked(value);
+            }
+
             static bool TryCastToShort(TNumber number, out short casted)
             {
                 try
                 {
-                    casted = checked((short)(dynamic)number);
+                    casted = ConvertChecked<short>(number);
                     return true;
                 }
                 catch (OverflowException)
