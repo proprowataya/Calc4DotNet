@@ -17,7 +17,7 @@ internal enum ExecutorType
 
 public class ExecutionTest
 {
-    private static readonly Type[] ValueTypes = new[] { typeof(Int32), typeof(Int64), typeof(Double), typeof(BigInteger) };
+    private static readonly Type[] ValueTypes = new[] { typeof(Int32), typeof(Int64), typeof(Int128), typeof(Double), typeof(BigInteger) };
 
     private static readonly ExecutorType[] ExecutorTypes = Enum.GetValues<ExecutorType>();
 

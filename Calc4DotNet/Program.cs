@@ -24,6 +24,10 @@ try
     {
         Start<Int64>();
     }
+    else if (setting.NumberType == typeof(Int128))
+    {
+        Start<Int128>();
+    }
     else if (setting.NumberType == typeof(Double))
     {
         Start<Double>();
