@@ -105,13 +105,13 @@ public static class LowLevelExecutor
                     break;
                 case Opcode.LoadArrayElement:
                     VerifyRange(stack, ref Unsafe.Add(ref top, -1));
-                    Unsafe.Add(ref top, -1) = array[NumberHelper.ConvertTruncating<TNumber, int>(Unsafe.Add(ref top, -1))];
+                    Unsafe.Add(ref top, -1) = array[Unsafe.Add(ref top, -1)];
                     break;
                 case Opcode.StoreArrayElement:
                     top = ref Unsafe.Add(ref top, -1);
                     VerifyRange(stack, ref top);
                     VerifyRange(stack, ref Unsafe.Add(ref top, -1));
-                    array[NumberHelper.ConvertTruncating<TNumber, int>(top)] = Unsafe.Add(ref top, -1);
+                    array[top] = Unsafe.Add(ref top, -1);
                     break;
                 case Opcode.Input:
                     throw new NotImplementedException();

@@ -6,7 +6,7 @@ namespace Calc4DotNet.Core;
 public interface IGlobalArraySource<TNumber>
     where TNumber : INumber<TNumber>
 {
-    TNumber this[int index] { get; set; }
+    TNumber this[TNumber index] { get; set; }
     IGlobalArraySource<TNumber> Clone();
 }
 
@@ -14,47 +14,44 @@ public sealed class Calc4GlobalArraySource<TNumber> : IGlobalArraySource<TNumber
     where TNumber : INumber<TNumber>
 {
     private const int ArrayLength = 2048;
-    private const int BaseOffset = -1024;
+    private static TNumber BaseOffset => TNumber.CreateTruncating(-1024);
 
     private readonly TNumber[] array;
-    private Dictionary<int, TNumber>? dictionary;   // [index] = value
+    private Dictionary<TNumber, TNumber>? dictionary;   // [index] = value
 
     public Calc4GlobalArraySource()
         : this(new TNumber[ArrayLength], null)
     { }
 
-    public Calc4GlobalArraySource(TNumber[] array, Dictionary<int, TNumber>? dictionary)
+    public Calc4GlobalArraySource(TNumber[] array, Dictionary<TNumber, TNumber>? dictionary)
     {
         this.array = array;
         this.dictionary = dictionary;
     }
 
-    public TNumber this[int index]
+    public TNumber this[TNumber index]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
-            if (index - BaseOffset is int arrayIndex && (uint)arrayIndex < (uint)array.Length)
+            if (TryGetArrayIndex(index, out var arrayIndex))
             {
                 return array[arrayIndex];
             }
+            else if (dictionary is not null && dictionary.TryGetValue(index, out var value))
+            {
+                return value;
+            }
             else
             {
-                if (dictionary is not null && dictionary.TryGetValue(index, out var value))
-                {
-                    return value;
-                }
-                else
-                {
-                    return TNumber.Zero;
-                }
+                return TNumber.Zero;
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         set
         {
-            if (index - BaseOffset is int arrayIndex && (uint)arrayIndex < (uint)array.Length)
+            if (TryGetArrayIndex(index, out var arrayIndex))
             {
                 array[arrayIndex] = value;
             }
@@ -75,6 +72,23 @@ public sealed class Calc4GlobalArraySource<TNumber> : IGlobalArraySource<TNumber
     {
         return Clone();
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool TryGetArrayIndex(TNumber index, out int arrayIndex)
+    {
+        TNumber offset = index - BaseOffset;
+
+        if (offset >= TNumber.Zero && offset < TNumber.CreateTruncating(array.Length))
+        {
+            arrayIndex = NumberHelper.ConvertTruncating<TNumber, int>(offset);
+            return true;
+        }
+        else
+        {
+            arrayIndex = default;
+            return false;
+        }
+    }
 }
 
 internal sealed class ArrayElementNotSetException : Exception
@@ -88,7 +102,7 @@ internal sealed class AlwaysThrowGlobalArraySource<TNumber> : IGlobalArraySource
     private AlwaysThrowGlobalArraySource()
     { }
 
-    public TNumber this[int index]
+    public TNumber this[TNumber index]
     {
         get => throw new ArrayElementNotSetException();
         set => throw new ArrayElementNotSetException();

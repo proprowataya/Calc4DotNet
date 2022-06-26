@@ -164,26 +164,24 @@ public static class ILCompiler
                     il.Emit(OpCodes.Stsfld, fieldBuilders[op.Value]);
                     break;
                 case Opcode.LoadArrayElement:
-                    index ??= il.DeclareLocal(typeof(int));
-                    il.EmitConvToINumber<TNumber, Int32>();
+                    index ??= il.DeclareLocal(typeof(TNumber));
                     il.Emit(OpCodes.Stloc_S, index.LocalIndex);
 
                     EmitLoadArraySource();
                     il.Emit(OpCodes.Ldloc_S, index.LocalIndex);
-                    il.Emit(OpCodes.Callvirt, typeof(IGlobalArraySource<TNumber>).GetMethod("get_Item", new[] { typeof(int) })!);
+                    il.Emit(OpCodes.Callvirt, typeof(IGlobalArraySource<TNumber>).GetMethod("get_Item", new[] { typeof(TNumber) })!);
                     break;
                 case Opcode.StoreArrayElement:
                     value ??= il.DeclareLocal(typeof(TNumber));
-                    index ??= il.DeclareLocal(typeof(int));
+                    index ??= il.DeclareLocal(typeof(TNumber));
 
-                    il.EmitConvToINumber<TNumber, Int32>();
                     il.Emit(OpCodes.Stloc_S, index.LocalIndex);
                     il.Emit(OpCodes.Stloc_S, value.LocalIndex);
 
                     EmitLoadArraySource();
                     il.Emit(OpCodes.Ldloc_S, index.LocalIndex);
                     il.Emit(OpCodes.Ldloc_S, value.LocalIndex);
-                    il.Emit(OpCodes.Callvirt, typeof(IGlobalArraySource<TNumber>).GetMethod("set_Item", new[] { typeof(int), typeof(TNumber) })!);
+                    il.Emit(OpCodes.Callvirt, typeof(IGlobalArraySource<TNumber>).GetMethod("set_Item", new[] { typeof(TNumber), typeof(TNumber) })!);
                     il.Emit(OpCodes.Ldloc_S, value.LocalIndex);
                     break;
                 case Opcode.Input:

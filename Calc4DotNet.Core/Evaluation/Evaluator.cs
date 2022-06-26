@@ -59,7 +59,7 @@ public static class Evaluator
         public TNumber Visit(LoadArrayOperator op, TNumber[]? arguments)
         {
             TNumber index = op.Index.Accept(this, arguments);
-            return evaluationState.GlobalArray[NumberHelper.ConvertTruncating<TNumber, int>(index)];
+            return evaluationState.GlobalArray[index];
         }
 
         public TNumber Visit(PrintCharOperator op, TNumber[]? arguments)
@@ -99,7 +99,7 @@ public static class Evaluator
         {
             TNumber value = op.Value.Accept(this, arguments);
             TNumber index = op.Index.Accept(this, arguments);
-            return evaluationState.GlobalArray[NumberHelper.ConvertTruncating<TNumber, int>(index)] = value;
+            return evaluationState.GlobalArray[index] = value;
         }
 
         public TNumber Visit(BinaryOperator op, TNumber[]? arguments)
