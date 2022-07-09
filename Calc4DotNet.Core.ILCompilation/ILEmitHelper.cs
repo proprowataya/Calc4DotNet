@@ -1,11 +1,14 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using System.Reflection.Emit;
+using static Calc4DotNet.Core.ILCompilation.ReflectionHelper;
 
 namespace Calc4DotNet.Core.ILCompilation;
 
 internal static class ILEmitHelper
 {
     public static void EmitLdc<TNumber>(this ILGenerator il, TNumber value)
+        where TNumber : INumber<TNumber>
     {
         switch (value)
         {
@@ -81,7 +84,45 @@ internal static class ILEmitHelper
                 }
                 break;
             default:
-                throw new InvalidOperationException();
+                {
+                    bool TryCastTo<TTo>([NotNullWhen(true)] out TTo? result) where TTo : INumber<TTo>
+                    {
+                        try
+                        {
+                            result = TTo.CreateChecked(value);
+                            return true;
+                        }
+                        catch
+                        {
+                            result = default;
+                            return false;
+                        }
+                    }
+
+                    // If the value is representable as Int32 or Int64, we use INumberBase<TNumber>.CreateTruncating.
+                    // Otherwise, we will parse its string representation.
+                    if (TryCastTo<Int32>(out var i32))
+                    {
+                        il.EmitLdc(i32);
+                        il.Emit(OpCodes.Constrained, typeof(TNumber));
+                        il.Emit(OpCodes.Call, GetInterfaceMethod<TNumber, INumberBase<TNumber>>(nameof(INumberBase<TNumber>.CreateTruncating)).MakeGenericMethod(typeof(Int32)));
+                    }
+                    else if (TryCastTo<Int64>(out var i64))
+                    {
+                        il.EmitLdc(i64);
+                        il.Emit(OpCodes.Constrained, typeof(TNumber));
+                        il.Emit(OpCodes.Call, GetInterfaceMethod<TNumber, INumberBase<TNumber>>(nameof(INumberBase<TNumber>.CreateTruncating)).MakeGenericMethod(typeof(Int64)));
+                    }
+                    else
+                    {
+                        il.Emit(OpCodes.Ldstr, value.ToString() ?? throw new InvalidOperationException("ToString() returned null"));
+                        il.Emit(OpCodes.Ldnull);
+                        il.Emit(OpCodes.Constrained, typeof(TNumber));
+                        il.Emit(OpCodes.Call, GetInterfaceMethod<TNumber, IParsable<TNumber>>(nameof(IParsable<TNumber>.Parse)));
+                    }
+
+                    break;
+                }
         }
     }
 
@@ -123,52 +164,11 @@ internal static class ILEmitHelper
         }
     }
 
-    public static void EmitConvToInt16<TFrom>(this ILGenerator il)
+    public static void EmitConvToINumber<TFrom, TTo>(this ILGenerator il)
+        where TFrom : INumber<TFrom>
+        where TTo : INumber<TTo>
     {
-        if (typeof(TFrom) == typeof(Int32))
-        {
-            il.Emit(OpCodes.Conv_I2);
-        }
-        else if (typeof(TFrom) == typeof(Int64))
-        {
-            il.Emit(OpCodes.Conv_I2);
-        }
-        else if (typeof(TFrom) == typeof(Double))
-        {
-            il.Emit(OpCodes.Conv_I2);
-        }
-        else if (typeof(TFrom) == typeof(BigInteger))
-        {
-            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethods().Single(m => m.Name == "op_Explicit" && m.ReturnType == typeof(int)));
-            il.Emit(OpCodes.Conv_I2);
-        }
-        else
-        {
-            throw new InvalidOperationException();
-        }
-    }
-
-    public static void EmitConvToInt32<TFrom>(this ILGenerator il)
-    {
-        if (typeof(TFrom) == typeof(Int32))
-        {
-            // Do nothing 
-        }
-        else if (typeof(TFrom) == typeof(Int64))
-        {
-            il.Emit(OpCodes.Conv_I4);
-        }
-        else if (typeof(TFrom) == typeof(Double))
-        {
-            il.Emit(OpCodes.Conv_I4);
-        }
-        else if (typeof(TFrom) == typeof(BigInteger))
-        {
-            il.Emit(OpCodes.Call, typeof(BigInteger).GetMethods().Single(m => m.Name == "op_Explicit" && m.ReturnType == typeof(int)));
-        }
-        else
-        {
-            throw new InvalidOperationException();
-        }
+        il.Emit(OpCodes.Constrained, typeof(TTo));
+        il.Emit(OpCodes.Call, GetInterfaceMethod<TTo, INumberBase<TTo>>(nameof(INumberBase<TTo>.CreateTruncating)).MakeGenericMethod(typeof(TFrom)));
     }
 }

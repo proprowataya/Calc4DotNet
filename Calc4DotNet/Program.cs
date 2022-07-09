@@ -3,14 +3,23 @@ using Calc4DotNet;
 
 Setting setting;
 string[] sourcePaths;
+bool printHelp;
 try
 {
-    (setting, sourcePaths) = Setting.ParseCommandLineArgs(args);
+    (setting, sourcePaths, printHelp) = CommandLineArgsParser.Parse(args);
 }
 catch (CommandLineArgsParseException e)
 {
     Console.WriteLine($"Error: {e.Message}");
+    Console.WriteLine();
+    Console.WriteLine(CommandLineArgsParser.GetHelp());
     Environment.Exit(1);
+    return;
+}
+
+if (printHelp)
+{
+    Console.WriteLine(CommandLineArgsParser.GetHelp());
     return;
 }
 
@@ -23,6 +32,10 @@ try
     else if (setting.NumberType == typeof(Int64))
     {
         Start<Int64>();
+    }
+    else if (setting.NumberType == typeof(Int128))
+    {
+        Start<Int128>();
     }
     else if (setting.NumberType == typeof(Double))
     {
@@ -44,7 +57,7 @@ catch (Exception e)
 }
 
 void Start<TNumber>()
-    where TNumber : notnull
+    where TNumber : INumber<TNumber>
 {
     if (sourcePaths.Length > 0)
     {

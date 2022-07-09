@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Numerics;
 using System.Reflection;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Execution;
@@ -62,7 +63,7 @@ internal struct CSharpSerializer
     }
 
     public void Serialize<TNumber>(CompilationResult<TNumber> result, bool insertIndentFirst = true)
-        where TNumber : notnull
+        where TNumber : INumber<TNumber>
     {
         WriteLine($"new {nameof(CompilationResult<TNumber>)}<{typeof(TNumber).Name}>(", insertIndentFirst);
 
@@ -172,7 +173,7 @@ internal struct CSharpSerializer
     }
 
     public void Serialize<TNumber>(LowLevelModule<TNumber> module, bool insertIndentFirst = true)
-        where TNumber : notnull
+        where TNumber : INumber<TNumber>
     {
         WriteLine($"new {nameof(LowLevelModule<TNumber>)}<{typeof(TNumber).Name}>(", insertIndentFirst);
         indent++;
