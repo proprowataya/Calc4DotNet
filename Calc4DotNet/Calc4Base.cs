@@ -52,7 +52,7 @@ internal abstract class Calc4Base<TNumber>
             LowLevelModule<TNumber> module = LowLevelCodeGenerator.Generate<TNumber>(op, context);
 
             // Print detail information of operators and low-level module
-            if (setting.PrintDetailInformation)
+            if (setting.Dump)
             {
                 PrintDetailInformation(op, context, module);
             }

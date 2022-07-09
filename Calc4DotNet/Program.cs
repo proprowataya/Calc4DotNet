@@ -3,14 +3,23 @@ using Calc4DotNet;
 
 Setting setting;
 string[] sourcePaths;
+bool printHelp;
 try
 {
-    (setting, sourcePaths) = Setting.ParseCommandLineArgs(args);
+    (setting, sourcePaths, printHelp) = CommandLineArgsParser.Parse(args);
 }
 catch (CommandLineArgsParseException e)
 {
     Console.WriteLine($"Error: {e.Message}");
+    Console.WriteLine();
+    Console.WriteLine(CommandLineArgsParser.GetHelp());
     Environment.Exit(1);
+    return;
+}
+
+if (printHelp)
+{
+    Console.WriteLine(CommandLineArgsParser.GetHelp());
     return;
 }
 
