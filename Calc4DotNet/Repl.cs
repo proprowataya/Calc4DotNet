@@ -10,7 +10,10 @@ internal class Repl<TNumber> : Calc4Base<TNumber>
 
     public override void Run()
     {
-        Console.WriteLine("Calc4 Interpreter");
+        Console.WriteLine("Calc4 REPL");
+        Console.WriteLine($"    Integer type: {setting.NumberType}");
+        Console.WriteLine($"    Executor: {setting.ExecutorType}");
+        Console.WriteLine($"    Optimize: {(setting.Optimize ? "on" : "off")}");
         Console.WriteLine();
 
         while (true)
