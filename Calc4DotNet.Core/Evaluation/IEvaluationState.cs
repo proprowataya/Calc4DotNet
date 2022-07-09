@@ -1,10 +1,12 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 
 namespace Calc4DotNet.Core.Evaluation;
 
 public interface IEvaluationState<TNumber>
+    where TNumber : INumber<TNumber>
 {
     IVariableSource<TNumber> Variables { get; }
     IGlobalArraySource<TNumber> GlobalArray { get; }
@@ -13,6 +15,7 @@ public interface IEvaluationState<TNumber>
 }
 
 public interface IVariableSource<TNumber>
+    where TNumber : INumber<TNumber>
 {
     TNumber this[string? variableName] { get; set; }
     bool TryGet(string? variableName, [MaybeNullWhen(false)] out TNumber value);
@@ -20,6 +23,7 @@ public interface IVariableSource<TNumber>
 }
 
 public sealed class SimpleEvaluationState<TNumber> : IEvaluationState<TNumber>
+    where TNumber : INumber<TNumber>
 {
     public IVariableSource<TNumber> Variables { get; }
     public IGlobalArraySource<TNumber> GlobalArray { get; }
@@ -44,6 +48,7 @@ public sealed class SimpleEvaluationState<TNumber> : IEvaluationState<TNumber>
 }
 
 public sealed class DefaultVariableSource<TNumber> : IVariableSource<TNumber>
+    where TNumber : INumber<TNumber>
 {
     private readonly TNumber defaultValue;
     private readonly Dictionary<ValueBox<string>, TNumber> variables;
@@ -92,6 +97,7 @@ internal sealed class VariableNotSetException : Exception
 { }
 
 internal sealed class OptimizeTimeEvaluationState<TNumber> : IVariableSource<TNumber>
+    where TNumber : INumber<TNumber>
 {
     private readonly Dictionary<ValueBox<string>, TNumber> variables;
     private readonly HashSet<string?> knownVariables;

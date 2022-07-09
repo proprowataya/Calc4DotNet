@@ -10,29 +10,8 @@ public static class LowLevelExecutor
     private const int StackSize = 1 << 20;
     private const int PtrStackSize = 1 << 20;
 
-    public static Int32 Execute(LowLevelModule<Int32> module, IEvaluationState<Int32> state)
-    {
-        return ExecuteCore<Int32, Int32Computer>(module, state);
-    }
-
-    public static Int64 Execute(LowLevelModule<Int64> module, IEvaluationState<Int64> state)
-    {
-        return ExecuteCore<Int64, Int64Computer>(module, state);
-    }
-
-    public static Double Execute(LowLevelModule<Double> module, IEvaluationState<Double> state)
-    {
-        return ExecuteCore<Double, DoubleComputer>(module, state);
-    }
-
-    public static BigInteger Execute(LowLevelModule<BigInteger> module, IEvaluationState<BigInteger> state)
-    {
-        return ExecuteCore<BigInteger, BigIntegerComputer>(module, state);
-    }
-
-    private static TNumber ExecuteCore<TNumber, TNumberComputer>(LowLevelModule<TNumber> module, IEvaluationState<TNumber> state)
-        where TNumber : notnull
-        where TNumberComputer : struct, INumberComputer<TNumber>
+    public static TNumber Execute<TNumber>(LowLevelModule<TNumber> module, IEvaluationState<TNumber> state)
+        where TNumber : INumber<TNumber>
     {
         // Get variable's values from IEvaluationState
         TNumber[] variables = new TNumber[module.Variables.Length];
@@ -46,7 +25,7 @@ public static class LowLevelExecutor
             throw new InvalidOperationException($"LowLevelExecutor only supports {nameof(Calc4GlobalArraySource<TNumber>)}, but {state.GlobalArray.GetType()} was given.");
         }
 
-        TNumber result = ExecuteCoreCore<TNumber, TNumberComputer>(module, variables, array, state.IOService);
+        TNumber result = ExecuteCore<TNumber>(module, variables, array, state.IOService);
 
         // Store variable's values to IEvaluationState
         for (int i = 0; i < variables.Length; i++)
@@ -57,12 +36,9 @@ public static class LowLevelExecutor
         return result;
     }
 
-    private static TNumber ExecuteCoreCore<TNumber, TNumberComputer>(LowLevelModule<TNumber> module, TNumber[] variables, Calc4GlobalArraySource<TNumber> array, IIOService ioService)
-        where TNumber : notnull
-        where TNumberComputer : struct, INumberComputer<TNumber>
+    private static TNumber ExecuteCore<TNumber>(LowLevelModule<TNumber> module, TNumber[] variables, Calc4GlobalArraySource<TNumber> array, IIOService ioService)
+        where TNumber : INumber<TNumber>
     {
-        TNumberComputer c = default;
-
         var (operationsArray, maxStackSizesArray) = module.FlattenOperations();
         Span<LowLevelOperation> operations = stackalloc LowLevelOperation[operationsArray.Length];
         Span<int> maxStackSizes = stackalloc int[maxStackSizesArray.Length];
@@ -90,7 +66,7 @@ public static class LowLevelExecutor
             {
                 case Opcode.Push:
                     VerifyRange(stack, ref top);
-                    top = c.Zero;
+                    top = TNumber.Zero;
                     top = ref Unsafe.Add(ref top, 1);
                     break;
                 case Opcode.Pop:
@@ -98,7 +74,7 @@ public static class LowLevelExecutor
                     break;
                 case Opcode.LoadConst:
                     VerifyRange(stack, ref top);
-                    top = c.FromInt(op.Value);
+                    top = TNumber.CreateTruncating(op.Value);
                     top = ref Unsafe.Add(ref top, 1);
                     break;
                 case Opcode.LoadConstTable:
@@ -129,50 +105,50 @@ public static class LowLevelExecutor
                     break;
                 case Opcode.LoadArrayElement:
                     VerifyRange(stack, ref Unsafe.Add(ref top, -1));
-                    Unsafe.Add(ref top, -1) = array[c.ToInt(Unsafe.Add(ref top, -1))];
+                    Unsafe.Add(ref top, -1) = array[Unsafe.Add(ref top, -1)];
                     break;
                 case Opcode.StoreArrayElement:
                     top = ref Unsafe.Add(ref top, -1);
                     VerifyRange(stack, ref top);
                     VerifyRange(stack, ref Unsafe.Add(ref top, -1));
-                    array[c.ToInt(top)] = Unsafe.Add(ref top, -1);
+                    array[top] = Unsafe.Add(ref top, -1);
                     break;
                 case Opcode.Input:
                     throw new NotImplementedException();
                 case Opcode.PrintChar:
                     VerifyRange(stack, ref Unsafe.Add(ref top, -1));
-                    ioService.PrintChar((char)c.ToInt(Unsafe.Add(ref top, -1)));
-                    Unsafe.Add(ref top, -1) = c.Zero;
+                    ioService.PrintChar((char)NumberHelper.ConvertTruncating<TNumber, int>(Unsafe.Add(ref top, -1)));
+                    Unsafe.Add(ref top, -1) = TNumber.Zero;
                     break;
                 case Opcode.Add:
                     top = ref Unsafe.Add(ref top, -1);
                     VerifyRange(stack, ref top);
                     VerifyRange(stack, ref Unsafe.Add(ref top, -1));
-                    Unsafe.Add(ref top, -1) = c.Add(Unsafe.Add(ref top, -1), top);
+                    Unsafe.Add(ref top, -1) += top;
                     break;
                 case Opcode.Sub:
                     top = ref Unsafe.Add(ref top, -1);
                     VerifyRange(stack, ref top);
                     VerifyRange(stack, ref Unsafe.Add(ref top, -1));
-                    Unsafe.Add(ref top, -1) = c.Subtract(Unsafe.Add(ref top, -1), top);
+                    Unsafe.Add(ref top, -1) -= top;
                     break;
                 case Opcode.Mult:
                     top = ref Unsafe.Add(ref top, -1);
                     VerifyRange(stack, ref top);
                     VerifyRange(stack, ref Unsafe.Add(ref top, -1));
-                    Unsafe.Add(ref top, -1) = c.Multiply(Unsafe.Add(ref top, -1), top);
+                    Unsafe.Add(ref top, -1) *= top;
                     break;
                 case Opcode.Div:
                     top = ref Unsafe.Add(ref top, -1);
                     VerifyRange(stack, ref top);
                     VerifyRange(stack, ref Unsafe.Add(ref top, -1));
-                    Unsafe.Add(ref top, -1) = c.Divide(Unsafe.Add(ref top, -1), top);
+                    Unsafe.Add(ref top, -1) /= top;
                     break;
                 case Opcode.Mod:
                     top = ref Unsafe.Add(ref top, -1);
                     VerifyRange(stack, ref top);
                     VerifyRange(stack, ref Unsafe.Add(ref top, -1));
-                    Unsafe.Add(ref top, -1) = c.Modulo(Unsafe.Add(ref top, -1), top);
+                    Unsafe.Add(ref top, -1) %= top;
                     break;
                 case Opcode.Goto:
                     op = ref Unsafe.Add(ref firstOperation, op.Value);
@@ -180,7 +156,7 @@ public static class LowLevelExecutor
                 case Opcode.GotoIfTrue:
                     top = ref Unsafe.Add(ref top, -1);
                     VerifyRange(stack, ref top);
-                    if (c.NotEquals(top, c.Zero))
+                    if (top != TNumber.Zero)
                     {
                         op = ref Unsafe.Add(ref firstOperation, op.Value);
                     }
@@ -189,7 +165,7 @@ public static class LowLevelExecutor
                     top = ref Unsafe.Add(ref top, -2);
                     VerifyRange(stack, ref top);
                     VerifyRange(stack, ref Unsafe.Add(ref top, 1));
-                    if (c.Equals(top, Unsafe.Add(ref top, 1)))
+                    if (top == Unsafe.Add(ref top, 1))
                     {
                         op = ref Unsafe.Add(ref firstOperation, op.Value);
                     }
@@ -198,7 +174,7 @@ public static class LowLevelExecutor
                     top = ref Unsafe.Add(ref top, -2);
                     VerifyRange(stack, ref top);
                     VerifyRange(stack, ref Unsafe.Add(ref top, 1));
-                    if (c.LessThan(top, Unsafe.Add(ref top, 1)))
+                    if (top < Unsafe.Add(ref top, 1))
                     {
                         op = ref Unsafe.Add(ref firstOperation, op.Value);
                     }
@@ -207,7 +183,7 @@ public static class LowLevelExecutor
                     top = ref Unsafe.Add(ref top, -2);
                     VerifyRange(stack, ref top);
                     VerifyRange(stack, ref Unsafe.Add(ref top, 1));
-                    if (c.LessThanOrEquals(top, Unsafe.Add(ref top, 1)))
+                    if (top <= Unsafe.Add(ref top, 1))
                     {
                         op = ref Unsafe.Add(ref firstOperation, op.Value);
                     }

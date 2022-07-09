@@ -17,7 +17,7 @@ internal enum ExecutorType
 
 public class ExecutionTest
 {
-    private static readonly Type[] ValueTypes = new[] { typeof(Int32), typeof(Int64), typeof(Double), typeof(BigInteger) };
+    private static readonly Type[] ValueTypes = new[] { typeof(Int32), typeof(Int64), typeof(Int128), typeof(Double), typeof(BigInteger) };
 
     private static readonly ExecutorType[] ExecutorTypes = Enum.GetValues<ExecutorType>();
 
@@ -48,7 +48,7 @@ public class ExecutionTest
                                                  OptimizeTarget? target,
                                                  TestCase testCase,
                                                  TNumber dummy)
-        where TNumber : notnull
+        where TNumber : INumber<TNumber>
     {
         /*****
          * Compile
@@ -112,13 +112,13 @@ public class ExecutionTest
          *****/
 
         {
-            TNumber expected = (TNumber)(dynamic)testCase.ExpectedValue;
+            TNumber expected = TNumber.CreateTruncating(testCase.ExpectedValue);
             IEvaluationState<TNumber> state = CreateEvaluationState<TNumber>();
 
             object actual = executorType switch
             {
                 ExecutorType.Tree => Evaluator.Evaluate<TNumber>(op, context, state),
-                ExecutorType.LowLevel => LowLevelExecutor.Execute((dynamic)module, (dynamic)state),
+                ExecutorType.LowLevel => LowLevelExecutor.Execute(module, state),
                 ExecutorType.Jit => ILCompiler.Compile(module).Run(state),
                 _ => throw new InvalidOperationException(),
             };
@@ -129,7 +129,7 @@ public class ExecutionTest
             // Test variables after execution
             foreach (var (name, value) in testCase.VariablesAfterExecution)
             {
-                Assert.Equal((TNumber)(dynamic)value, state.Variables[name.Value]);
+                Assert.Equal(TNumber.CreateTruncating(value), state.Variables[name.Value]);
             }
 
             // Test console output
@@ -158,14 +158,14 @@ public class ExecutionTest
     }
 
     private static CompilationResult<TNumber> CompileGeneric<TNumber>(string source, OptimizeTarget? target, TNumber dummy)
-        where TNumber : notnull
+        where TNumber : INumber<TNumber>
     {
         CompilationContext context = CompilationContext.Empty;
         List<IToken> tokens = Lexer.Lex(source, ref context);
         IOperator op = Parser.Parse(tokens, ref context);
         if (target is not null)
         {
-            Optimizer.Optimize<TNumber>(ref op, ref context, target.GetValueOrDefault(), new DefaultVariableSource<TNumber>((dynamic)0));
+            Optimizer.Optimize<TNumber>(ref op, ref context, target.GetValueOrDefault(), new DefaultVariableSource<TNumber>(TNumber.Zero));
         }
         LowLevelModule<TNumber> module = LowLevelCodeGenerator.Generate<TNumber>(op, context);
 
@@ -173,8 +173,9 @@ public class ExecutionTest
     }
 
     private static IEvaluationState<TNumber> CreateEvaluationState<TNumber>(TNumber? dummy = default)
+        where TNumber : INumber<TNumber>
     {
-        return new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((dynamic)0),
+        return new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>(TNumber.Zero),
                                                   new Calc4GlobalArraySource<TNumber>(),
                                                   new MemoryIOService());
     }

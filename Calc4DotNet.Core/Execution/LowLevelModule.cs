@@ -1,11 +1,12 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.InteropServices;
 
 namespace Calc4DotNet.Core.Execution;
 
 public sealed class LowLevelModule<TNumber>
-    where TNumber : notnull
+    where TNumber : INumber<TNumber>
 {
     public ImmutableArray<LowLevelOperation> EntryPoint { get; }
     public ImmutableArray<TNumber> ConstTable { get; }

@@ -39,6 +39,7 @@ internal sealed record Setting(Type NumberType, ExecutorType ExecutorType, bool 
                     {
                         "int32" => typeof(Int32),
                         "int64" => typeof(Int64),
+                        "int128" => typeof(Int128),
                         "double" => typeof(Double),
                         "bigint" or "biginteger" => typeof(BigInteger),
                         var arg => throw new CommandLineArgsParseException($"Type {arg} is not supported."),

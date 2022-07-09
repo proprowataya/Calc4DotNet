@@ -1,7 +1,9 @@
-﻿namespace Calc4DotNet;
+﻿using System.Numerics;
+
+namespace Calc4DotNet;
 
 internal sealed class Executor<TNumber> : Calc4Base<TNumber>
-    where TNumber : notnull
+    where TNumber : INumber<TNumber>
 {
     private readonly string[] sourcePaths;
 

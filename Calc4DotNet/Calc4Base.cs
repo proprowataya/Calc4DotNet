@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Numerics;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Exceptions;
@@ -12,14 +13,14 @@ using Calc4DotNet.Core.SyntaxAnalysis;
 namespace Calc4DotNet;
 
 internal abstract class Calc4Base<TNumber>
-    where TNumber : notnull
+    where TNumber : INumber<TNumber>
 {
     protected const int Indent = 4;
 
     protected readonly Setting setting;
     protected CompilationContext context = CompilationContext.Empty;
     protected IEvaluationState<TNumber> state =
-        new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>((dynamic)0),
+        new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>(TNumber.Zero),
                                            new Calc4GlobalArraySource<TNumber>(),
                                            new TextWriterIOService(Console.Out));
 
@@ -60,7 +61,7 @@ internal abstract class Calc4Base<TNumber>
             TNumber result;
             if (setting.ExecutorType == ExecutorType.LowLevel)
             {
-                result = LowLevelExecutor.Execute((dynamic)module, (dynamic)state);
+                result = LowLevelExecutor.Execute(module, state);
             }
             else if (setting.ExecutorType == ExecutorType.JIT)
             {

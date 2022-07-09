@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Numerics;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Operators;
 
@@ -21,7 +22,7 @@ public static partial class Optimizer
                                          ref CompilationContext context,
                                          OptimizeTarget target,
                                          IVariableSource<TNumber>? initalVariableValues = null)
-        where TNumber : notnull
+        where TNumber : INumber<TNumber>
     {
         if (target == OptimizeTarget.None)
         {
@@ -53,7 +54,7 @@ public static partial class Optimizer
     private static void OptimizeUserDefinedOperator<TNumber>(OperatorImplement implement,
                                                              ref CompilationContext context,
                                                              HashSet<string?> allVariableNames)
-        where TNumber : notnull
+        where TNumber : INumber<TNumber>
     {
         Debug.Assert(!implement.IsOptimized);
 
@@ -67,7 +68,7 @@ public static partial class Optimizer
                                                    CompilationContext context,
                                                    HashSet<string?> allVariableNames,
                                                    IVariableSource<TNumber>? initalVariableValues)
-        where TNumber : notnull
+        where TNumber : INumber<TNumber>
     {
         // Create a dictionary given to OptimizeTimeEvaluationState
         Dictionary<ValueBox<string>, TNumber> dictionary = new();

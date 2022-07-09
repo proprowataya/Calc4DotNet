@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using Calc4DotNet.Core.Execution;
 
 namespace Calc4DotNet.Test;
 
 internal sealed class LowLevelModuleEqualityComparer<TNumber> : IEqualityComparer<LowLevelModule<TNumber>>
-    where TNumber : notnull
+    where TNumber : INumber<TNumber>
 {
     public static readonly LowLevelModuleEqualityComparer<TNumber> Instance = new();
 

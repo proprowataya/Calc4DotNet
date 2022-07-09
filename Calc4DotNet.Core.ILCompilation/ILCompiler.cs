@@ -11,10 +11,10 @@ public static class ILCompiler
 {
     private static readonly AssemblyName AsmName = new AssemblyName("Calc4Assembly");
     private const string ClassName = "<Calc4Implement>";
-    private const string RunMethodName = nameof(ICompiledModule<object>.Run);
+    private const string RunMethodName = nameof(ICompiledModule<int>.Run);
 
     public static ICompiledModule<TNumber> Compile<TNumber>(LowLevelModule<TNumber> module)
-        where TNumber : notnull
+        where TNumber : INumber<TNumber>
     {
         AssemblyBuilder assemblyBuilder
             = AssemblyBuilder.DefineDynamicAssembly(AsmName, AssemblyBuilderAccess.Run);
@@ -59,7 +59,7 @@ public static class ILCompiler
     }
 
     private static void EmitIL<TNumber>(LowLevelModule<TNumber> module, FieldBuilder[] fieldBuilders, MethodBuilder runMethod, (MethodBuilder Method, int NumOperands)[] methods)
-        where TNumber : notnull
+        where TNumber : INumber<TNumber>
     {
         // Emit Main(Run) operator
         EmitILCore(module, module.EntryPoint, fieldBuilders, runMethod, 0, methods, isMain: true);
@@ -72,13 +72,13 @@ public static class ILCompiler
     }
 
     private static void EmitILCore<TNumber>(LowLevelModule<TNumber> module, ImmutableArray<LowLevelOperation> operations, FieldBuilder[] fieldBuilders, MethodBuilder method, int numOperands, (MethodBuilder Method, int NumOperands)[] methods, bool isMain)
-        where TNumber : notnull
+        where TNumber : INumber<TNumber>
     {
         /* Locals */
         ILGenerator il = method.GetILGenerator();
         Dictionary<int, Label> labels = new Dictionary<int, Label>();
         Label methodEnd = il.DefineLabel();
-        LocalBuilder? temp = null, value = null, index = null, character = null;
+        LocalBuilder? value = null, index = null, character = null;
         int stateIndex = numOperands + (isMain ? 1 : 0);
 
         /* Local method */
@@ -138,16 +138,17 @@ public static class ILCompiler
             switch (op.Opcode)
             {
                 case Opcode.Push:
-                    il.EmitLdc((TNumber)(dynamic)0);
+                    il.Emit(OpCodes.Constrained, typeof(TNumber));
+                    il.Emit(OpCodes.Call, typeof(TNumber).GetProperty(nameof(TNumber.Zero))!.GetMethod!);
                     break;
                 case Opcode.Pop:
                     il.Emit(OpCodes.Pop);
                     break;
                 case Opcode.LoadConst:
-                    il.EmitLdc((TNumber)(dynamic)op.Value);
+                    il.EmitLdc(TNumber.CreateTruncating(op.Value));
                     break;
                 case Opcode.LoadConstTable:
-                    il.EmitLdc((TNumber)(dynamic)module.ConstTable[op.Value]);
+                    il.EmitLdc(module.ConstTable[op.Value]);
                     break;
                 case Opcode.LoadArg:
                     il.EmitLdarg(RestoreMethodParameterIndex(op.Value));
@@ -163,140 +164,80 @@ public static class ILCompiler
                     il.Emit(OpCodes.Stsfld, fieldBuilders[op.Value]);
                     break;
                 case Opcode.LoadArrayElement:
-                    index ??= il.DeclareLocal(typeof(int));
-                    il.EmitConvToInt32<TNumber>();
+                    index ??= il.DeclareLocal(typeof(TNumber));
                     il.Emit(OpCodes.Stloc_S, index.LocalIndex);
 
                     EmitLoadArraySource();
                     il.Emit(OpCodes.Ldloc_S, index.LocalIndex);
-                    il.Emit(OpCodes.Callvirt, typeof(IGlobalArraySource<TNumber>).GetMethod("get_Item", new[] { typeof(int) })!);
+                    il.Emit(OpCodes.Callvirt, typeof(IGlobalArraySource<TNumber>).GetMethod("get_Item", new[] { typeof(TNumber) })!);
                     break;
                 case Opcode.StoreArrayElement:
                     value ??= il.DeclareLocal(typeof(TNumber));
-                    index ??= il.DeclareLocal(typeof(int));
+                    index ??= il.DeclareLocal(typeof(TNumber));
 
-                    il.EmitConvToInt32<TNumber>();
                     il.Emit(OpCodes.Stloc_S, index.LocalIndex);
                     il.Emit(OpCodes.Stloc_S, value.LocalIndex);
 
                     EmitLoadArraySource();
                     il.Emit(OpCodes.Ldloc_S, index.LocalIndex);
                     il.Emit(OpCodes.Ldloc_S, value.LocalIndex);
-                    il.Emit(OpCodes.Callvirt, typeof(IGlobalArraySource<TNumber>).GetMethod("set_Item", new[] { typeof(int), typeof(TNumber) })!);
+                    il.Emit(OpCodes.Callvirt, typeof(IGlobalArraySource<TNumber>).GetMethod("set_Item", new[] { typeof(TNumber), typeof(TNumber) })!);
                     il.Emit(OpCodes.Ldloc_S, value.LocalIndex);
                     break;
                 case Opcode.Input:
                     throw new NotImplementedException();
                 case Opcode.PrintChar:
                     character ??= il.DeclareLocal(typeof(char));
-                    il.EmitConvToInt16<TNumber>();
+                    il.EmitConvToINumber<TNumber, Int16>();
                     il.Emit(OpCodes.Stloc_S, character.LocalIndex);
 
                     EmitLoadIOService();
                     il.Emit(OpCodes.Ldloc_S, character.LocalIndex);
                     il.Emit(OpCodes.Callvirt, typeof(IIOService).GetMethod(nameof(IIOService.PrintChar))!);
-                    il.EmitLdc((TNumber)(dynamic)0);
+                    il.EmitLdc(TNumber.Zero);
                     break;
                 case Opcode.Add:
-                    if (typeof(TNumber) == typeof(BigInteger))
-                    {
-                        il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Addition", new[] { typeof(BigInteger), typeof(BigInteger) })!);
-                    }
-                    else
-                    {
-                        il.Emit(OpCodes.Add);
-                    }
+                    il.Emit(OpCodes.Constrained, typeof(TNumber));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod<IAdditionOperators<TNumber, TNumber, TNumber>>("op_Addition"));
                     break;
                 case Opcode.Sub:
-                    if (typeof(TNumber) == typeof(BigInteger))
-                    {
-                        il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Subtraction", new[] { typeof(BigInteger), typeof(BigInteger) })!);
-                    }
-                    else
-                    {
-                        il.Emit(OpCodes.Sub);
-                    }
+                    il.Emit(OpCodes.Constrained, typeof(TNumber));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod<ISubtractionOperators<TNumber, TNumber, TNumber>>("op_Subtraction"));
                     break;
                 case Opcode.Mult:
-                    if (typeof(TNumber) == typeof(BigInteger))
-                    {
-                        il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Multiply", new[] { typeof(BigInteger), typeof(BigInteger) })!);
-                    }
-                    else
-                    {
-                        il.Emit(OpCodes.Mul);
-                    }
+                    il.Emit(OpCodes.Constrained, typeof(TNumber));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod<IMultiplyOperators<TNumber, TNumber, TNumber>>("op_Multiply"));
                     break;
                 case Opcode.Div:
-                    if (typeof(TNumber) == typeof(BigInteger))
-                    {
-                        il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Division", new[] { typeof(BigInteger), typeof(BigInteger) })!);
-                    }
-                    else
-                    {
-                        il.Emit(OpCodes.Div);
-                    }
+                    il.Emit(OpCodes.Constrained, typeof(TNumber));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod<IDivisionOperators<TNumber, TNumber, TNumber>>("op_Division"));
                     break;
                 case Opcode.Mod:
-                    if (typeof(TNumber) == typeof(BigInteger))
-                    {
-                        il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Modulus", new[] { typeof(BigInteger), typeof(BigInteger) })!);
-                    }
-                    else
-                    {
-                        il.Emit(OpCodes.Rem);
-                    }
+                    il.Emit(OpCodes.Constrained, typeof(TNumber));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod<IModulusOperators<TNumber, TNumber, TNumber>>("op_Modulus"));
                     break;
                 case Opcode.Goto:
                     il.Emit(OpCodes.Br, labels[op.Value + 1]);
                     break;
                 case Opcode.GotoIfTrue:
-                    if (typeof(TNumber) == typeof(BigInteger))
-                    {
-                        temp ??= il.DeclareLocal(typeof(TNumber));
-
-                        il.Emit(OpCodes.Stloc_S, temp.LocalIndex);
-                        il.Emit(OpCodes.Ldloca_S, temp.LocalIndex);
-                        il.Emit(OpCodes.Call, typeof(BigInteger).GetProperty(nameof(BigInteger.IsZero))!.GetMethod!);
-                        il.Emit(OpCodes.Brfalse, labels[op.Value + 1]);
-                    }
-                    else
-                    {
-                        il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
-                    }
+                    il.Emit(OpCodes.Constrained, typeof(TNumber));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod<INumberBase<TNumber>>(nameof(INumberBase<TNumber>.IsZero)));
+                    il.Emit(OpCodes.Brfalse, labels[op.Value + 1]);
                     break;
                 case Opcode.GotoIfEqual:
-                    if (typeof(TNumber) == typeof(BigInteger))
-                    {
-                        il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_Equality", new[] { typeof(BigInteger), typeof(BigInteger) })!);
-                        il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
-                    }
-                    else
-                    {
-                        il.Emit(OpCodes.Beq, labels[op.Value + 1]);
-                    }
+                    il.Emit(OpCodes.Constrained, typeof(TNumber));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod<IEqualityOperators<TNumber, TNumber>>("op_Equality"));
+                    il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
                     break;
                 case Opcode.GotoIfLessThan:
-                    if (typeof(TNumber) == typeof(BigInteger))
-                    {
-                        il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_LessThan", new[] { typeof(BigInteger), typeof(BigInteger) })!);
-                        il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
-                    }
-                    else
-                    {
-                        il.Emit(OpCodes.Blt, labels[op.Value + 1]);
-                    }
+                    il.Emit(OpCodes.Constrained, typeof(TNumber));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod<IComparisonOperators<TNumber, TNumber>>("op_LessThan"));
+                    il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
                     break;
                 case Opcode.GotoIfLessThanOrEqual:
-                    if (typeof(TNumber) == typeof(BigInteger))
-                    {
-                        il.Emit(OpCodes.Call, typeof(BigInteger).GetMethod("op_LessThanOrEqual", new[] { typeof(BigInteger), typeof(BigInteger) })!);
-                        il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
-                    }
-                    else
-                    {
-                        il.Emit(OpCodes.Ble, labels[op.Value + 1]);
-                    }
+                    il.Emit(OpCodes.Constrained, typeof(TNumber));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod<IComparisonOperators<TNumber, TNumber>>("op_LessThanOrEqual"));
+                    il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
                     break;
                 case Opcode.Call:
                     il.Emit(OpCodes.Ldarg_S, stateIndex);
@@ -350,6 +291,11 @@ public static class ILCompiler
             }
 
             il.Emit(OpCodes.Ret);
+        }
+
+        static MethodInfo GetInterfaceMethod<TInterface>(string methodName)
+        {
+            return ReflectionHelper.GetInterfaceMethod<TNumber, TInterface>(methodName);
         }
     }
 

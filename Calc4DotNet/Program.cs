@@ -24,6 +24,10 @@ try
     {
         Start<Int64>();
     }
+    else if (setting.NumberType == typeof(Int128))
+    {
+        Start<Int128>();
+    }
     else if (setting.NumberType == typeof(Double))
     {
         Start<Double>();
@@ -44,7 +48,7 @@ catch (Exception e)
 }
 
 void Start<TNumber>()
-    where TNumber : notnull
+    where TNumber : INumber<TNumber>
 {
     if (sourcePaths.Length > 0)
     {
