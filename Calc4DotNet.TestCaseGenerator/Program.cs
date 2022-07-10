@@ -115,16 +115,16 @@ static TestCase GenerateTestCase(string source, Type[]? skipTypes)
     CompilationContext context = CompilationContext.Empty;
     List<IToken> tokens = Lexer.Lex(source, ref context);
     IOperator op = Parser.Parse(tokens, ref context);
-    DefaultVariableSource<int> variables = new(0);
+    DefaultVariableSource<int> variables = new();
     MemoryIOService ioService = new();
     int expectedValue = Evaluator.Evaluate(op, context, new SimpleEvaluationState<int>(variables,
-                                                                                       new Calc4GlobalArraySource<Int32>(),
+                                                                                       new DefaultArraySource<Int32>(),
                                                                                        ioService));
     string? expectedConsoleOutput = ioService.GetHistory() is string output && output.Length > 0 ? output : null;
 
     CompilationResult<Int32> expectedWhenNotOptimized = new(op, context, LowLevelCodeGenerator.Generate<Int32>(op, context));
 
-    Optimizer.Optimize<int>(ref op, ref context, OptimizeTarget.All, new DefaultVariableSource<Int32>(0));
+    Optimizer.Optimize<int>(ref op, ref context, OptimizeTarget.All, new DefaultVariableSource<Int32>());
     CompilationResult<Int32> expectedWhenOptimized = new(op, context, LowLevelCodeGenerator.Generate<Int32>(op, context));
 
     return new TestCase(source,

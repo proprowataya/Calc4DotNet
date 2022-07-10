@@ -3,14 +3,14 @@ using System.Runtime.CompilerServices;
 
 namespace Calc4DotNet.Core;
 
-public interface IGlobalArraySource<TNumber>
+public interface IArraySource<TNumber>
     where TNumber : INumber<TNumber>
 {
     TNumber this[TNumber index] { get; set; }
-    IGlobalArraySource<TNumber> Clone();
+    IArraySource<TNumber> Clone();
 }
 
-public sealed class Calc4GlobalArraySource<TNumber> : IGlobalArraySource<TNumber>
+public sealed class DefaultArraySource<TNumber> : IArraySource<TNumber>
     where TNumber : INumber<TNumber>
 {
     private const int ArrayLength = 2048;
@@ -19,11 +19,11 @@ public sealed class Calc4GlobalArraySource<TNumber> : IGlobalArraySource<TNumber
     private readonly TNumber[] array;
     private Dictionary<TNumber, TNumber>? dictionary;   // [index] = value
 
-    public Calc4GlobalArraySource()
+    public DefaultArraySource()
         : this(new TNumber[ArrayLength], null)
     { }
 
-    public Calc4GlobalArraySource(TNumber[] array, Dictionary<TNumber, TNumber>? dictionary)
+    private DefaultArraySource(TNumber[] array, Dictionary<TNumber, TNumber>? dictionary)
     {
         this.array = array;
         this.dictionary = dictionary;
@@ -63,12 +63,12 @@ public sealed class Calc4GlobalArraySource<TNumber> : IGlobalArraySource<TNumber
         }
     }
 
-    public Calc4GlobalArraySource<TNumber> Clone()
+    public DefaultArraySource<TNumber> Clone()
     {
-        return new Calc4GlobalArraySource<TNumber>((TNumber[])array.Clone(), dictionary is not null ? new(dictionary) : null);
+        return new DefaultArraySource<TNumber>((TNumber[])array.Clone(), dictionary is not null ? new(dictionary) : null);
     }
 
-    IGlobalArraySource<TNumber> IGlobalArraySource<TNumber>.Clone()
+    IArraySource<TNumber> IArraySource<TNumber>.Clone()
     {
         return Clone();
     }
@@ -94,7 +94,7 @@ public sealed class Calc4GlobalArraySource<TNumber> : IGlobalArraySource<TNumber
 internal sealed class ArrayElementNotSetException : Exception
 { }
 
-internal sealed class AlwaysThrowGlobalArraySource<TNumber> : IGlobalArraySource<TNumber>
+internal sealed class AlwaysThrowGlobalArraySource<TNumber> : IArraySource<TNumber>
     where TNumber : INumber<TNumber>
 {
     public static readonly AlwaysThrowGlobalArraySource<TNumber> Instance = new();
@@ -108,5 +108,5 @@ internal sealed class AlwaysThrowGlobalArraySource<TNumber> : IGlobalArraySource
         set => throw new ArrayElementNotSetException();
     }
 
-    public IGlobalArraySource<TNumber> Clone() => this;
+    public IArraySource<TNumber> Clone() => this;
 }
