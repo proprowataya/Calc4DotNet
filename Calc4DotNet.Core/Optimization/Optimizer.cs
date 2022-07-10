@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
-using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.Optimization;
