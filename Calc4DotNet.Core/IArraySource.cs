@@ -23,7 +23,7 @@ public sealed class DefaultArraySource<TNumber> : IArraySource<TNumber>
         : this(new TNumber[ArrayLength], null)
     { }
 
-    public DefaultArraySource(TNumber[] array, Dictionary<TNumber, TNumber>? dictionary)
+    private DefaultArraySource(TNumber[] array, Dictionary<TNumber, TNumber>? dictionary)
     {
         this.array = array;
         this.dictionary = dictionary;
