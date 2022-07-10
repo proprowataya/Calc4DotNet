@@ -176,7 +176,7 @@ public class ExecutionTest
         where TNumber : INumber<TNumber>
     {
         return new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>(TNumber.Zero),
-                                                  new Calc4GlobalArraySource<TNumber>(),
+                                                  new DefaultArraySource<TNumber>(),
                                                   new MemoryIOService());
     }
 }

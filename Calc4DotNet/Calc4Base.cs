@@ -21,7 +21,7 @@ internal abstract class Calc4Base<TNumber>
     protected CompilationContext context = CompilationContext.Empty;
     protected IEvaluationState<TNumber> state =
         new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>(TNumber.Zero),
-                                           new Calc4GlobalArraySource<TNumber>(),
+                                           new DefaultArraySource<TNumber>(),
                                            new TextWriterIOService(Console.Out));
 
     protected Calc4Base(Setting setting)

@@ -118,7 +118,7 @@ static TestCase GenerateTestCase(string source, Type[]? skipTypes)
     DefaultVariableSource<int> variables = new(0);
     MemoryIOService ioService = new();
     int expectedValue = Evaluator.Evaluate(op, context, new SimpleEvaluationState<int>(variables,
-                                                                                       new Calc4GlobalArraySource<Int32>(),
+                                                                                       new DefaultArraySource<Int32>(),
                                                                                        ioService));
     string? expectedConsoleOutput = ioService.GetHistory() is string output && output.Length > 0 ? output : null;
 
