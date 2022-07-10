@@ -34,12 +34,12 @@ public class Program
         CompilationContext context = CompilationContext.Empty;
         List<IToken> tokens = Lexer.Lex(Source!, ref context);
         IOperator op = Parser.Parse(tokens, ref context);
-        Optimizer.Optimize<NumberType>(ref op, ref context, OptimizeTarget.All, new DefaultVariableSource<NumberType>((NumberType)0));
+        Optimizer.Optimize<NumberType>(ref op, ref context, OptimizeTarget.All, new DefaultVariableSource<NumberType>());
         LowLevelModule<NumberType> module = LowLevelCodeGenerator.Generate<NumberType>(op, context);
 
         // Run
-        var state = new SimpleEvaluationState<NumberType>(new DefaultVariableSource<NumberType>((NumberType)0),
-                                                          new Calc4GlobalArraySource<NumberType>(),
+        var state = new SimpleEvaluationState<NumberType>(new DefaultVariableSource<NumberType>(),
+                                                          new DefaultArraySource<NumberType>(),
                                                           new MemoryIOService());
         LowLevelExecutor.Execute(module, state);
     }

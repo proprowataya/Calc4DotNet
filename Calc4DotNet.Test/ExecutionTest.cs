@@ -165,7 +165,7 @@ public class ExecutionTest
         IOperator op = Parser.Parse(tokens, ref context);
         if (target is not null)
         {
-            Optimizer.Optimize<TNumber>(ref op, ref context, target.GetValueOrDefault(), new DefaultVariableSource<TNumber>(TNumber.Zero));
+            Optimizer.Optimize<TNumber>(ref op, ref context, target.GetValueOrDefault(), new DefaultVariableSource<TNumber>());
         }
         LowLevelModule<TNumber> module = LowLevelCodeGenerator.Generate<TNumber>(op, context);
 
@@ -175,8 +175,8 @@ public class ExecutionTest
     private static IEvaluationState<TNumber> CreateEvaluationState<TNumber>(TNumber? dummy = default)
         where TNumber : INumber<TNumber>
     {
-        return new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>(TNumber.Zero),
-                                                  new Calc4GlobalArraySource<TNumber>(),
+        return new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>(),
+                                                  new DefaultArraySource<TNumber>(),
                                                   new MemoryIOService());
     }
 }

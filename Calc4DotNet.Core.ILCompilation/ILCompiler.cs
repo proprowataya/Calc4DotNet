@@ -169,7 +169,7 @@ public static class ILCompiler
 
                     EmitLoadArraySource();
                     il.Emit(OpCodes.Ldloc_S, index.LocalIndex);
-                    il.Emit(OpCodes.Callvirt, typeof(IGlobalArraySource<TNumber>).GetMethod("get_Item", new[] { typeof(TNumber) })!);
+                    il.Emit(OpCodes.Callvirt, typeof(IArraySource<TNumber>).GetMethod("get_Item", new[] { typeof(TNumber) })!);
                     break;
                 case Opcode.StoreArrayElement:
                     value ??= il.DeclareLocal(typeof(TNumber));
@@ -181,7 +181,7 @@ public static class ILCompiler
                     EmitLoadArraySource();
                     il.Emit(OpCodes.Ldloc_S, index.LocalIndex);
                     il.Emit(OpCodes.Ldloc_S, value.LocalIndex);
-                    il.Emit(OpCodes.Callvirt, typeof(IGlobalArraySource<TNumber>).GetMethod("set_Item", new[] { typeof(TNumber), typeof(TNumber) })!);
+                    il.Emit(OpCodes.Callvirt, typeof(IArraySource<TNumber>).GetMethod("set_Item", new[] { typeof(TNumber), typeof(TNumber) })!);
                     il.Emit(OpCodes.Ldloc_S, value.LocalIndex);
                     break;
                 case Opcode.Input:

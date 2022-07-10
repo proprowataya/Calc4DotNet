@@ -20,9 +20,9 @@ public static class LowLevelExecutor
             variables[i] = state.Variables[module.Variables[i]];
         }
 
-        if (state.GlobalArray is not Calc4GlobalArraySource<TNumber> array)
+        if (state.GlobalArray is not DefaultArraySource<TNumber> array)
         {
-            throw new InvalidOperationException($"LowLevelExecutor only supports {nameof(Calc4GlobalArraySource<TNumber>)}, but {state.GlobalArray.GetType()} was given.");
+            throw new InvalidOperationException($"LowLevelExecutor only supports {nameof(DefaultArraySource<TNumber>)}, but {state.GlobalArray.GetType()} was given.");
         }
 
         TNumber result = ExecuteCore<TNumber>(module, variables, array, state.IOService);
@@ -36,7 +36,7 @@ public static class LowLevelExecutor
         return result;
     }
 
-    private static TNumber ExecuteCore<TNumber>(LowLevelModule<TNumber> module, TNumber[] variables, Calc4GlobalArraySource<TNumber> array, IIOService ioService)
+    private static TNumber ExecuteCore<TNumber>(LowLevelModule<TNumber> module, TNumber[] variables, DefaultArraySource<TNumber> array, IIOService ioService)
         where TNumber : INumber<TNumber>
     {
         var (operationsArray, maxStackSizesArray) = module.FlattenOperations();
