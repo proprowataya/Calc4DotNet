@@ -16,24 +16,21 @@ public interface IVariableSource<TNumber>
 public sealed class DefaultVariableSource<TNumber> : IVariableSource<TNumber>
     where TNumber : INumber<TNumber>
 {
-    private readonly TNumber defaultValue;
     private readonly Dictionary<ValueBox<string>, TNumber> variables;
 
-    public DefaultVariableSource(TNumber defaultValue)
+    public DefaultVariableSource()
     {
-        this.defaultValue = defaultValue;
         this.variables = new Dictionary<ValueBox<string>, TNumber>();
     }
 
-    private DefaultVariableSource(TNumber defaultValue, Dictionary<ValueBox<string>, TNumber> variables)
+    private DefaultVariableSource(Dictionary<ValueBox<string>, TNumber> variables)
     {
-        this.defaultValue = defaultValue;
         this.variables = variables;
     }
 
     public TNumber this[string? variableName]
     {
-        get => variables.TryGetValue(ValueBox.Create(variableName), out var value) ? value : defaultValue;
+        get => variables.TryGetValue(ValueBox.Create(variableName), out var value) ? value : TNumber.Zero;
         set => variables[ValueBox.Create(variableName)] = value;
     }
 
@@ -50,7 +47,7 @@ public sealed class DefaultVariableSource<TNumber> : IVariableSource<TNumber>
 
     public DefaultVariableSource<TNumber> Clone()
     {
-        return new DefaultVariableSource<TNumber>(defaultValue, new(variables));
+        return new DefaultVariableSource<TNumber>(new(variables));
     }
 
     IVariableSource<TNumber> IVariableSource<TNumber>.Clone()

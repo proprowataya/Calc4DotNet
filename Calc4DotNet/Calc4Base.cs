@@ -20,7 +20,7 @@ internal abstract class Calc4Base<TNumber>
     protected readonly Setting setting;
     protected CompilationContext context = CompilationContext.Empty;
     protected IEvaluationState<TNumber> state =
-        new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>(TNumber.Zero),
+        new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>(),
                                            new DefaultArraySource<TNumber>(),
                                            new TextWriterIOService(Console.Out));
 
