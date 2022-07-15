@@ -198,45 +198,45 @@ public static class ILCompiler
                     break;
                 case Opcode.Add:
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
-                    il.Emit(OpCodes.Call, GetInterfaceMethod<IAdditionOperators<TNumber, TNumber, TNumber>>("op_Addition"));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IAdditionOperators<TNumber, TNumber, TNumber>), "op_Addition"));
                     break;
                 case Opcode.Sub:
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
-                    il.Emit(OpCodes.Call, GetInterfaceMethod<ISubtractionOperators<TNumber, TNumber, TNumber>>("op_Subtraction"));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(ISubtractionOperators<TNumber, TNumber, TNumber>), "op_Subtraction"));
                     break;
                 case Opcode.Mult:
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
-                    il.Emit(OpCodes.Call, GetInterfaceMethod<IMultiplyOperators<TNumber, TNumber, TNumber>>("op_Multiply"));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IMultiplyOperators<TNumber, TNumber, TNumber>), "op_Multiply"));
                     break;
                 case Opcode.Div:
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
-                    il.Emit(OpCodes.Call, GetInterfaceMethod<IDivisionOperators<TNumber, TNumber, TNumber>>("op_Division"));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IDivisionOperators<TNumber, TNumber, TNumber>), "op_Division"));
                     break;
                 case Opcode.Mod:
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
-                    il.Emit(OpCodes.Call, GetInterfaceMethod<IModulusOperators<TNumber, TNumber, TNumber>>("op_Modulus"));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IModulusOperators<TNumber, TNumber, TNumber>), "op_Modulus"));
                     break;
                 case Opcode.Goto:
                     il.Emit(OpCodes.Br, labels[op.Value + 1]);
                     break;
                 case Opcode.GotoIfTrue:
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
-                    il.Emit(OpCodes.Call, GetInterfaceMethod<INumberBase<TNumber>>(nameof(INumberBase<TNumber>.IsZero)));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(INumberBase<TNumber>), nameof(INumberBase<TNumber>.IsZero)));
                     il.Emit(OpCodes.Brfalse, labels[op.Value + 1]);
                     break;
                 case Opcode.GotoIfEqual:
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
-                    il.Emit(OpCodes.Call, GetInterfaceMethod<IEqualityOperators<TNumber, TNumber>>("op_Equality"));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IEqualityOperators<TNumber, TNumber>), "op_Equality"));
                     il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
                     break;
                 case Opcode.GotoIfLessThan:
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
-                    il.Emit(OpCodes.Call, GetInterfaceMethod<IComparisonOperators<TNumber, TNumber>>("op_LessThan"));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IComparisonOperators<TNumber, TNumber>), "op_LessThan"));
                     il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
                     break;
                 case Opcode.GotoIfLessThanOrEqual:
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
-                    il.Emit(OpCodes.Call, GetInterfaceMethod<IComparisonOperators<TNumber, TNumber>>("op_LessThanOrEqual"));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IComparisonOperators<TNumber, TNumber>), "op_LessThanOrEqual"));
                     il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
                     break;
                 case Opcode.Call:
@@ -293,9 +293,9 @@ public static class ILCompiler
             il.Emit(OpCodes.Ret);
         }
 
-        static MethodInfo GetInterfaceMethod<TInterface>(string methodName)
+        static MethodInfo GetInterfaceMethod(Type typeOfInterface, string methodName)
         {
-            return ReflectionHelper.GetInterfaceMethod<TNumber, TInterface>(methodName);
+            return ReflectionHelper.GetInterfaceMethod(typeof(TNumber), typeOfInterface, methodName);
         }
     }
 
