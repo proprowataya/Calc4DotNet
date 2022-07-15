@@ -4,8 +4,8 @@ namespace Calc4DotNet.Core.ILCompilation;
 
 internal static class ReflectionHelper
 {
-    public static MethodInfo GetInterfaceMethod<TNumber, TInterface>(string methodName)
+    public static MethodInfo GetInterfaceMethod(Type typeOfTNumber, Type typeOfInterface, string methodName)
     {
-        return typeof(TNumber).GetInterfaceMap(typeof(TInterface)).InterfaceMethods.Single(method => method.Name == methodName);
+        return typeOfTNumber.GetInterfaceMap(typeOfInterface).InterfaceMethods.Single(method => method.Name == methodName);
     }
 }
