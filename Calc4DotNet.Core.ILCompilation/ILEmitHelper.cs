@@ -105,20 +105,20 @@ internal static class ILEmitHelper
                     {
                         il.EmitLdc(i32);
                         il.Emit(OpCodes.Constrained, typeof(TNumber));
-                        il.Emit(OpCodes.Call, GetInterfaceMethod<TNumber, INumberBase<TNumber>>(nameof(INumberBase<TNumber>.CreateTruncating)).MakeGenericMethod(typeof(Int32)));
+                        il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(TNumber), typeof(INumberBase<TNumber>), nameof(INumberBase<TNumber>.CreateTruncating)).MakeGenericMethod(typeof(Int32)));
                     }
                     else if (TryCastTo<Int64>(out var i64))
                     {
                         il.EmitLdc(i64);
                         il.Emit(OpCodes.Constrained, typeof(TNumber));
-                        il.Emit(OpCodes.Call, GetInterfaceMethod<TNumber, INumberBase<TNumber>>(nameof(INumberBase<TNumber>.CreateTruncating)).MakeGenericMethod(typeof(Int64)));
+                        il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(TNumber), typeof(INumberBase<TNumber>), nameof(INumberBase<TNumber>.CreateTruncating)).MakeGenericMethod(typeof(Int64)));
                     }
                     else
                     {
                         il.Emit(OpCodes.Ldstr, value.ToString() ?? throw new InvalidOperationException("ToString() returned null"));
                         il.Emit(OpCodes.Ldnull);
                         il.Emit(OpCodes.Constrained, typeof(TNumber));
-                        il.Emit(OpCodes.Call, GetInterfaceMethod<TNumber, IParsable<TNumber>>(nameof(IParsable<TNumber>.Parse)));
+                        il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(TNumber), typeof(IParsable<TNumber>), nameof(IParsable<TNumber>.Parse)));
                     }
 
                     break;
@@ -169,6 +169,6 @@ internal static class ILEmitHelper
         where TTo : INumber<TTo>
     {
         il.Emit(OpCodes.Constrained, typeof(TTo));
-        il.Emit(OpCodes.Call, GetInterfaceMethod<TTo, INumberBase<TTo>>(nameof(INumberBase<TTo>.CreateTruncating)).MakeGenericMethod(typeof(TFrom)));
+        il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(TTo), typeof(INumberBase<TTo>), nameof(INumberBase<TTo>.CreateTruncating)).MakeGenericMethod(typeof(TFrom)));
     }
 }
