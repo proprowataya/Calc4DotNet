@@ -46,7 +46,7 @@ public static class LowLevelCodeGenerator
         }
 
         // Assert all variable indicies are consecutive
-        Debug.Assert(variableIndices.Select(pair => pair.Value).OrderBy(x => x).SequenceEqual(Enumerable.Range(0, variableIndices.Count)));
+        Debug.Assert(variableIndices.Select(pair => pair.Value).Order().SequenceEqual(Enumerable.Range(0, variableIndices.Count)));
 
         return new LowLevelModule<TNumber>(entryPoint,
                                            constTable.ToImmutableArray(),
