@@ -65,7 +65,7 @@ public static class Evaluator
         public TNumber Visit(PrintCharOperator op, TNumber[]? arguments)
         {
             TNumber character = op.Character.Accept(this, arguments);
-            evaluationState.IOService.PrintChar((char)NumberHelper.ConvertTruncating<TNumber, int>(character));
+            evaluationState.IOService.PrintChar((char)Int32.CreateTruncating(character));
             return TNumber.Zero;
         }
 

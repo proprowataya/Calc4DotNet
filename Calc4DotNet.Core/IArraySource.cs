@@ -80,7 +80,7 @@ public sealed class DefaultArraySource<TNumber> : IArraySource<TNumber>
 
         if (offset >= TNumber.Zero && offset < TNumber.CreateTruncating(array.Length))
         {
-            arrayIndex = NumberHelper.ConvertTruncating<TNumber, int>(offset);
+            arrayIndex = Int32.CreateTruncating(offset);
             return true;
         }
         else
