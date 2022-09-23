@@ -226,17 +226,17 @@ public static class ILCompiler
                     break;
                 case Opcode.GotoIfEqual:
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
-                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IEqualityOperators<TNumber, TNumber>), "op_Equality"));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IEqualityOperators<TNumber, TNumber, bool>), "op_Equality"));
                     il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
                     break;
                 case Opcode.GotoIfLessThan:
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
-                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IComparisonOperators<TNumber, TNumber>), "op_LessThan"));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IComparisonOperators<TNumber, TNumber, bool>), "op_LessThan"));
                     il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
                     break;
                 case Opcode.GotoIfLessThanOrEqual:
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
-                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IComparisonOperators<TNumber, TNumber>), "op_LessThanOrEqual"));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IComparisonOperators<TNumber, TNumber, bool>), "op_LessThanOrEqual"));
                     il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
                     break;
                 case Opcode.Call:
