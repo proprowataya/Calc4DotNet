@@ -70,7 +70,7 @@ public static partial class Optimizer
             var operators = ImmutableArray.CreateBuilder<IOperator>();
 
             // If this operator writes variables, we keep StoreOperators
-            foreach (var variableName in variables.OrderBy(x => x))
+            foreach (var variableName in variables.Order())
             {
                 if (stateAferPreCompuation.TryGet(variableName, out var value))
                 {

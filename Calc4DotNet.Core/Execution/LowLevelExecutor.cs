@@ -117,7 +117,7 @@ public static class LowLevelExecutor
                     throw new NotImplementedException();
                 case Opcode.PrintChar:
                     VerifyRange(stack, ref Unsafe.Add(ref top, -1));
-                    ioService.PrintChar((char)NumberHelper.ConvertTruncating<TNumber, int>(Unsafe.Add(ref top, -1)));
+                    ioService.PrintChar((char)Int32.CreateTruncating(Unsafe.Add(ref top, -1)));
                     Unsafe.Add(ref top, -1) = TNumber.Zero;
                     break;
                 case Opcode.Add:
