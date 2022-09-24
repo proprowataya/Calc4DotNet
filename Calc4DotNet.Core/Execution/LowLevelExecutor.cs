@@ -144,10 +144,30 @@ public static class LowLevelExecutor
                     VerifyRange(stack, ref Unsafe.Add(ref top, -1));
                     Unsafe.Add(ref top, -1) /= top;
                     break;
+                case Opcode.DivChecked:
+                    top = ref Unsafe.Add(ref top, -1);
+                    VerifyRange(stack, ref top);
+                    VerifyRange(stack, ref Unsafe.Add(ref top, -1));
+                    if (top == TNumber.Zero)
+                    {
+                        ThrowZeroDivisionException();
+                    }
+                    Unsafe.Add(ref top, -1) /= top;
+                    break;
                 case Opcode.Mod:
                     top = ref Unsafe.Add(ref top, -1);
                     VerifyRange(stack, ref top);
                     VerifyRange(stack, ref Unsafe.Add(ref top, -1));
+                    Unsafe.Add(ref top, -1) %= top;
+                    break;
+                case Opcode.ModChecked:
+                    top = ref Unsafe.Add(ref top, -1);
+                    VerifyRange(stack, ref top);
+                    VerifyRange(stack, ref Unsafe.Add(ref top, -1));
+                    if (top == TNumber.Zero)
+                    {
+                        ThrowZeroDivisionException();
+                    }
                     Unsafe.Add(ref top, -1) %= top;
                     break;
                 case Opcode.Goto:
@@ -256,6 +276,11 @@ public static class LowLevelExecutor
     private static void ThrowStackOverflowException()
     {
         throw new Calc4DotNet.Core.Exceptions.StackOverflowException();
+    }
+
+    private static void ThrowZeroDivisionException()
+    {
+        throw new Calc4DotNet.Core.Exceptions.ZeroDivisionException();
     }
 
     [Conditional("DEBUG")]

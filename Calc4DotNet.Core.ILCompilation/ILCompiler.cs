@@ -212,10 +212,52 @@ public static class ILCompiler
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
                     il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IDivisionOperators<TNumber, TNumber, TNumber>), "op_Division"));
                     break;
+                case Opcode.DivChecked:
+                    {
+                        Label whenNotZero = il.DefineLabel();
+
+                        il.Emit(OpCodes.Dup);
+                        il.Emit(OpCodes.Constrained, typeof(TNumber));
+                        il.Emit(OpCodes.Call, GetInterfacePropertyGetter(typeof(INumberBase<TNumber>), nameof(TNumber.Zero)));
+                        il.Emit(OpCodes.Constrained, typeof(TNumber));
+                        il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IEqualityOperators<TNumber, TNumber, bool>), "op_Equality"));
+                        il.Emit(OpCodes.Brfalse_S, whenNotZero);
+
+                        // Throw ZeroDivisionException
+                        il.Emit(OpCodes.Newobj, typeof(Calc4DotNet.Core.Exceptions.ZeroDivisionException).GetConstructor(Array.Empty<Type>())!);
+                        il.Emit(OpCodes.Throw);
+
+                        // Operate
+                        il.MarkLabel(whenNotZero);
+                        il.Emit(OpCodes.Constrained, typeof(TNumber));
+                        il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IDivisionOperators<TNumber, TNumber, TNumber>), "op_Division"));
+                        break;
+                    }
                 case Opcode.Mod:
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
                     il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IModulusOperators<TNumber, TNumber, TNumber>), "op_Modulus"));
                     break;
+                case Opcode.ModChecked:
+                    {
+                        Label whenNotZero = il.DefineLabel();
+
+                        il.Emit(OpCodes.Dup);
+                        il.Emit(OpCodes.Constrained, typeof(TNumber));
+                        il.Emit(OpCodes.Call, GetInterfacePropertyGetter(typeof(INumberBase<TNumber>), nameof(TNumber.Zero)));
+                        il.Emit(OpCodes.Constrained, typeof(TNumber));
+                        il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IEqualityOperators<TNumber, TNumber, bool>), "op_Equality"));
+                        il.Emit(OpCodes.Brfalse_S, whenNotZero);
+
+                        // Throw ZeroDivisionException
+                        il.Emit(OpCodes.Newobj, typeof(Calc4DotNet.Core.Exceptions.ZeroDivisionException).GetConstructor(Array.Empty<Type>())!);
+                        il.Emit(OpCodes.Throw);
+
+                        // Operate
+                        il.MarkLabel(whenNotZero);
+                        il.Emit(OpCodes.Constrained, typeof(TNumber));
+                        il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IModulusOperators<TNumber, TNumber, TNumber>), "op_Modulus"));
+                        break;
+                    }
                 case Opcode.Goto:
                     il.Emit(OpCodes.Br, labels[op.Value + 1]);
                     break;
@@ -296,6 +338,11 @@ public static class ILCompiler
         static MethodInfo GetInterfaceMethod(Type typeOfInterface, string methodName)
         {
             return ReflectionHelper.GetInterfaceMethod(typeof(TNumber), typeOfInterface, methodName);
+        }
+
+        static MethodInfo GetInterfacePropertyGetter(Type typeOfInterface, string methodName)
+        {
+            return ReflectionHelper.GetInterfacePropertyGetter(typeof(TNumber), typeOfInterface, methodName);
         }
     }
 

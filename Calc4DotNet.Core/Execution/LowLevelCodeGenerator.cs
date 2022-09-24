@@ -186,7 +186,9 @@ public static class LowLevelCodeGenerator
                 case Opcode.Sub:
                 case Opcode.Mult:
                 case Opcode.Div:
+                case Opcode.DivChecked:
                 case Opcode.Mod:
+                case Opcode.ModChecked:
                 case Opcode.GotoIfTrue:
                 case Opcode.Return:
                 case Opcode.Halt:
@@ -355,10 +357,10 @@ public static class LowLevelCodeGenerator
                     AddOperation(new LowLevelOperation(Opcode.Mult));
                     break;
                 case BinaryType.Div:
-                    AddOperation(new LowLevelOperation(Opcode.Div));
+                    AddOperation(new LowLevelOperation(option.CheckZeroDivision ? Opcode.DivChecked : Opcode.Div));
                     break;
                 case BinaryType.Mod:
-                    AddOperation(new LowLevelOperation(Opcode.Mod));
+                    AddOperation(new LowLevelOperation(option.CheckZeroDivision ? Opcode.ModChecked : Opcode.Mod));
                     break;
                 case BinaryType.Equal:
                     EmitComparisonBranch(Opcode.GotoIfEqual, reverse: false);

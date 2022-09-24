@@ -112,8 +112,10 @@ public static class Evaluator
                 BinaryType.Add => left + right,
                 BinaryType.Sub => left - right,
                 BinaryType.Mult => left * right,
-                BinaryType.Div => left / right,
-                BinaryType.Mod => left % right,
+                BinaryType.Div => right == TNumber.Zero ? throw new Calc4DotNet.Core.Exceptions.ZeroDivisionException()
+                                                        : left / right,
+                BinaryType.Mod => right == TNumber.Zero ? throw new Calc4DotNet.Core.Exceptions.ZeroDivisionException()
+                                                        : left % right,
                 BinaryType.Equal => left == right ? TNumber.One : TNumber.Zero,
                 BinaryType.NotEqual => left != right ? TNumber.One : TNumber.Zero,
                 BinaryType.LessThan => left < right ? TNumber.One : TNumber.Zero,
