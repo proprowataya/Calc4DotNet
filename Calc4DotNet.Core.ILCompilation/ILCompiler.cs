@@ -340,9 +340,9 @@ public static class ILCompiler
             return ReflectionHelper.GetInterfaceMethod(typeof(TNumber), typeOfInterface, methodName);
         }
 
-        static MethodInfo GetInterfacePropertyGetter(Type typeOfInterface, string methodName)
+        static MethodInfo GetInterfacePropertyGetter(Type typeOfInterface, string propertyName)
         {
-            return ReflectionHelper.GetInterfacePropertyGetter(typeof(TNumber), typeOfInterface, methodName);
+            return ReflectionHelper.GetInterfacePropertyGetter(typeof(TNumber), typeOfInterface, propertyName);
         }
     }
 
