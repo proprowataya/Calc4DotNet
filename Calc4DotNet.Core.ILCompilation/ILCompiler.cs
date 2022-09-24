@@ -50,6 +50,7 @@ public static class ILCompiler
                                            MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig,
                                            typeof(TNumber),
                                            Enumerable.Repeat(typeof(TNumber), op.Definition.NumOperands).Append(typeof(IEvaluationState<TNumber>)).ToArray());
+            methodBuilder.SetImplementationFlags(MethodImplAttributes.AggressiveInlining);
             methods[i] = (methodBuilder, op.Definition.NumOperands);
         }
 
