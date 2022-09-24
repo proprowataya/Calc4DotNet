@@ -29,7 +29,7 @@ internal static class TestCommon
         {
             Optimizer.Optimize<TNumber>(ref op, ref context, target.GetValueOrDefault(), new DefaultVariableSource<TNumber>());
         }
-        LowLevelModule<TNumber> module = LowLevelCodeGenerator.Generate<TNumber>(op, context);
+        LowLevelModule<TNumber> module = LowLevelCodeGenerator.Generate<TNumber>(op, context, LowLevelCodeGenerationOption.Default);
 
         return new CompilationResult<TNumber>(op, context, module);
     }
