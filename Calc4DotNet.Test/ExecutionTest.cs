@@ -127,23 +127,4 @@ public class ExecutionTest
             Assert.Equal(testCase.ExpectedConsoleOutput ?? "", actualConsoleOutput);
         }
     }
-
-    [Fact]
-    public static void TestStackOverflow()
-    {
-        const string Source = "D[x||{x} + 1] {x}";
-
-        foreach (var valueType in ValueTypes)
-        {
-            foreach (var target in OptimizeTargets)
-            {
-                Assert.Throws<Calc4DotNet.Core.Exceptions.StackOverflowException>(() =>
-                {
-                    dynamic dummy = Activator.CreateInstance(valueType)!;
-                    dynamic module = CompileGeneric(Source, target, dummy).Module;
-                    LowLevelExecutor.Execute(module, CreateEvaluationState(dummy));
-                });
-            }
-        }
-    }
 }
