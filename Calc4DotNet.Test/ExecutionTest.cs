@@ -3,10 +3,9 @@ using Calc4DotNet.Core;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Execution;
 using Calc4DotNet.Core.ILCompilation;
-using Calc4DotNet.Core.Operators;
 using Calc4DotNet.Core.Optimization;
-using Calc4DotNet.Core.SyntaxAnalysis;
 using Xunit;
+using static Calc4DotNet.Test.TestCommon;
 
 namespace Calc4DotNet.Test;
 
@@ -17,15 +16,6 @@ internal enum ExecutorType
 
 public class ExecutionTest
 {
-    private static readonly Type[] ValueTypes = new[] { typeof(Int32), typeof(Int64), typeof(Int128), typeof(Double), typeof(BigInteger) };
-
-    private static readonly ExecutorType[] ExecutorTypes = Enum.GetValues<ExecutorType>();
-
-    private static readonly OptimizeTarget?[] OptimizeTargets = Enum.GetValues<OptimizeTarget>()
-                                                                    .Select(target => (OptimizeTarget?)target)
-                                                                    .Append(null)
-                                                                    .ToArray();
-
     public static readonly object[][] Source =
         (from testCase in TestCases.Values
          from valueType in ValueTypes
@@ -136,47 +126,5 @@ public class ExecutionTest
             string actualConsoleOutput = ((MemoryIOService)state.IOService).GetHistory();
             Assert.Equal(testCase.ExpectedConsoleOutput ?? "", actualConsoleOutput);
         }
-    }
-
-    [Fact]
-    public static void TestStackOverflow()
-    {
-        const string Source = "D[x||{x} + 1] {x}";
-
-        foreach (var valueType in ValueTypes)
-        {
-            foreach (var target in OptimizeTargets)
-            {
-                Assert.Throws<Calc4DotNet.Core.Exceptions.StackOverflowException>(() =>
-                {
-                    dynamic dummy = Activator.CreateInstance(valueType)!;
-                    dynamic module = CompileGeneric(Source, target, dummy).Module;
-                    LowLevelExecutor.Execute(module, CreateEvaluationState(dummy));
-                });
-            }
-        }
-    }
-
-    private static CompilationResult<TNumber> CompileGeneric<TNumber>(string source, OptimizeTarget? target, TNumber dummy)
-        where TNumber : INumber<TNumber>
-    {
-        CompilationContext context = CompilationContext.Empty;
-        List<IToken> tokens = Lexer.Lex(source, ref context);
-        IOperator op = Parser.Parse(tokens, ref context);
-        if (target is not null)
-        {
-            Optimizer.Optimize<TNumber>(ref op, ref context, target.GetValueOrDefault(), new DefaultVariableSource<TNumber>());
-        }
-        LowLevelModule<TNumber> module = LowLevelCodeGenerator.Generate<TNumber>(op, context);
-
-        return new CompilationResult<TNumber>(op, context, module);
-    }
-
-    private static IEvaluationState<TNumber> CreateEvaluationState<TNumber>(TNumber? dummy = default)
-        where TNumber : INumber<TNumber>
-    {
-        return new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>(),
-                                                  new DefaultArraySource<TNumber>(),
-                                                  new MemoryIOService());
     }
 }

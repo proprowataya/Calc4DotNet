@@ -41,7 +41,7 @@ public enum Opcode : byte
 {
     Push, Pop, LoadConst, LoadConstTable, LoadArg, StoreArg, LoadVariable, StoreVariable, LoadArrayElement, StoreArrayElement,
     Input, PrintChar,
-    Add, Sub, Mult, Div, Mod,
+    Add, Sub, Mult, Div, DivChecked, Mod, ModChecked,
     Goto, GotoIfTrue, GotoIfEqual, GotoIfLessThan, GotoIfLessThanOrEqual,
     Call, Return, Halt,
     Lavel,

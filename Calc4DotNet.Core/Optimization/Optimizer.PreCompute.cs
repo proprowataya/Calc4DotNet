@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Numerics;
 using Calc4DotNet.Core.Evaluation;
+using Calc4DotNet.Core.Exceptions;
 using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.Optimization;
@@ -62,6 +63,11 @@ public static partial class Optimizer
                 return op;
             }
             catch (EvaluationArgumentNotSetException)
+            {
+                UnsetAllVariables();
+                return op;
+            }
+            catch (ZeroDivisionException)
             {
                 UnsetAllVariables();
                 return op;

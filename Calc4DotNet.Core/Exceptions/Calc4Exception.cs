@@ -76,6 +76,13 @@ public sealed class TypeNotSupportedException : Calc4Exception
     }
 }
 
+public sealed class ZeroDivisionException : Calc4Exception
+{
+    public ZeroDivisionException()
+        : base("Zero Division")
+    { }
+}
+
 public sealed class StackOverflowException : Calc4Exception
 {
     public StackOverflowException()

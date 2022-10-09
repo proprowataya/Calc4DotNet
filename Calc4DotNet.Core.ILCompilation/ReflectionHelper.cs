@@ -8,4 +8,10 @@ internal static class ReflectionHelper
     {
         return typeOfTNumber.GetInterfaceMap(typeOfInterface).InterfaceMethods.Single(method => method.Name == methodName);
     }
+
+    public static MethodInfo GetInterfacePropertyGetter(Type typeOfTNumber, Type typeOfInterface, string propertyName)
+    {
+        // TODO
+        return typeOfTNumber.GetInterfaceMap(typeOfInterface).InterfaceMethods.Single(property => property.Name == $"get_{propertyName}");
+    }
 }

@@ -209,13 +209,43 @@ public static class ILCompiler
                     il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IMultiplyOperators<TNumber, TNumber, TNumber>), "op_Multiply"));
                     break;
                 case Opcode.Div:
-                    il.Emit(OpCodes.Constrained, typeof(TNumber));
-                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IDivisionOperators<TNumber, TNumber, TNumber>), "op_Division"));
-                    break;
                 case Opcode.Mod:
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
-                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IModulusOperators<TNumber, TNumber, TNumber>), "op_Modulus"));
+                    il.Emit(OpCodes.Call,
+                            op.Opcode switch
+                            {
+                                Opcode.Div => GetInterfaceMethod(typeof(IDivisionOperators<TNumber, TNumber, TNumber>), "op_Division"),
+                                Opcode.Mod => GetInterfaceMethod(typeof(IModulusOperators<TNumber, TNumber, TNumber>), "op_Modulus"),
+                                _ => throw new InvalidOperationException(),
+                            });
                     break;
+                case Opcode.DivChecked:
+                case Opcode.ModChecked:
+                    {
+                        Label whenNotZero = il.DefineLabel();
+
+                        il.Emit(OpCodes.Dup);
+                        il.Emit(OpCodes.Constrained, typeof(TNumber));
+                        il.Emit(OpCodes.Call, GetInterfacePropertyGetter(typeof(INumberBase<TNumber>), nameof(TNumber.Zero)));
+                        il.Emit(OpCodes.Constrained, typeof(TNumber));
+                        il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IEqualityOperators<TNumber, TNumber, bool>), "op_Equality"));
+                        il.Emit(OpCodes.Brfalse_S, whenNotZero);
+
+                        // Throw ZeroDivisionException
+                        il.Emit(OpCodes.Call, typeof(ThrowHelper).GetMethod(nameof(ThrowHelper.ThrowZeroDivisionException))!);
+
+                        // Operate
+                        il.MarkLabel(whenNotZero);
+                        il.Emit(OpCodes.Constrained, typeof(TNumber));
+                        il.Emit(OpCodes.Call,
+                                op.Opcode switch
+                                {
+                                    Opcode.DivChecked => GetInterfaceMethod(typeof(IDivisionOperators<TNumber, TNumber, TNumber>), "op_Division"),
+                                    Opcode.ModChecked => GetInterfaceMethod(typeof(IModulusOperators<TNumber, TNumber, TNumber>), "op_Modulus"),
+                                    _ => throw new InvalidOperationException(),
+                                });
+                        break;
+                    }
                 case Opcode.Goto:
                     il.Emit(OpCodes.Br, labels[op.Value + 1]);
                     break;
@@ -296,6 +326,11 @@ public static class ILCompiler
         static MethodInfo GetInterfaceMethod(Type typeOfInterface, string methodName)
         {
             return ReflectionHelper.GetInterfaceMethod(typeof(TNumber), typeOfInterface, methodName);
+        }
+
+        static MethodInfo GetInterfacePropertyGetter(Type typeOfInterface, string propertyName)
+        {
+            return ReflectionHelper.GetInterfacePropertyGetter(typeof(TNumber), typeOfInterface, propertyName);
         }
     }
 
