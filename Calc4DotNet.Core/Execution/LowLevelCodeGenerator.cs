@@ -7,7 +7,7 @@ namespace Calc4DotNet.Core.Execution;
 
 public static class LowLevelCodeGenerator
 {
-    public static LowLevelModule<TNumber> Generate<TNumber>(IOperator op, CompilationContext context)
+    public static LowLevelModule<TNumber> Generate<TNumber>(IOperator op, CompilationContext context, LowLevelCodeGenerationOption option)
         where TNumber : INumber<TNumber>
     {
         var constTable = new List<TNumber>();
@@ -25,7 +25,7 @@ public static class LowLevelCodeGenerator
         // Generate user-defined operators' codes
         foreach (var implement in context.OperatorImplements)
         {
-            var visitor = new Visitor<TNumber>(context, constTable, operatorLabels, implement.Definition, variableIndices);
+            var visitor = new Visitor<TNumber>(context, option, constTable, operatorLabels, implement.Definition, variableIndices);
 
             var operatorBody = implement.Operator;
             Debug.Assert(operatorBody is not null);
@@ -40,7 +40,7 @@ public static class LowLevelCodeGenerator
         // Generate Main code
         ImmutableArray<LowLevelOperation> entryPoint;
         {
-            var visitor = new Visitor<TNumber>(context, constTable, operatorLabels, null, variableIndices);
+            var visitor = new Visitor<TNumber>(context, option, constTable, operatorLabels, null, variableIndices);
             visitor.Generate(op);
             entryPoint = visitor.Operations.ToImmutableArray();
         }
@@ -60,6 +60,7 @@ public static class LowLevelCodeGenerator
         private const int OperatorBeginLabel = 0;
 
         private readonly CompilationContext context;
+        private readonly LowLevelCodeGenerationOption option;
         private readonly List<TNumber> constTable;
         private readonly Dictionary<OperatorDefinition, int> operatorLabels;
         private readonly OperatorDefinition? definition;
@@ -89,9 +90,10 @@ public static class LowLevelCodeGenerator
 
         public int MaxStackSize => maxStackSize;
 
-        public Visitor(CompilationContext context, List<TNumber> constTable, Dictionary<OperatorDefinition, int> operatorLabels, OperatorDefinition? definition, Dictionary<ValueBox<string>, int> variableIndices)
+        public Visitor(CompilationContext context, LowLevelCodeGenerationOption option, List<TNumber> constTable, Dictionary<OperatorDefinition, int> operatorLabels, OperatorDefinition? definition, Dictionary<ValueBox<string>, int> variableIndices)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
+            this.option = option ?? throw new ArgumentNullException(nameof(option));
             this.constTable = constTable ?? throw new ArgumentNullException(nameof(constTable));
             this.operatorLabels = operatorLabels ?? throw new ArgumentNullException(nameof(operatorLabels));
             this.definition = definition;
@@ -184,7 +186,9 @@ public static class LowLevelCodeGenerator
                 case Opcode.Sub:
                 case Opcode.Mult:
                 case Opcode.Div:
+                case Opcode.DivChecked:
                 case Opcode.Mod:
+                case Opcode.ModChecked:
                 case Opcode.GotoIfTrue:
                 case Opcode.Return:
                 case Opcode.Halt:
@@ -353,10 +357,10 @@ public static class LowLevelCodeGenerator
                     AddOperation(new LowLevelOperation(Opcode.Mult));
                     break;
                 case BinaryType.Div:
-                    AddOperation(new LowLevelOperation(Opcode.Div));
+                    AddOperation(new LowLevelOperation(option.CheckZeroDivision ? Opcode.DivChecked : Opcode.Div));
                     break;
                 case BinaryType.Mod:
-                    AddOperation(new LowLevelOperation(Opcode.Mod));
+                    AddOperation(new LowLevelOperation(option.CheckZeroDivision ? Opcode.ModChecked : Opcode.Mod));
                     break;
                 case BinaryType.Equal:
                     EmitComparisonBranch(Opcode.GotoIfEqual, reverse: false);

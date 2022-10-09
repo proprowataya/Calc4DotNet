@@ -122,10 +122,10 @@ static TestCase GenerateTestCase(string source, Type[]? skipTypes)
                                                                                        ioService));
     string? expectedConsoleOutput = ioService.GetHistory() is string output && output.Length > 0 ? output : null;
 
-    CompilationResult<Int32> expectedWhenNotOptimized = new(op, context, LowLevelCodeGenerator.Generate<Int32>(op, context));
+    CompilationResult<Int32> expectedWhenNotOptimized = new(op, context, LowLevelCodeGenerator.Generate<Int32>(op, context, LowLevelCodeGenerationOption.Default));
 
     Optimizer.Optimize<int>(ref op, ref context, OptimizeTarget.All, new DefaultVariableSource<Int32>());
-    CompilationResult<Int32> expectedWhenOptimized = new(op, context, LowLevelCodeGenerator.Generate<Int32>(op, context));
+    CompilationResult<Int32> expectedWhenOptimized = new(op, context, LowLevelCodeGenerator.Generate<Int32>(op, context, LowLevelCodeGenerationOption.Default));
 
     return new TestCase(source,
                         expectedValue,

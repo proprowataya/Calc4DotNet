@@ -35,7 +35,7 @@ public class Program
         List<IToken> tokens = Lexer.Lex(Source!, ref context);
         IOperator op = Parser.Parse(tokens, ref context);
         Optimizer.Optimize<NumberType>(ref op, ref context, OptimizeTarget.All, new DefaultVariableSource<NumberType>());
-        LowLevelModule<NumberType> module = LowLevelCodeGenerator.Generate<NumberType>(op, context);
+        LowLevelModule<NumberType> module = LowLevelCodeGenerator.Generate<NumberType>(op, context, LowLevelCodeGenerationOption.Default);
 
         // Run
         var state = new SimpleEvaluationState<NumberType>(new DefaultVariableSource<NumberType>(),
