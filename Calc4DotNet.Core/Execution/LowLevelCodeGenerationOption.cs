@@ -2,7 +2,7 @@
 
 public sealed record LowLevelCodeGenerationOption
 {
-    public static LowLevelCodeGenerationOption Default = new LowLevelCodeGenerationOption();
+    public static readonly LowLevelCodeGenerationOption Default = new LowLevelCodeGenerationOption();
 
     public bool CheckZeroDivision { get; init; } = true;
 }

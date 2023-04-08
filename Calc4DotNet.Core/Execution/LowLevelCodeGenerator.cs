@@ -226,30 +226,12 @@ public static class LowLevelCodeGenerator
 
         public void Visit(PreComputedOperator op)
         {
-            static T ConvertChecked<T>(TNumber value) where T : INumber<T>
+            try
             {
-                return T.CreateChecked(value);
-            }
-
-            static bool TryCastToShort(TNumber number, out short casted)
-            {
-                try
-                {
-                    casted = ConvertChecked<short>(number);
-                    return true;
-                }
-                catch (OverflowException)
-                {
-                    casted = default;
-                    return false;
-                }
-            }
-
-            if (TryCastToShort((TNumber)op.Value, out var value))
-            {
+                short value = short.CreateChecked<TNumber>((TNumber)op.Value);
                 AddOperation(new LowLevelOperation(Opcode.LoadConst, value));
             }
-            else
+            catch (OverflowException)
             {
                 // We cannot emit Opcode.LoadConst,
                 // because the constant value exceeds limit of 16-bit integer.
