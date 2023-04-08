@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Calc4DotNet;
 
@@ -43,7 +44,7 @@ Options:
     public static (Setting Setting, string[] SourcePaths, bool PrintHelp) Parse(string[] args)
     {
         Type numberType = typeof(Int64);
-        ExecutorType executorType = ExecutorType.JIT;
+        ExecutorType executorType = RuntimeFeature.IsDynamicCodeCompiled ? ExecutorType.JIT : ExecutorType.LowLevel;
         bool optimize = true;
         bool dump = false;
         List<string> sourcePaths = new();
@@ -67,6 +68,10 @@ Options:
                     printHelp = true;
                     break;
                 case CommandLineArgs.EnableJit:
+                    if (!RuntimeFeature.IsDynamicCodeCompiled)
+                    {
+                        throw new CommandLineArgsParseException("JIT compiler is not supported on this platform.");
+                    }
                     executorType = ExecutorType.JIT;
                     break;
                 case CommandLineArgs.DisableJit:
