@@ -1,6 +1,16 @@
 ﻿using System.Numerics;
+using Calc4DotNet.Core;
 
 namespace Calc4DotNet;
+
+internal static class ReplCommand
+{
+    public const string DumpOff = "#dump off";
+    public const string DumpOn = "#dump on";
+    public const string OptimizeOff = "#optimize off";
+    public const string OptimizeOn = "#optimize on";
+    public const string Reset = "#reset";
+}
 
 internal class Repl<TNumber> : Calc4Base<TNumber>
     where TNumber : INumber<TNumber>
@@ -24,9 +34,30 @@ internal class Repl<TNumber> : Calc4Base<TNumber>
             {
                 break;
             }
-
             Console.WriteLine();
-            Execute(text);
+
+            switch (text)
+            {
+                case ReplCommand.DumpOff:
+                    setting = setting with { Dump = false };
+                    break;
+                case ReplCommand.DumpOn:
+                    setting = setting with { Dump = true };
+                    break;
+                case ReplCommand.OptimizeOff:
+                    setting = setting with { Optimize = false };
+                    break;
+                case ReplCommand.OptimizeOn:
+                    setting = setting with { Optimize = true };
+                    break;
+                case ReplCommand.Reset:
+                    context = CompilationContext.Empty;
+                    state = CreateEvaluationState();
+                    break;
+                default:
+                    Execute(text);
+                    break;
+            }
         }
     }
 }

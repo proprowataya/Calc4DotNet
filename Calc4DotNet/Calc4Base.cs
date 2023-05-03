@@ -17,12 +17,9 @@ internal abstract class Calc4Base<TNumber>
 {
     protected const int Indent = 4;
 
-    protected readonly Setting setting;
+    protected Setting setting;
     protected CompilationContext context = CompilationContext.Empty;
-    protected IEvaluationState<TNumber> state =
-        new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>(),
-                                           new DefaultArraySource<TNumber>(),
-                                           new TextWriterIOService(Console.Out));
+    protected IEvaluationState<TNumber> state = CreateEvaluationState();
 
     protected Calc4Base(Setting setting)
     {
@@ -85,6 +82,13 @@ internal abstract class Calc4Base<TNumber>
             Console.WriteLine($"Error: {e.Message}");
             Console.WriteLine();
         }
+    }
+
+    protected static SimpleEvaluationState<TNumber> CreateEvaluationState()
+    {
+        return new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>(),
+                                                  new DefaultArraySource<TNumber>(),
+                                                  new TextWriterIOService(Console.Out));
     }
 
     private static void PrintDetailInformation(IOperator op, CompilationContext context, LowLevelModule<TNumber> module)
