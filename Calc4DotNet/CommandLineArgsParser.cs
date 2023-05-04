@@ -43,8 +43,7 @@ During the Repl mode, the following commands are available:
     {ReplCommand.DumpOn}
     {ReplCommand.OptimizeOff}
     {ReplCommand.OptimizeOn}
-    {ReplCommand.Reset}
-";
+    {ReplCommand.Reset}";
 
     public static string GetHelp() => HelpText;
 
