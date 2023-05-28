@@ -36,7 +36,14 @@ Options:
 {CommandLineArgs.EnableOptimization}
     Enable optimization (default)
 {CommandLineArgs.DumpProgram}
-    Dump the given program's structures such as an abstract syntax tree";
+    Dump the given program's structures such as an abstract syntax tree
+
+During the Repl mode, the following commands are available:
+    {ReplCommand.DumpOff}
+    {ReplCommand.DumpOn}
+    {ReplCommand.OptimizeOff}
+    {ReplCommand.OptimizeOn}
+    {ReplCommand.Reset}";
 
     public static string GetHelp() => HelpText;
 
