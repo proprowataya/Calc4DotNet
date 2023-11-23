@@ -4,7 +4,7 @@ Calc4 is a programming language where everything in its code is an operator. Thi
 
 ## Requirements
 
-[.NET](https://dotnet.microsoft.com/) (>= 7.0)
+[.NET](https://dotnet.microsoft.com/) (>= 8.0)
 
 ## Getting Started
 
