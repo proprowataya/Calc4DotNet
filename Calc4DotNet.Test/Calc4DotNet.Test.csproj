@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Calc4DotNet.Compiler\Calc4DotNet.Compiler.csproj" />
     <ProjectReference Include="..\Calc4DotNet.Core.ILCompilation\Calc4DotNet.Core.ILCompilation.csproj" />
     <ProjectReference Include="..\Calc4DotNet.Core\Calc4DotNet.Core.csproj" />
   </ItemGroup>
