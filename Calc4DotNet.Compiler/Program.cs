@@ -35,7 +35,7 @@ internal static class Program
 
         """;
 
-    public static void Main(string[] args)
+    public static int Main(string[] args)
     {
         try
         {
@@ -44,7 +44,7 @@ internal static class Program
             if (printHelp)
             {
                 Console.WriteLine(CommandLineArgsParser.GetHelp());
-                return;
+                return 0;
             }
 
             Debug.Assert(sourcePath is not null);
@@ -69,14 +69,18 @@ internal static class Program
             {
                 throw new InvalidOperationException($"Type {setting.NumberType} is not supported.");
             }
+
+            return 0;
         }
-        catch (CommandLineArgsParseException e)
+        catch (Exception e) when (e is CommandLineArgsParseException or Calc4Exception)
         {
-            Console.Out.WriteLine($"Error: {e.Message}");
+            Console.Error.WriteLine($"Error: {e.Message}");
+            return 1;
         }
         catch (Exception e)
         {
-            Console.Out.WriteLine($"Fatal error: {e.Message}");
+            Console.Error.WriteLine($"Fatal error: {e.Message}");
+            return 1;
         }
     }
 
@@ -90,16 +94,7 @@ internal static class Program
         /*
          * Compile the given code.
          */
-        LowLevelModule<TNumber> module;
-        try
-        {
-            module = Compile<TNumber>(source);
-        }
-        catch (Calc4Exception e)
-        {
-            Console.Error.WriteLine($"Error: {e.Message}");
-            return;
-        }
+        LowLevelModule<TNumber> module = Compile<TNumber>(source);
 
         /*
          * Generate an executable.
