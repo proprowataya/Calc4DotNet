@@ -67,7 +67,7 @@ internal static class Program
             }
             else
             {
-                Console.WriteLine($"Error: Type {setting.NumberType} is not supported.");
+                throw new InvalidOperationException($"Type {setting.NumberType} is not supported.");
             }
         }
         catch (CommandLineArgsParseException e)
