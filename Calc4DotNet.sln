@@ -18,7 +18,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calc4DotNet.TestCaseGenerator", "Calc4DotNet.TestCaseGenerator\Calc4DotNet.TestCaseGenerator.csproj", "{97013641-EA46-4F21-8787-003637F740BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calc4DotNet.TestCaseGenerator", "Calc4DotNet.TestCaseGenerator\Calc4DotNet.TestCaseGenerator.csproj", "{97013641-EA46-4F21-8787-003637F740BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calc4DotNet.Compiler", "Calc4DotNet.Compiler\Calc4DotNet.Compiler.csproj", "{89BCC893-7351-45A1-8629-FB9BADCEB0CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +52,10 @@ Global
 		{97013641-EA46-4F21-8787-003637F740BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97013641-EA46-4F21-8787-003637F740BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97013641-EA46-4F21-8787-003637F740BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89BCC893-7351-45A1-8629-FB9BADCEB0CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89BCC893-7351-45A1-8629-FB9BADCEB0CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89BCC893-7351-45A1-8629-FB9BADCEB0CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89BCC893-7351-45A1-8629-FB9BADCEB0CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
