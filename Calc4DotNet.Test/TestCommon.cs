@@ -34,11 +34,11 @@ internal static class TestCommon
         return new CompilationResult<TNumber>(op, context, module);
     }
 
-    public static IEvaluationState<TNumber> CreateEvaluationState<TNumber>(TNumber? dummy = default)
+    public static IEvaluationState<TNumber> CreateEvaluationState<TNumber>(string standardInput, TNumber? dummy = default)
         where TNumber : INumber<TNumber>
     {
         return new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>(),
                                                   new DefaultArraySource<TNumber>(),
-                                                  new MemoryIOService());
+                                                  new MemoryIOService(standardInput));
     }
 }

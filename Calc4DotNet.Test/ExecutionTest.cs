@@ -103,7 +103,7 @@ public class ExecutionTest
 
         {
             TNumber expected = TNumber.CreateTruncating(testCase.ExpectedValue);
-            IEvaluationState<TNumber> state = CreateEvaluationState<TNumber>();
+            IEvaluationState<TNumber> state = CreateEvaluationState<TNumber>(testCase.StandardInput);
 
             object actual = executorType switch
             {

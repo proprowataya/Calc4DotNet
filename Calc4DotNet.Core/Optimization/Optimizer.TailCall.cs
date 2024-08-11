@@ -32,6 +32,11 @@ public static partial class Optimizer
             return op;
         }
 
+        public IOperator Visit(InputOperator op, bool isTailCall)
+        {
+            return op;
+        }
+
         public IOperator Visit(LoadArrayOperator op, bool isTailCall)
         {
             var index = op.Index.Accept(this, isTailCall);

@@ -258,6 +258,11 @@ public static class LowLevelCodeGenerator
             AddOperation(new LowLevelOperation(Opcode.LoadVariable, GetOrCreateVariableIndex(op.VariableName)));
         }
 
+        public void Visit(InputOperator op)
+        {
+            AddOperation(new LowLevelOperation(Opcode.Input));
+        }
+
         public void Visit(LoadArrayOperator op)
         {
             op.Index.Accept(this);

@@ -114,7 +114,10 @@ public static class LowLevelExecutor
                     array[top] = Unsafe.Add(ref top, -1);
                     break;
                 case Opcode.Input:
-                    throw new NotImplementedException();
+                    VerifyRange(stack, ref top);
+                    top = TNumber.CreateTruncating(ioService.GetChar());
+                    top = ref Unsafe.Add(ref top, 1);
+                    break;
                 case Opcode.PrintChar:
                     VerifyRange(stack, ref Unsafe.Add(ref top, -1));
                     ioService.PrintChar((char)Int32.CreateTruncating(Unsafe.Add(ref top, -1)));
