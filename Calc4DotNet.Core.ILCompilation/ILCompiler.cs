@@ -187,11 +187,11 @@ public static class ILCompiler
                 case Opcode.Input:
                     EmitLoadIOService();
                     il.Emit(OpCodes.Callvirt, typeof(IIOService).GetMethod(nameof(IIOService.GetChar))!);
-                    il.EmitConvToINumber<Int16, TNumber>();
+                    il.EmitConvToINumber<char, TNumber>();
                     break;
                 case Opcode.PrintChar:
                     character ??= il.DeclareLocal(typeof(char));
-                    il.EmitConvToINumber<TNumber, Int16>();
+                    il.EmitConvToINumber<TNumber, char>();
                     il.Emit(OpCodes.Stloc_S, character.LocalIndex);
 
                     EmitLoadIOService();
