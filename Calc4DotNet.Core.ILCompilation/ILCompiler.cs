@@ -235,7 +235,8 @@ public static class ILCompiler
                         il.Emit(OpCodes.Brfalse_S, whenNotZero);
 
                         // Throw ZeroDivisionException
-                        il.Emit(OpCodes.Call, typeof(ThrowHelper).GetMethod(nameof(ThrowHelper.ThrowZeroDivisionException))!);
+                        il.Emit(OpCodes.Newobj, typeof(Calc4DotNet.Core.Exceptions.ZeroDivisionException).GetConstructor([])!);
+                        il.Emit(OpCodes.Throw);
 
                         // Operate
                         il.MarkLabel(whenNotZero);
