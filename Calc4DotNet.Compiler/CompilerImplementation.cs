@@ -44,12 +44,12 @@ internal static class CompilerImplementation
         /*
          * Compile the given code.
          */
-        LowLevelModule<TNumber> module = Compile<TNumber>(source);
+        LowLevelModule<TNumber> module = Compile<TNumber>(source, setting.Optimize);
 
         /*
          * Generate an executable.
          */
-        GenerateDll(module, outputDllPath);
+        GenerateDll(module, outputDllPath, setting.Optimize);
 
         /*
          * Copy referenced assemblies.
@@ -66,7 +66,7 @@ internal static class CompilerImplementation
         File.WriteAllText(Path.ChangeExtension(sourcePath, RuntimeConfigFileExtension), RuntimeConfigFileContext);
     }
 
-    private static LowLevelModule<TNumber> Compile<TNumber>(string source, bool optimize = true)
+    private static LowLevelModule<TNumber> Compile<TNumber>(string source, bool optimize)
         where TNumber : INumber<TNumber>
     {
         /*
@@ -84,7 +84,7 @@ internal static class CompilerImplementation
         return module;
     }
 
-    private static void GenerateDll<TNumber>(LowLevelModule<TNumber> module, string outputDllPath, bool optimize = true)
+    private static void GenerateDll<TNumber>(LowLevelModule<TNumber> module, string outputDllPath, bool optimize)
         where TNumber : INumber<TNumber>
     {
         /*
