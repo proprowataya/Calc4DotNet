@@ -88,7 +88,7 @@ internal abstract class Calc4Base<TNumber>
     {
         return new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>(),
                                                   new DefaultArraySource<TNumber>(),
-                                                  new TextWriterIOService(Console.Out));
+                                                  new TextReaderWriterIOService(Console.In, Console.Out));
     }
 
     private static void PrintDetailInformation(IOperator op, CompilationContext context, LowLevelModule<TNumber> module)

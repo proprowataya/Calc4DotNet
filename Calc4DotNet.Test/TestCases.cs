@@ -12,6 +12,7 @@ internal static class TestCases
     {
         new TestCase(
             Source: "200",
+            StandardInput: "",
             ExpectedValue: 200,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -103,6 +104,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "1<2",
+            StandardInput: "",
             ExpectedValue: 1,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -196,6 +198,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "1<=2",
+            StandardInput: "",
             ExpectedValue: 1,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -289,6 +292,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "1>=2",
+            StandardInput: "",
             ExpectedValue: 0,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -382,6 +386,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "1>2",
+            StandardInput: "",
             ExpectedValue: 0,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -475,6 +480,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "2<1",
+            StandardInput: "",
             ExpectedValue: 0,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -568,6 +574,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "2<=1",
+            StandardInput: "",
             ExpectedValue: 0,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -661,6 +668,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "2>=1",
+            StandardInput: "",
             ExpectedValue: 1,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -754,6 +762,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "2>1",
+            StandardInput: "",
             ExpectedValue: 1,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -847,6 +856,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "1<1",
+            StandardInput: "",
             ExpectedValue: 0,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -940,6 +950,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "1<=1",
+            StandardInput: "",
             ExpectedValue: 1,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -1033,6 +1044,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "1>=1",
+            StandardInput: "",
             ExpectedValue: 1,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -1126,6 +1138,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "1>1",
+            StandardInput: "",
             ExpectedValue: 0,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -1219,6 +1232,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "12345678",
+            StandardInput: "",
             ExpectedValue: 12345678,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -1351,6 +1365,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "1+2*3-10",
+            StandardInput: "",
             ExpectedValue: -1,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -1479,6 +1494,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "0?1?2?3?4",
+            StandardInput: "",
             ExpectedValue: 3,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -1604,6 +1620,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "72P101P108P108P111P10P",
+            StandardInput: "",
             ExpectedValue: 0,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -1884,6 +1901,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "1+// C++ style comment\n2",
+            StandardInput: "",
             ExpectedValue: 3,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -1974,6 +1992,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "1+/* C style comment*/2",
+            StandardInput: "",
             ExpectedValue: 3,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -2064,6 +2083,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[print||72P101P108P108P111P10P] {print}",
+            StandardInput: "",
             ExpectedValue: 0,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -2450,6 +2470,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[add|x,y|x+y] 12{add}23",
+            StandardInput: "",
             ExpectedValue: 35,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -2614,6 +2635,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[get12345||12345] {get12345}+{get12345}",
+            StandardInput: "",
             ExpectedValue: 24690,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -2781,6 +2803,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[fact|x,y|x==0?y?(x-1){fact}(x*y)] 10{fact}1",
+            StandardInput: "",
             ExpectedValue: 3628800,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -3043,6 +3066,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}] 10{fib}",
+            StandardInput: "",
             ExpectedValue: 55,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -3334,6 +3358,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[fibImpl|x,a,b|x ? ((x-1) ? ((x-1){fibImpl}(a+b){fibImpl}a) ? a) ? b] D[fib|x|x{fibImpl}1{fibImpl}0] 10{fib}",
+            StandardInput: "",
             ExpectedValue: 55,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -3718,6 +3743,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[f|a,b,p,q,c|c < 2 ? ((a*p) + (b*q)) ? (c % 2 ? ((a*p) + (b*q) {f} (a*q) + (b*q) + (b*p) {f} (p*p) + (q*q) {f} (2*p+q)*q {f} c/2) ? (a {f} b {f} (p*p) + (q*q) {f} (2*p+q)*q {f} c/2))] D[fib|n|0{f}1{f}0{f}1{f}n] 10{fib}",
+            StandardInput: "",
             ExpectedValue: 55,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -4707,6 +4733,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[tarai|x,y,z|x <= y ? y ? (((x - 1){tarai}y{tarai}z){tarai}((y - 1){tarai}z{tarai}x){tarai}((z - 1){tarai}x{tarai}y))] 10{tarai}5{tarai}5",
+            StandardInput: "",
             ExpectedValue: 5,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -5127,6 +5154,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "1S",
+            StandardInput: "",
             ExpectedValue: 1,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -5213,6 +5241,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "L",
+            StandardInput: "",
             ExpectedValue: 0,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -5283,6 +5312,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "1S[var]",
+            StandardInput: "",
             ExpectedValue: 1,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -5369,6 +5399,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "L[var]",
+            StandardInput: "",
             ExpectedValue: 0,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -5439,6 +5470,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[get||L[var]] D[set|x|xS[var]] 123{set} {get} * {get}",
+            StandardInput: "",
             ExpectedValue: 15129,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -5670,6 +5702,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[set|x|xS] 7{set}L",
+            StandardInput: "",
             ExpectedValue: 7,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -5825,6 +5858,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[set|x|xS] 7{set}LS[var1] L[zero]3{set}LS[var2] L[var1]*L[var2]",
+            StandardInput: "",
             ExpectedValue: 21,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -6054,6 +6088,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "(123S)L*L",
+            StandardInput: "",
             ExpectedValue: 15129,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -6187,6 +6222,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "(123S[var])L[var]*L[var]",
+            StandardInput: "",
             ExpectedValue: 15129,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -6320,6 +6356,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "((100+20+3)S)L*L",
+            StandardInput: "",
             ExpectedValue: 15129,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -6491,6 +6528,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "((100+20+3)S[var])L[var]*L[var]",
+            StandardInput: "",
             ExpectedValue: 15129,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -6662,6 +6700,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[op||(123S)L*L]{op}",
+            StandardInput: "",
             ExpectedValue: 15129,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -6856,6 +6895,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[op||L*L](123S){op}",
+            StandardInput: "",
             ExpectedValue: 15129,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -7038,6 +7078,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] (20{fib}S)+L",
+            StandardInput: "",
             ExpectedValue: 13530,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -7367,6 +7408,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[get||L] D[set|x|xS] D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] (20{fib}>=1000?10?5)S {get}",
+            StandardInput: "",
             ExpectedValue: 10,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -7882,6 +7924,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[get||L] D[set|x|xS] D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] (20{fib}>=1000?10S?5S) {get}",
+            StandardInput: "",
             ExpectedValue: 10,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -8399,6 +8442,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] D[fib2||L{fib}] D[set|x|xS] 3{set} {fib2}",
+            StandardInput: "",
             ExpectedValue: 2,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -8811,6 +8855,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] D[fib2||L{fib}] D[set|x|xS] 20{set} {fib2}",
+            StandardInput: "",
             ExpectedValue: 6765,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -9236,6 +9281,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] D[fib2||L{fib}] D[set|x|xS] 3S {fib2}",
+            StandardInput: "",
             ExpectedValue: 2,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -9643,6 +9689,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] D[fib2||L{fib}] D[set|x|xS] 20S {fib2}",
+            StandardInput: "",
             ExpectedValue: 6765,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -10063,6 +10110,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[fib|n|10S(n<=1?n?((n-1){fib}+(n-2){fib}))S] 20{fib} L",
+            StandardInput: "",
             ExpectedValue: 6765,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -10431,6 +10479,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "0@",
+            StandardInput: "",
             ExpectedValue: 0,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -10514,6 +10563,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "5->0",
+            StandardInput: "",
             ExpectedValue: 5,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -10611,6 +10661,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "(10->20)L[zero]20@",
+            StandardInput: "",
             ExpectedValue: 10,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -10787,6 +10838,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "((4+6)->(10+10))(20@)",
+            StandardInput: "",
             ExpectedValue: 10,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -10974,6 +11026,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[func||(10->20)L[zero]20@] {func} (20@)",
+            StandardInput: "",
             ExpectedValue: 10,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -11240,6 +11293,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[func||((4+6)->(10+10))(20@)] {func} (20@)",
+            StandardInput: "",
             ExpectedValue: 10,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -11516,6 +11570,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[func||(10->20)L[zero]20@] D[get||20@] {func} (20@)",
+            StandardInput: "",
             ExpectedValue: 10,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -11839,6 +11894,7 @@ internal static class TestCases
         ),
         new TestCase(
             Source: "D[func||((4+6)->(10+10))(20@)] D[get||20@] {func} {get}",
+            StandardInput: "",
             ExpectedValue: 10,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
@@ -12148,6 +12204,394 @@ internal static class TestCases
                                         /* 00 */ new LowLevelOperation(Opcode.LoadConst, 20),
                                         /* 01 */ new LowLevelOperation(Opcode.LoadArrayElement, 0),
                                         /* 02 */ new LowLevelOperation(Opcode.Return, 0)
+                                    }.ToImmutableArray(),
+                                    1)
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            SkipTypes: null
+        ),
+        new TestCase(
+            Source: "I",
+            StandardInput: "A",
+            ExpectedValue: 65,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
+            ExpectedWhenNotOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new InputOperator(
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            ExpectedWhenOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new InputOperator(
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            SkipTypes: null
+        ),
+        new TestCase(
+            Source: "I+I",
+            StandardInput: "AB",
+            ExpectedValue: 131,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
+            ExpectedWhenNotOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new BinaryOperator(
+                        Left: new InputOperator(
+                            SupplementaryText: null
+                        ),
+                        Right: new InputOperator(
+                            SupplementaryText: null
+                        ),
+                        Type: BinaryType.Add,
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 02 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            ExpectedWhenOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new BinaryOperator(
+                        Left: new InputOperator(
+                            SupplementaryText: null
+                        ),
+                        Right: new InputOperator(
+                            SupplementaryText: null
+                        ),
+                        Type: BinaryType.Add,
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 02 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            SkipTypes: null
+        ),
+        new TestCase(
+            Source: "1+2+I",
+            StandardInput: "A",
+            ExpectedValue: 68,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
+            ExpectedWhenNotOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new BinaryOperator(
+                        Left: new BinaryOperator(
+                            Left: new DecimalOperator(
+                                Operand: new ZeroOperator(),
+                                Value: 1,
+                                SupplementaryText: null
+                            ),
+                            Right: new DecimalOperator(
+                                Operand: new ZeroOperator(),
+                                Value: 2,
+                                SupplementaryText: null
+                            ),
+                            Type: BinaryType.Add,
+                            SupplementaryText: null
+                        ),
+                        Right: new InputOperator(
+                            SupplementaryText: null
+                        ),
+                        Type: BinaryType.Add,
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 02 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                /* 04 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 05 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 06 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 07 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 08 */ new LowLevelOperation(Opcode.LoadConst, 2),
+                                /* 09 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 10 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 11 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 12 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 13 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            ExpectedWhenOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new BinaryOperator(
+                        Left: new PreComputedOperator(
+                            Value: 3
+                        ),
+                        Right: new InputOperator(
+                            SupplementaryText: null
+                        ),
+                        Type: BinaryType.Add,
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 3),
+                                /* 01 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 02 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            SkipTypes: null
+        ),
+        new TestCase(
+            Source: "D[Input||I]{Input}",
+            StandardInput: "A",
+            ExpectedValue: 65,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
+            ExpectedWhenNotOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new ParenthesisOperator(
+                        Operators: new IOperator[]
+                        {
+                            new DefineOperator(
+                                SupplementaryText: "Input||I"
+                            ),
+                            new UserDefinedOperator(
+                                Definition: new OperatorDefinition(Name: "Input", NumOperands: 0),
+                                Operands: new IOperator[]
+                                {
+                                }.ToImmutableArray(),
+                                IsTailCall: null,
+                                SupplementaryText: null
+                            )
+                        }.ToImmutableArray(),
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                                new OperatorImplement(
+                                    Definition: new OperatorDefinition(Name: "Input", NumOperands: 0),
+                                    IsOptimized: false,
+                                    Operator: new InputOperator(
+                                        SupplementaryText: null
+                                    )
+                                )
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 02 */ new LowLevelOperation(Opcode.Call, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                                new LowLevelUserDefinedOperator(
+                                    new OperatorDefinition(Name: "Input", NumOperands: 0),
+                                    new LowLevelOperation[]
+                                    {
+                                        /* 00 */ new LowLevelOperation(Opcode.Input, 0),
+                                        /* 01 */ new LowLevelOperation(Opcode.Return, 0)
+                                    }.ToImmutableArray(),
+                                    1)
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            ExpectedWhenOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new UserDefinedOperator(
+                        Definition: new OperatorDefinition(Name: "Input", NumOperands: 0),
+                        Operands: new IOperator[]
+                        {
+                        }.ToImmutableArray(),
+                        IsTailCall: true,
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                                new OperatorImplement(
+                                    Definition: new OperatorDefinition(Name: "Input", NumOperands: 0),
+                                    IsOptimized: true,
+                                    Operator: new InputOperator(
+                                        SupplementaryText: null
+                                    )
+                                )
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.Call, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                                new LowLevelUserDefinedOperator(
+                                    new OperatorDefinition(Name: "Input", NumOperands: 0),
+                                    new LowLevelOperation[]
+                                    {
+                                        /* 00 */ new LowLevelOperation(Opcode.Input, 0),
+                                        /* 01 */ new LowLevelOperation(Opcode.Return, 0)
                                     }.ToImmutableArray(),
                                     1)
                             }.ToImmutableArray(),

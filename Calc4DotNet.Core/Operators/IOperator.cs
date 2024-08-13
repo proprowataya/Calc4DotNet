@@ -65,6 +65,16 @@ public sealed record LoadVariableOperator(string? SupplementaryText = null) : IO
     public override string ToString() => this.ToStringImplement();
 }
 
+public sealed record InputOperator(string? SupplementaryText = null) : IOperator
+{
+    public IOperator[] GetOperands() => Array.Empty<IOperator>();
+
+    public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+    public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+    public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+    public override string ToString() => this.ToStringImplement();
+}
+
 public sealed record LoadArrayOperator(IOperator Index, string? SupplementaryText = null) : IOperator
 {
     public IOperator[] GetOperands() => new[] { Index };

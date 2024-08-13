@@ -36,11 +36,16 @@ public class AotCompilerTest
          * Validate result
          */
         string dllPath = Path.ChangeExtension(sourcePath, "dll");
-        using var process = Process.Start(new ProcessStartInfo("dotnet", dllPath) { RedirectStandardOutput = true });
+        using var process = Process.Start(new ProcessStartInfo("dotnet", dllPath)
+        {
+            RedirectStandardInput = true,
+            RedirectStandardOutput = true,
+        });
         if (process is null)
         {
             Assert.Fail("Could not start dotnet process.");
         }
+        process.StandardInput.WriteLine(testCase.StandardInput);
         string result = process.StandardOutput.ReadToEnd();
         string expected = testCase.ExpectedConsoleOutput + testCase.ExpectedValue.ToString() + Environment.NewLine;
         Assert.Equal(expected, result);

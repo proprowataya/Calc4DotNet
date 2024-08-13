@@ -191,10 +191,13 @@ public static class ILCompiler
                     il.Emit(OpCodes.Ldloc_S, value.LocalIndex);
                     break;
                 case Opcode.Input:
-                    throw new NotImplementedException();
+                    EmitLoadIOService();
+                    il.Emit(OpCodes.Callvirt, typeof(IIOService).GetMethod(nameof(IIOService.GetChar))!);
+                    il.EmitConvToINumber<char, TNumber>();
+                    break;
                 case Opcode.PrintChar:
                     character ??= il.DeclareLocal(typeof(char));
-                    il.EmitConvToINumber<TNumber, Int16>();
+                    il.EmitConvToINumber<TNumber, char>();
                     il.Emit(OpCodes.Stloc_S, character.LocalIndex);
 
                     EmitLoadIOService();

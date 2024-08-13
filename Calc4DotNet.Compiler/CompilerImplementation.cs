@@ -107,8 +107,9 @@ internal static class CompilerImplementation
         il.Emit(OpCodes.Newobj, compiledModule.GetConstructor([])!);
         il.Emit(OpCodes.Newobj, typeof(DefaultVariableSource<TNumber>).GetConstructor([])!);
         il.Emit(OpCodes.Newobj, typeof(DefaultArraySource<TNumber>).GetConstructor([])!);
+        il.Emit(OpCodes.Call, typeof(Console).GetProperty(nameof(Console.In))!.GetMethod!);
         il.Emit(OpCodes.Call, typeof(Console).GetProperty(nameof(Console.Out))!.GetMethod!);
-        il.Emit(OpCodes.Newobj, typeof(TextWriterIOService).GetConstructor([typeof(TextWriter)])!);
+        il.Emit(OpCodes.Newobj, typeof(TextReaderWriterIOService).GetConstructor([typeof(TextReader), typeof(TextWriter)])!);
         il.Emit(OpCodes.Newobj, typeof(SimpleEvaluationState<TNumber>).GetConstructor([typeof(IVariableSource<TNumber>), typeof(IArraySource<TNumber>), typeof(IIOService)])!);
         il.Emit(OpCodes.Callvirt, compiledModuleTypeBuilder.GetMethod(nameof(ICompiledModule<TNumber>.Run)!)!);
         il.Emit(OpCodes.Box, typeof(TNumber));
