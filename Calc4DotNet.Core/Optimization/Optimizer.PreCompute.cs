@@ -67,6 +67,11 @@ public static partial class Optimizer
                 UnsetAllVariables();
                 return op;
             }
+            catch (InputIsNotSupportedException)
+            {
+                UnsetAllVariables();
+                return op;
+            }
             catch (ZeroDivisionException)
             {
                 UnsetAllVariables();
@@ -116,6 +121,8 @@ public static partial class Optimizer
         public IOperator Visit(DefineOperator op, OptimizeTimeEvaluationState<TNumber> state) => PreComputeIfPossible(op, state);
 
         public IOperator Visit(LoadVariableOperator op, OptimizeTimeEvaluationState<TNumber> state) => PreComputeIfPossible(op, state);
+
+        public IOperator Visit(InputOperator op, OptimizeTimeEvaluationState<TNumber> state) => PreComputeIfPossible(op, state);
 
         public IOperator Visit(LoadArrayOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {

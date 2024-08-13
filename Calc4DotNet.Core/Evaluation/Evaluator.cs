@@ -56,6 +56,9 @@ public static class Evaluator
         public TNumber Visit(LoadVariableOperator op, TNumber[]? arguments)
             => evaluationState.Variables[op.VariableName];
 
+        public TNumber Visit(InputOperator op, TNumber[]? param)
+            => TNumber.CreateTruncating(evaluationState.IOService.GetChar());
+
         public TNumber Visit(LoadArrayOperator op, TNumber[]? arguments)
         {
             TNumber index = op.Index.Accept(this, arguments);

@@ -7,6 +7,7 @@ using Calc4DotNet.Core.Operators;
 namespace Calc4DotNet.Test;
 
 internal sealed record TestCase(string Source,
+                                string StandardInput,
                                 int ExpectedValue,
                                 ImmutableDictionary<ValueBox<string>, Int32> VariablesAfterExecution,
                                 CompilationResult<Int32> ExpectedWhenOptimized,

@@ -28,6 +28,10 @@ internal struct CSharpSerializer
         Serialize(testCase.Source, insertIndentFirst: false);
         WriteLine(",", insertIndent: false);
 
+        Write($"{nameof(TestCase.StandardInput)}: ");
+        Serialize(testCase.StandardInput, insertIndentFirst: false);
+        WriteLine(",", insertIndent: false);
+
         WriteLine($"{nameof(TestCase.ExpectedValue)}: {testCase.ExpectedValue},");
 
         WriteLine($"{nameof(TestCase.VariablesAfterExecution)}:");

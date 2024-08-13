@@ -25,6 +25,11 @@ public sealed record LoadVariableToken(string? SupplementaryText = null) : IToke
     public int NumOperands => 0;
 }
 
+public sealed record InputToken(string? SupplementaryText = null) : IToken
+{
+    public int NumOperands => 0;
+}
+
 public sealed record ParenthesisToken(ImmutableArray<IToken> Tokens, string? SupplementaryText = null) : IToken
 {
     public int NumOperands => 0;

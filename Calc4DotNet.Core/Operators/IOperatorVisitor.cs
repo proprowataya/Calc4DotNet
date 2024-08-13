@@ -7,6 +7,7 @@ public interface IOperatorVisitor
     void Visit(ArgumentOperator op);
     void Visit(DefineOperator op);
     void Visit(LoadVariableOperator op);
+    void Visit(InputOperator op);
     void Visit(LoadArrayOperator op);
     void Visit(PrintCharOperator op);
     void Visit(ParenthesisOperator op);
@@ -25,6 +26,7 @@ public interface IOperatorVisitor<TResult>
     TResult Visit(ArgumentOperator op);
     TResult Visit(DefineOperator op);
     TResult Visit(LoadVariableOperator op);
+    TResult Visit(InputOperator op);
     TResult Visit(LoadArrayOperator op);
     TResult Visit(PrintCharOperator op);
     TResult Visit(ParenthesisOperator op);
@@ -43,6 +45,7 @@ public interface IOperatorVisitor<TResult, TParam>
     TResult Visit(ArgumentOperator op, TParam param);
     TResult Visit(DefineOperator op, TParam param);
     TResult Visit(LoadVariableOperator op, TParam param);
+    TResult Visit(InputOperator op, TParam param);
     TResult Visit(LoadArrayOperator op, TParam param);
     TResult Visit(PrintCharOperator op, TParam param);
     TResult Visit(ParenthesisOperator op, TParam param);

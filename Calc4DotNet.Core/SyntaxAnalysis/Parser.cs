@@ -128,6 +128,7 @@ public static class Parser
                 ArgumentToken arg => new ArgumentOperator(arg.Index, arg.SupplementaryText),
                 DefineToken def => new DefineOperator(def.SupplementaryText),
                 LoadVariableToken loadVariable => new LoadVariableOperator(loadVariable.SupplementaryText),
+                InputToken input => new InputOperator(input.SupplementaryText),
                 LoadArrayToken loadArray => new LoadArrayOperator(operands[0], loadArray.SupplementaryText),
                 PrintCharToken printChar => new PrintCharOperator(operands[0], printChar.SupplementaryText),
                 ParenthesisToken parenthesis => ParseCore(parenthesis.Tokens, context),

@@ -58,7 +58,7 @@ public class ExecutionFailureTest
         // So, we compile the given code outside Assert.Throws().
         var (op, context, module) = CompileGeneric<TNumber>(testCase.Source, target, default!);
         ICompiledModule<TNumber> ilModule = ILCompiler.Compile<TNumber>(module);
-        IEvaluationState<TNumber> state = CreateEvaluationState<TNumber>();
+        IEvaluationState<TNumber> state = CreateEvaluationState<TNumber>("");
 
         Assert.Throws(testCase.ExpectedException, () =>
         {
