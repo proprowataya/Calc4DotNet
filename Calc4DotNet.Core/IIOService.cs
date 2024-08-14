@@ -5,7 +5,7 @@ namespace Calc4DotNet.Core;
 public interface IIOService
 {
     void PrintChar(char c);
-    char GetChar();
+    int GetChar();
     IIOService Clone();
 }
 
@@ -25,9 +25,9 @@ public sealed class TextReaderWriterIOService : IIOService
         writer.Write(c);
     }
 
-    public char GetChar()
+    public int GetChar()
     {
-        return (char)reader.Read();
+        return reader.Read();
     }
 
     public TextReaderWriterIOService Clone()
@@ -73,7 +73,7 @@ public sealed class MemoryIOService : IIOService
         history.Add(c);
     }
 
-    public char GetChar()
+    public int GetChar()
     {
         if (input is null)
         {
@@ -87,7 +87,7 @@ public sealed class MemoryIOService : IIOService
             return input[index];
         }
 
-        return (char)0;
+        return -1;
     }
 
     public string GetHistory()
