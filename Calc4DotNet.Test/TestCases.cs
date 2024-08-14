@@ -12602,5 +12602,75 @@ internal static class TestCases
                 ),
             SkipTypes: null
         ),
+        new TestCase(
+            Source: "I",
+            StandardInput: "",
+            ExpectedValue: -1,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
+            ExpectedWhenNotOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new InputOperator(
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            ExpectedWhenOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new InputOperator(
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            SkipTypes: null
+        ),
     };
 }
