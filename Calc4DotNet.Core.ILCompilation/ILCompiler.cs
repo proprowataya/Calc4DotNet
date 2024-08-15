@@ -193,7 +193,7 @@ public static class ILCompiler
                 case Opcode.Input:
                     EmitLoadIOService();
                     il.Emit(OpCodes.Callvirt, typeof(IIOService).GetMethod(nameof(IIOService.GetChar))!);
-                    il.EmitConvToINumber<char, TNumber>();
+                    il.EmitConvToINumber<int, TNumber>();
                     break;
                 case Opcode.PrintChar:
                     character ??= il.DeclareLocal(typeof(char));

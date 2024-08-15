@@ -80,6 +80,7 @@ var testCaseInputs = new (string Source, string StandardInput, Type[]? SkipTypes
     ("I+I", "AB", null),
     ("1+2+I", "A", null),
     ("D[Input||I]{Input}", "A", null),
+    ("I", "", null),
 };
 
 string outputPath = Path.GetFullPath(Path.Join(new[] { Assembly.GetExecutingAssembly().Location, "..", "..", "..", "..", "..", "Calc4DotNet.Test", "TestCases.cs" }));

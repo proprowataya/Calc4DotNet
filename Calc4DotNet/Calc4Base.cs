@@ -5,7 +5,9 @@ using Calc4DotNet.Core;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Exceptions;
 using Calc4DotNet.Core.Execution;
+#if !NO_JIT_COMPILER
 using Calc4DotNet.Core.ILCompilation;
+#endif
 using Calc4DotNet.Core.Operators;
 using Calc4DotNet.Core.Optimization;
 using Calc4DotNet.Core.SyntaxAnalysis;
@@ -60,11 +62,13 @@ internal abstract class Calc4Base<TNumber>
             {
                 result = LowLevelExecutor.Execute(module, state);
             }
+#if !NO_JIT_COMPILER
             else if (setting.ExecutorType == ExecutorType.JIT)
             {
                 ICompiledModule<TNumber> ilModule = ILCompiler.Compile(module);
                 result = ilModule.Run(state);
             }
+#endif
             else
             {
                 throw new InvalidOperationException();

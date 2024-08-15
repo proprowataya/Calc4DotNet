@@ -27,11 +27,15 @@ Options:
 {CommandLineArgs.IntegerSize}|{CommandLineArgs.IntegerSizeShort} <size>
     Specify the size of integer
     size: 32, 64 (default), 128, inf (meaning infinite-precision or arbitrary-precision)
-{CommandLineArgs.DisableJit}
+" +
+#if !NO_JIT_COMPILER
+$@"{CommandLineArgs.DisableJit}
     Disable JIT compilation
 {CommandLineArgs.EnableJit}
     Enable JIT compilation (default)
-{CommandLineArgs.DisableOptimization}
+" +
+#endif
+$@"{CommandLineArgs.DisableOptimization}
     Disable optimization
 {CommandLineArgs.EnableOptimization}
     Enable optimization (default)
@@ -50,7 +54,12 @@ During the Repl mode, the following commands are available:
     public static (Setting Setting, string[] SourcePaths, bool PrintHelp) Parse(string[] args)
     {
         Type numberType = typeof(Int64);
-        ExecutorType executorType = ExecutorType.JIT;
+        ExecutorType executorType =
+#if !NO_JIT_COMPILER
+            ExecutorType.JIT;
+#else
+            ExecutorType.LowLevel;
+#endif
         bool optimize = true;
         bool dump = false;
         List<string> sourcePaths = new();
@@ -73,12 +82,14 @@ During the Repl mode, the following commands are available:
                 case CommandLineArgs.Help:
                     printHelp = true;
                     break;
+#if !NO_JIT_COMPILER
                 case CommandLineArgs.EnableJit:
                     executorType = ExecutorType.JIT;
                     break;
                 case CommandLineArgs.DisableJit:
                     executorType = ExecutorType.LowLevel;
                     break;
+#endif
                 case CommandLineArgs.IntegerSize:
                 case CommandLineArgs.IntegerSizeShort:
                     numberType = GetNextArgument() switch

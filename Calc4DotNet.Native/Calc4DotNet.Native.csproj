@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PublishAot>true</PublishAot>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <DefineConstants>NO_JIT_COMPILER</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Calc4DotNet\Calc4Base.cs" Link="Calc4Base.cs" />
+    <Compile Include="..\Calc4DotNet\CommandLineArgsParser.cs" Link="CommandLineArgsParser.cs" />
+    <Compile Include="..\Calc4DotNet\Executor.cs" Link="Executor.cs" />
+    <Compile Include="..\Calc4DotNet\Program.cs" Link="Program.cs" />
+    <Compile Include="..\Calc4DotNet\Repl.cs" Link="Repl.cs" />
+    <Compile Include="..\Calc4DotNet\Setting.cs" Link="Setting.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Calc4DotNet.Core\Calc4DotNet.Core.csproj" />
+  </ItemGroup>
+
+</Project>
