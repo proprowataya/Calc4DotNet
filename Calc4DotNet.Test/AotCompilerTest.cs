@@ -45,7 +45,8 @@ public class AotCompilerTest
         {
             Assert.Fail("Could not start dotnet process.");
         }
-        process.StandardInput.WriteLine(testCase.StandardInput);
+        process.StandardInput.Write(testCase.StandardInput);
+        process.StandardInput.Close();
         string result = process.StandardOutput.ReadToEnd();
         string expected = testCase.ExpectedConsoleOutput + testCase.ExpectedValue.ToString() + Environment.NewLine;
         Assert.Equal(expected, result);
