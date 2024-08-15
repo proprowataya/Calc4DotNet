@@ -6,6 +6,7 @@ public interface IOperator
 {
     string? SupplementaryText { get; }
     IOperator[] GetOperands();
+    (string Name, object? Value)[] GetProperties();
 
     void Accept(IOperatorVisitor visitor);
     TResult Accept<TResult>(IOperatorVisitor<TResult> visitor);
@@ -16,6 +17,10 @@ public sealed record ZeroOperator : IOperator
 {
     public string? SupplementaryText => null;
     public IOperator[] GetOperands() => Array.Empty<IOperator>();
+    public (string Name, object? Value)[] GetProperties() =>
+    [
+        (nameof(SupplementaryText), SupplementaryText),
+    ];
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
@@ -27,6 +32,11 @@ public sealed record PreComputedOperator(object Value) : IOperator
 {
     public string? SupplementaryText => null;
     public IOperator[] GetOperands() => Array.Empty<IOperator>();
+    public (string Name, object? Value)[] GetProperties() =>
+    [
+        (nameof(SupplementaryText), SupplementaryText),
+        (nameof(Value), Value),
+    ];
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
@@ -37,6 +47,11 @@ public sealed record PreComputedOperator(object Value) : IOperator
 public sealed record ArgumentOperator(int Index, string? SupplementaryText = null) : IOperator
 {
     public IOperator[] GetOperands() => Array.Empty<IOperator>();
+    public (string Name, object? Value)[] GetProperties() =>
+    [
+        (nameof(SupplementaryText), SupplementaryText),
+        (nameof(Index), Index),
+    ];
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
@@ -47,6 +62,10 @@ public sealed record ArgumentOperator(int Index, string? SupplementaryText = nul
 public sealed record DefineOperator(string? SupplementaryText = null) : IOperator
 {
     public IOperator[] GetOperands() => Array.Empty<IOperator>();
+    public (string Name, object? Value)[] GetProperties() =>
+    [
+        (nameof(SupplementaryText), SupplementaryText),
+    ];
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
@@ -58,6 +77,11 @@ public sealed record LoadVariableOperator(string? SupplementaryText = null) : IO
 {
     public string? VariableName => SupplementaryText;
     public IOperator[] GetOperands() => Array.Empty<IOperator>();
+    public (string Name, object? Value)[] GetProperties() =>
+    [
+        (nameof(SupplementaryText), SupplementaryText),
+        (nameof(VariableName), VariableName),
+    ];
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
@@ -68,6 +92,10 @@ public sealed record LoadVariableOperator(string? SupplementaryText = null) : IO
 public sealed record InputOperator(string? SupplementaryText = null) : IOperator
 {
     public IOperator[] GetOperands() => Array.Empty<IOperator>();
+    public (string Name, object? Value)[] GetProperties() =>
+    [
+        (nameof(SupplementaryText), SupplementaryText),
+    ];
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
@@ -78,6 +106,10 @@ public sealed record InputOperator(string? SupplementaryText = null) : IOperator
 public sealed record LoadArrayOperator(IOperator Index, string? SupplementaryText = null) : IOperator
 {
     public IOperator[] GetOperands() => new[] { Index };
+    public (string Name, object? Value)[] GetProperties() =>
+    [
+        (nameof(SupplementaryText), SupplementaryText),
+    ];
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
@@ -88,6 +120,10 @@ public sealed record LoadArrayOperator(IOperator Index, string? SupplementaryTex
 public sealed record PrintCharOperator(IOperator Character, string? SupplementaryText = null) : IOperator
 {
     public IOperator[] GetOperands() => new[] { Character };
+    public (string Name, object? Value)[] GetProperties() =>
+    [
+        (nameof(SupplementaryText), SupplementaryText),
+    ];
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
@@ -98,6 +134,11 @@ public sealed record PrintCharOperator(IOperator Character, string? Supplementar
 public sealed record ParenthesisOperator(ImmutableArray<IOperator> Operators, string? SupplementaryText = null) : IOperator
 {
     public IOperator[] GetOperands() => Array.Empty<IOperator>();
+    public (string Name, object? Value)[] GetProperties() =>
+    [
+        (nameof(SupplementaryText), SupplementaryText),
+        // We don't show the 'Operators' property.
+    ];
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
@@ -129,6 +170,11 @@ public sealed record ParenthesisOperator(ImmutableArray<IOperator> Operators, st
 public sealed record DecimalOperator(IOperator Operand, int Value, string? SupplementaryText = null) : IOperator
 {
     public IOperator[] GetOperands() => new[] { Operand };
+    public (string Name, object? Value)[] GetProperties() =>
+    [
+        (nameof(SupplementaryText), SupplementaryText),
+        (nameof(Value), Value),
+    ];
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
@@ -140,6 +186,11 @@ public sealed record StoreVariableOperator(IOperator Operand, string? Supplement
 {
     public string? VariableName => SupplementaryText;
     public IOperator[] GetOperands() => new[] { Operand };
+    public (string Name, object? Value)[] GetProperties() =>
+    [
+        (nameof(SupplementaryText), SupplementaryText),
+        (nameof(VariableName), VariableName),
+    ];
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
@@ -150,6 +201,10 @@ public sealed record StoreVariableOperator(IOperator Operand, string? Supplement
 public sealed record StoreArrayOperator(IOperator Value, IOperator Index, string? SupplementaryText = null) : IOperator
 {
     public IOperator[] GetOperands() => new[] { Value, Index };
+    public (string Name, object? Value)[] GetProperties() =>
+    [
+        (nameof(SupplementaryText), SupplementaryText),
+    ];
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
@@ -162,6 +217,11 @@ public enum BinaryType { Add, Sub, Mult, Div, Mod, Equal, NotEqual, LessThan, Le
 public sealed record BinaryOperator(IOperator Left, IOperator Right, BinaryType Type, string? SupplementaryText = null) : IOperator
 {
     public IOperator[] GetOperands() => new[] { Left, Right };
+    public (string Name, object? Value)[] GetProperties() =>
+    [
+        (nameof(SupplementaryText), SupplementaryText),
+        (nameof(Type), Type),
+    ];
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
@@ -172,6 +232,10 @@ public sealed record BinaryOperator(IOperator Left, IOperator Right, BinaryType 
 public sealed record ConditionalOperator(IOperator Condition, IOperator IfTrue, IOperator IfFalse, string? SupplementaryText = null) : IOperator
 {
     public IOperator[] GetOperands() => new[] { Condition, IfTrue, IfFalse };
+    public (string Name, object? Value)[] GetProperties() =>
+    [
+        (nameof(SupplementaryText), SupplementaryText),
+    ];
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
@@ -182,6 +246,12 @@ public sealed record ConditionalOperator(IOperator Condition, IOperator IfTrue, 
 public sealed record UserDefinedOperator(OperatorDefinition Definition, ImmutableArray<IOperator> Operands, bool? IsTailCall, string? SupplementaryText = null) : IOperator
 {
     public IOperator[] GetOperands() => Operands.ToArray();
+    public (string Name, object? Value)[] GetProperties() =>
+    [
+        (nameof(SupplementaryText), SupplementaryText),
+        (nameof(Definition), Definition),
+        (nameof(IsTailCall), IsTailCall),
+    ];
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
     public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
