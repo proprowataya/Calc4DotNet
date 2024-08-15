@@ -8,6 +8,8 @@ internal static class OperatorHelper
 
     public static string ToStringImplement(this IOperator op)
     {
+        // TODO: This method uses reflection, which is incompatible with Native AOT.
+        // With the Native AOT feature, properties are not displayed in the output string.
         var type = op.GetType();
         var props = type.GetProperties()
                         .Where(p => !typeof(IOperator).IsAssignableFrom(p.PropertyType)
