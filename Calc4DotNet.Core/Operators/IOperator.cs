@@ -16,7 +16,7 @@ public interface IOperator
 public sealed record ZeroOperator : IOperator
 {
     public string? SupplementaryText => null;
-    public IOperator[] GetOperands() => Array.Empty<IOperator>();
+    public IOperator[] GetOperands() => [];
     public (string Name, object? Value)[] GetProperties() =>
     [
         (nameof(SupplementaryText), SupplementaryText),
@@ -31,7 +31,7 @@ public sealed record ZeroOperator : IOperator
 public sealed record PreComputedOperator(object Value) : IOperator
 {
     public string? SupplementaryText => null;
-    public IOperator[] GetOperands() => Array.Empty<IOperator>();
+    public IOperator[] GetOperands() => [];
     public (string Name, object? Value)[] GetProperties() =>
     [
         (nameof(SupplementaryText), SupplementaryText),
@@ -46,7 +46,7 @@ public sealed record PreComputedOperator(object Value) : IOperator
 
 public sealed record ArgumentOperator(int Index, string? SupplementaryText = null) : IOperator
 {
-    public IOperator[] GetOperands() => Array.Empty<IOperator>();
+    public IOperator[] GetOperands() => [];
     public (string Name, object? Value)[] GetProperties() =>
     [
         (nameof(SupplementaryText), SupplementaryText),
@@ -61,7 +61,7 @@ public sealed record ArgumentOperator(int Index, string? SupplementaryText = nul
 
 public sealed record DefineOperator(string? SupplementaryText = null) : IOperator
 {
-    public IOperator[] GetOperands() => Array.Empty<IOperator>();
+    public IOperator[] GetOperands() => [];
     public (string Name, object? Value)[] GetProperties() =>
     [
         (nameof(SupplementaryText), SupplementaryText),
@@ -76,7 +76,7 @@ public sealed record DefineOperator(string? SupplementaryText = null) : IOperato
 public sealed record LoadVariableOperator(string? SupplementaryText = null) : IOperator
 {
     public string? VariableName => SupplementaryText;
-    public IOperator[] GetOperands() => Array.Empty<IOperator>();
+    public IOperator[] GetOperands() => [];
     public (string Name, object? Value)[] GetProperties() =>
     [
         (nameof(SupplementaryText), SupplementaryText),
@@ -91,7 +91,7 @@ public sealed record LoadVariableOperator(string? SupplementaryText = null) : IO
 
 public sealed record InputOperator(string? SupplementaryText = null) : IOperator
 {
-    public IOperator[] GetOperands() => Array.Empty<IOperator>();
+    public IOperator[] GetOperands() => [];
     public (string Name, object? Value)[] GetProperties() =>
     [
         (nameof(SupplementaryText), SupplementaryText),
@@ -105,7 +105,7 @@ public sealed record InputOperator(string? SupplementaryText = null) : IOperator
 
 public sealed record LoadArrayOperator(IOperator Index, string? SupplementaryText = null) : IOperator
 {
-    public IOperator[] GetOperands() => new[] { Index };
+    public IOperator[] GetOperands() => [Index];
     public (string Name, object? Value)[] GetProperties() =>
     [
         (nameof(SupplementaryText), SupplementaryText),
@@ -119,7 +119,7 @@ public sealed record LoadArrayOperator(IOperator Index, string? SupplementaryTex
 
 public sealed record PrintCharOperator(IOperator Character, string? SupplementaryText = null) : IOperator
 {
-    public IOperator[] GetOperands() => new[] { Character };
+    public IOperator[] GetOperands() => [Character];
     public (string Name, object? Value)[] GetProperties() =>
     [
         (nameof(SupplementaryText), SupplementaryText),
@@ -133,7 +133,7 @@ public sealed record PrintCharOperator(IOperator Character, string? Supplementar
 
 public sealed record ParenthesisOperator(ImmutableArray<IOperator> Operators, string? SupplementaryText = null) : IOperator
 {
-    public IOperator[] GetOperands() => Array.Empty<IOperator>();
+    public IOperator[] GetOperands() => [];
     public (string Name, object? Value)[] GetProperties() =>
     [
         (nameof(SupplementaryText), SupplementaryText),
@@ -169,7 +169,7 @@ public sealed record ParenthesisOperator(ImmutableArray<IOperator> Operators, st
 
 public sealed record DecimalOperator(IOperator Operand, int Value, string? SupplementaryText = null) : IOperator
 {
-    public IOperator[] GetOperands() => new[] { Operand };
+    public IOperator[] GetOperands() => [Operand];
     public (string Name, object? Value)[] GetProperties() =>
     [
         (nameof(SupplementaryText), SupplementaryText),
@@ -185,7 +185,7 @@ public sealed record DecimalOperator(IOperator Operand, int Value, string? Suppl
 public sealed record StoreVariableOperator(IOperator Operand, string? SupplementaryText = null) : IOperator
 {
     public string? VariableName => SupplementaryText;
-    public IOperator[] GetOperands() => new[] { Operand };
+    public IOperator[] GetOperands() => [Operand];
     public (string Name, object? Value)[] GetProperties() =>
     [
         (nameof(SupplementaryText), SupplementaryText),
@@ -200,7 +200,7 @@ public sealed record StoreVariableOperator(IOperator Operand, string? Supplement
 
 public sealed record StoreArrayOperator(IOperator Value, IOperator Index, string? SupplementaryText = null) : IOperator
 {
-    public IOperator[] GetOperands() => new[] { Value, Index };
+    public IOperator[] GetOperands() => [Value, Index];
     public (string Name, object? Value)[] GetProperties() =>
     [
         (nameof(SupplementaryText), SupplementaryText),
@@ -216,7 +216,7 @@ public enum BinaryType { Add, Sub, Mult, Div, Mod, Equal, NotEqual, LessThan, Le
 
 public sealed record BinaryOperator(IOperator Left, IOperator Right, BinaryType Type, string? SupplementaryText = null) : IOperator
 {
-    public IOperator[] GetOperands() => new[] { Left, Right };
+    public IOperator[] GetOperands() => [Left, Right];
     public (string Name, object? Value)[] GetProperties() =>
     [
         (nameof(SupplementaryText), SupplementaryText),
@@ -231,7 +231,7 @@ public sealed record BinaryOperator(IOperator Left, IOperator Right, BinaryType 
 
 public sealed record ConditionalOperator(IOperator Condition, IOperator IfTrue, IOperator IfFalse, string? SupplementaryText = null) : IOperator
 {
-    public IOperator[] GetOperands() => new[] { Condition, IfTrue, IfFalse };
+    public IOperator[] GetOperands() => [Condition, IfTrue, IfFalse];
     public (string Name, object? Value)[] GetProperties() =>
     [
         (nameof(SupplementaryText), SupplementaryText),
