@@ -16,8 +16,15 @@ public static class ILCompiler
     public static ICompiledModule<TNumber> Compile<TNumber>(LowLevelModule<TNumber> module)
         where TNumber : INumber<TNumber>
     {
-        AssemblyBuilder assemblyBuilder
-            = AssemblyBuilder.DefineDynamicAssembly(AsmName, AssemblyBuilderAccess.Run);
+        AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(AsmName, AssemblyBuilderAccess.Run);
+        var (_, typeBuilder) = CompileToAssembly(module, assemblyBuilder);
+        Type type = typeBuilder.CreateType()!;
+        return (ICompiledModule<TNumber>)Activator.CreateInstance(type)!;
+    }
+
+    public static (ModuleBuilder ModuleBuilder, TypeBuilder TypeBuilder) CompileToAssembly<TNumber>(LowLevelModule<TNumber> module, AssemblyBuilder assemblyBuilder)
+        where TNumber : INumber<TNumber>
+    {
         ModuleBuilder moduleBuilder
             = assemblyBuilder.DefineDynamicModule(AsmName.Name!);
         TypeBuilder typeBuilder
@@ -54,8 +61,7 @@ public static class ILCompiler
         }
 
         EmitIL(module, fieldBuilders, runMethod, methods);
-        Type type = typeBuilder.CreateType()!;
-        return (ICompiledModule<TNumber>)Activator.CreateInstance(type)!;
+        return (moduleBuilder, typeBuilder);
     }
 
     private static void EmitIL<TNumber>(LowLevelModule<TNumber> module, FieldBuilder[] fieldBuilders, MethodBuilder runMethod, (MethodBuilder Method, int NumOperands)[] methods)
