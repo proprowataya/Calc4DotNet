@@ -148,6 +148,7 @@ public static class LowLevelCodeGenerator
                 {
                     case Opcode.Goto:
                     case Opcode.GotoIfTrue:
+                    case Opcode.GotoIfFalse:
                     case Opcode.GotoIfEqual:
                     case Opcode.GotoIfLessThan:
                     case Opcode.GotoIfLessThanOrEqual:
@@ -190,6 +191,7 @@ public static class LowLevelCodeGenerator
                 case Opcode.Mod:
                 case Opcode.ModChecked:
                 case Opcode.GotoIfTrue:
+                case Opcode.GotoIfFalse:
                 case Opcode.Return:
                 case Opcode.Halt:
                     StackSize--;
@@ -310,6 +312,39 @@ public static class LowLevelCodeGenerator
 
         public void Visit(BinaryOperator op)
         {
+            void EmitLogical(Opcode opcode, int branchResult, int fallthroughResult)
+            {
+                int branchLabel = nextLabel++, endLabel = nextLabel++;
+
+                op.Left.Accept(this);
+                AddOperation(new LowLevelOperation(opcode, branchLabel));
+                op.Right.Accept(this);
+                AddOperation(new LowLevelOperation(opcode, branchLabel));
+                AddOperation(new LowLevelOperation(Opcode.LoadConst, fallthroughResult));
+                AddOperation(new LowLevelOperation(Opcode.Goto, endLabel));
+                AddOperation(new LowLevelOperation(Opcode.Lavel, branchLabel));
+                AddOperation(new LowLevelOperation(Opcode.LoadConst, branchResult));
+                AddOperation(new LowLevelOperation(Opcode.Lavel, endLabel));
+
+                // StackSize increased by two due to two LoadConst operations.
+                // However, only one of them will be executed.
+                // We modify StackSize here.
+                StackSize--;
+            }
+
+            if (op.Type is BinaryType.LogicalAnd)
+            {
+                EmitLogical(Opcode.GotoIfFalse, branchResult: 0, fallthroughResult: 1);
+                return;
+            }
+            else if (op.Type is BinaryType.LogicalOr)
+            {
+                EmitLogical(Opcode.GotoIfTrue, branchResult: 1, fallthroughResult: 0);
+                return;
+            }
+
+            /* ******************** */
+
             void EmitComparisonBranch(Opcode opcode, bool reverse)
             {
                 int ifFalse = nextLabel++, end = nextLabel++;
@@ -367,6 +402,10 @@ public static class LowLevelCodeGenerator
                 case BinaryType.GreaterThan:
                     EmitComparisonBranch(Opcode.GotoIfLessThanOrEqual, reverse: true);
                     break;
+                case BinaryType.LogicalAnd:
+                case BinaryType.LogicalOr:
+                    // These are already handled above.
+                    throw new InvalidOperationException();
                 default:
                     throw new InvalidOperationException();
             }
@@ -378,13 +417,9 @@ public static class LowLevelCodeGenerator
 
             if (op.Condition is BinaryOperator binary)
             {
-                // Special optimiztion for comparisons
-                void Emit(Opcode opcode, IOperator ifTrue, IOperator ifFalse)
+                // Special optimization for logical operators
+                void EmitBranch(IOperator ifTrue, IOperator ifFalse)
                 {
-                    binary.Left.Accept(this);
-                    binary.Right.Accept(this);
-                    AddOperation(new LowLevelOperation(opcode, ifTrueLabel));
-
                     int savedStackSize = StackSize;
                     ifFalse.Accept(this);
                     if (list.Last(x => x.Opcode != Opcode.Lavel).Opcode != Opcode.Goto)
@@ -399,28 +434,51 @@ public static class LowLevelCodeGenerator
                     AddOperation(new LowLevelOperation(Opcode.Lavel, endLabel));
                 }
 
+                // Special optimization for comparisons
+                void EmitComparison(Opcode opcode, IOperator ifTrue, IOperator ifFalse)
+                {
+                    binary.Left.Accept(this);
+                    binary.Right.Accept(this);
+                    AddOperation(new LowLevelOperation(opcode, ifTrueLabel));
+                    EmitBranch(ifTrue, ifFalse);
+                }
+
                 switch (binary.Type)
                 {
                     case BinaryType.Equal:
-                        Emit(Opcode.GotoIfEqual, ifTrue: op.IfTrue, ifFalse: op.IfFalse);
+                        EmitComparison(Opcode.GotoIfEqual, ifTrue: op.IfTrue, ifFalse: op.IfFalse);
                         return;
                     case BinaryType.NotEqual:
                         // "a != b ? c ? d" is equivalent to "a == b ? d ? c"
-                        Emit(Opcode.GotoIfEqual, ifTrue: op.IfFalse, ifFalse: op.IfTrue);
+                        EmitComparison(Opcode.GotoIfEqual, ifTrue: op.IfFalse, ifFalse: op.IfTrue);
                         return;
                     case BinaryType.LessThan:
-                        Emit(Opcode.GotoIfLessThan, ifTrue: op.IfTrue, ifFalse: op.IfFalse);
+                        EmitComparison(Opcode.GotoIfLessThan, ifTrue: op.IfTrue, ifFalse: op.IfFalse);
                         return;
                     case BinaryType.LessThanOrEqual:
-                        Emit(Opcode.GotoIfLessThanOrEqual, ifTrue: op.IfTrue, ifFalse: op.IfFalse);
+                        EmitComparison(Opcode.GotoIfLessThanOrEqual, ifTrue: op.IfTrue, ifFalse: op.IfFalse);
                         return;
                     case BinaryType.GreaterThanOrEqual:
                         // "a >= b ? c ? d" is equivalent to "a < b ? d ? c"
-                        Emit(Opcode.GotoIfLessThan, ifTrue: op.IfFalse, ifFalse: op.IfTrue);
+                        EmitComparison(Opcode.GotoIfLessThan, ifTrue: op.IfFalse, ifFalse: op.IfTrue);
                         return;
                     case BinaryType.GreaterThan:
                         // "a > b ? c ? d" is equivalent to "a <= b ? d ? c"
-                        Emit(Opcode.GotoIfLessThanOrEqual, ifTrue: op.IfFalse, ifFalse: op.IfTrue);
+                        EmitComparison(Opcode.GotoIfLessThanOrEqual, ifTrue: op.IfFalse, ifFalse: op.IfTrue);
+                        return;
+                    case BinaryType.LogicalAnd:
+                        binary.Left.Accept(this);
+                        AddOperation(new LowLevelOperation(Opcode.GotoIfFalse, ifTrueLabel));
+                        binary.Right.Accept(this);
+                        AddOperation(new LowLevelOperation(Opcode.GotoIfFalse, ifTrueLabel));
+                        EmitBranch(ifTrue: op.IfFalse, ifFalse: op.IfTrue);
+                        return;
+                    case BinaryType.LogicalOr:
+                        binary.Left.Accept(this);
+                        AddOperation(new LowLevelOperation(Opcode.GotoIfTrue, ifTrueLabel));
+                        binary.Right.Accept(this);
+                        AddOperation(new LowLevelOperation(Opcode.GotoIfTrue, ifTrueLabel));
+                        EmitBranch(ifTrue: op.IfTrue, ifFalse: op.IfFalse);
                         return;
                     default:
                         break;

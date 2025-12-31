@@ -184,6 +184,14 @@ public static class LowLevelExecutor
                         op = ref Unsafe.Add(ref firstOperation, op.Value);
                     }
                     break;
+                case Opcode.GotoIfFalse:
+                    top = ref Unsafe.Add(ref top, -1);
+                    VerifyRange(stack, ref top);
+                    if (top == TNumber.Zero)
+                    {
+                        op = ref Unsafe.Add(ref firstOperation, op.Value);
+                    }
+                    break;
                 case Opcode.GotoIfEqual:
                     top = ref Unsafe.Add(ref top, -2);
                     VerifyRange(stack, ref top);

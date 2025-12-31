@@ -139,7 +139,7 @@ public static class Lexer
                 throw new Calc4DotNet.Core.Exceptions.DefinitionTextIsEmptyException();
             }
 
-            string[] elems = supplementaryText.Split("|");
+            string[] elems = supplementaryText.Split('|', 3);
             if (elems.Length != 3)
             {
                 throw new Calc4DotNet.Core.Exceptions.DefinitionTextNotSplittedProperlyException(supplementaryText);
@@ -258,6 +258,12 @@ public static class Lexer
                     case "<=":
                         Index += 2;
                         return new BinaryOperatorToken(BinaryType.LessThanOrEqual, LexSupplementaryText());
+                    case "&&":
+                        Index += 2;
+                        return new BinaryOperatorToken(BinaryType.LogicalAnd, LexSupplementaryText());
+                    case "||":
+                        Index += 2;
+                        return new BinaryOperatorToken(BinaryType.LogicalOr, LexSupplementaryText());
                     case "->":
                         Index += 2;
                         return new StoreArrayToken(LexSupplementaryText());

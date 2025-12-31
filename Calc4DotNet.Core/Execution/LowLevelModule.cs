@@ -50,6 +50,7 @@ public sealed class LowLevelModule<TNumber>
                 {
                     case Opcode.Goto:
                     case Opcode.GotoIfTrue:
+                    case Opcode.GotoIfFalse:
                     case Opcode.GotoIfEqual:
                     case Opcode.GotoIfLessThan:
                     case Opcode.GotoIfLessThanOrEqual:

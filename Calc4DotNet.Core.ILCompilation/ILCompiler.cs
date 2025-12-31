@@ -277,6 +277,11 @@ public static class ILCompiler
                     il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(INumberBase<TNumber>), nameof(INumberBase<TNumber>.IsZero)));
                     il.Emit(OpCodes.Brfalse, labels[op.Value + 1]);
                     break;
+                case Opcode.GotoIfFalse:
+                    il.Emit(OpCodes.Constrained, typeof(TNumber));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(INumberBase<TNumber>), nameof(INumberBase<TNumber>.IsZero)));
+                    il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
+                    break;
                 case Opcode.GotoIfEqual:
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
                     il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IEqualityOperators<TNumber, TNumber, bool>), "op_Equality"));

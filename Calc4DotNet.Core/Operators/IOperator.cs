@@ -212,7 +212,7 @@ public sealed record StoreArrayOperator(IOperator Value, IOperator Index, string
     public override string ToString() => this.ToStringImplement();
 }
 
-public enum BinaryType { Add, Sub, Mult, Div, Mod, Equal, NotEqual, LessThan, LessThanOrEqual, GreaterThanOrEqual, GreaterThan }
+public enum BinaryType { Add, Sub, Mult, Div, Mod, Equal, NotEqual, LessThan, LessThanOrEqual, GreaterThanOrEqual, GreaterThan, LogicalAnd, LogicalOr }
 
 public sealed record BinaryOperator(IOperator Left, IOperator Right, BinaryType Type, string? SupplementaryText = null) : IOperator
 {
