@@ -85,6 +85,7 @@ public static class ILCompiler
         Dictionary<int, Label> labels = new Dictionary<int, Label>();
         Label methodEnd = il.DefineLabel();
         LocalBuilder? value = null, index = null, character = null;
+        LocalBuilder? checkedLeft = null, checkedRight = null;
         int stateIndex = numOperands + (isMain ? 1 : 0);
 
         /* Local method */
@@ -233,7 +234,17 @@ public static class ILCompiler
                     {
                         Label whenNotZero = il.DefineLabel();
 
-                        il.Emit(OpCodes.Dup);
+                        // Store both operands in locals before the zero check.
+                        // The verifier requires a clean stack on the exception path.
+                        // Without this, the throw path would keep extra values on the stack.
+                        // That can generate invalid IL and the runtime can reject the method.
+                        // We reload the operands after the check to perform the operation.
+                        checkedLeft ??= il.DeclareLocal(typeof(TNumber));
+                        checkedRight ??= il.DeclareLocal(typeof(TNumber));
+
+                        il.Emit(OpCodes.Stloc_S, checkedRight.LocalIndex);
+                        il.Emit(OpCodes.Stloc_S, checkedLeft.LocalIndex);
+                        il.Emit(OpCodes.Ldloc_S, checkedRight.LocalIndex);
                         il.Emit(OpCodes.Constrained, typeof(TNumber));
                         il.Emit(OpCodes.Call, GetInterfacePropertyGetter(typeof(INumberBase<TNumber>), nameof(TNumber.Zero)));
                         il.Emit(OpCodes.Constrained, typeof(TNumber));
@@ -246,6 +257,8 @@ public static class ILCompiler
 
                         // Operate
                         il.MarkLabel(whenNotZero);
+                        il.Emit(OpCodes.Ldloc_S, checkedLeft.LocalIndex);
+                        il.Emit(OpCodes.Ldloc_S, checkedRight.LocalIndex);
                         il.Emit(OpCodes.Constrained, typeof(TNumber));
                         il.Emit(OpCodes.Call,
                                 op.Opcode switch
