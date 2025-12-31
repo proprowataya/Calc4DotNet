@@ -34,6 +34,11 @@ var testCaseInputs = new (string Source, string StandardInput, Type[]? SkipTypes
     ("D[get12345||12345] {get12345}+{get12345}", "", null),
     ("D[fact|x,y|x==0?y?(x-1){fact}(x*y)] 10{fact}1", "", null),
 
+    // Division by zero in an unused branch.
+    // The checked division path needs a clean evaluation stack.
+    // Without that, the compiler can emit invalid IL.
+    ("0?1/0?2", "", null),
+
     // Fibonacci
     ("D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}] 10{fib}", "", null),
     ("D[fibImpl|x,a,b|x ? ((x-1) ? ((x-1){fibImpl}(a+b){fibImpl}a) ? a) ? b] D[fib|x|x{fibImpl}1{fibImpl}0] 10{fib}", "", null),

@@ -3065,6 +3065,122 @@ internal static class TestCases
             SkipTypes: null
         ),
         new TestCase(
+            Source: "0?1/0?2",
+            StandardInput: "",
+            ExpectedValue: 2,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
+            ExpectedWhenNotOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new ConditionalOperator(
+                        Condition: new DecimalOperator(
+                            Operand: new ZeroOperator(),
+                            Value: 0,
+                            SupplementaryText: null
+                        ),
+                        IfTrue: new BinaryOperator(
+                            Left: new DecimalOperator(
+                                Operand: new ZeroOperator(),
+                                Value: 1,
+                                SupplementaryText: null
+                            ),
+                            Right: new DecimalOperator(
+                                Operand: new ZeroOperator(),
+                                Value: 0,
+                                SupplementaryText: null
+                            ),
+                            Type: BinaryType.Div,
+                            SupplementaryText: null
+                        ),
+                        IfFalse: new DecimalOperator(
+                            Operand: new ZeroOperator(),
+                            Value: 2,
+                            SupplementaryText: null
+                        ),
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 02 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 04 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 05 */ new LowLevelOperation(Opcode.GotoIfTrue, 11),
+                                /* 06 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 07 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 08 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 09 */ new LowLevelOperation(Opcode.LoadConst, 2),
+                                /* 10 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 11 */ new LowLevelOperation(Opcode.Goto, 22),
+                                /* 12 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 13 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 14 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 15 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                /* 16 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 17 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 18 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 19 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 20 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 21 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 22 */ new LowLevelOperation(Opcode.DivChecked, 0),
+                                /* 23 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            ExpectedWhenOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new PreComputedOperator(
+                        Value: 2
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 2),
+                                /* 01 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            SkipTypes: null
+        ),
+        new TestCase(
             Source: "D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}] 10{fib}",
             StandardInput: "",
             ExpectedValue: 55,
