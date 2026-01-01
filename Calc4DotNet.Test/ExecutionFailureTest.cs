@@ -35,6 +35,10 @@ public class ExecutionFailureTest
                                      typeof(Calc4DotNet.Core.Exceptions.ZeroDivisionException)),
         new ExecutionFailureTestCase("D[getzero||0] 1%{getzero}",
                                      typeof(Calc4DotNet.Core.Exceptions.ZeroDivisionException)),
+        new ExecutionFailureTestCase("1&&(1/0)",
+                                     typeof(Calc4DotNet.Core.Exceptions.ZeroDivisionException)),
+        new ExecutionFailureTestCase("0||(1/0)",
+                                     typeof(Calc4DotNet.Core.Exceptions.ZeroDivisionException)),
     };
 
     public static readonly object[][] Source =
