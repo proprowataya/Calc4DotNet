@@ -26,6 +26,16 @@ var testCaseInputs = new (string Source, string StandardInput, Type[]? SkipTypes
     ("12345678", "", null),
     ("1+2*3-10", "", null),
     ("0?1?2?3?4", "", null),
+    ("1==0?2?3", "", null),
+    ("0==1?2?3", "", null),
+    ("0==0?2?3", "", null),
+    ("I==0?2?3", "A", null),
+    ("0==I?2?3", "A", null),
+    ("1!=0?2?3", "", null),
+    ("0!=1?2?3", "", null),
+    ("0!=0?2?3", "", null),
+    ("I!=0?2?3", "A", null),
+    ("0!=I?2?3", "A", null),
     ("72P101P108P108P111P10P", "", null),
     ("1+// C++ style comment\n2", "", null),
     ("1+/* C style comment*/2", "", null),
@@ -69,6 +79,9 @@ var testCaseInputs = new (string Source, string StandardInput, Type[]? SkipTypes
     ("(0-1)&&1", "", null),
     ("(0-1)||0", "", null),
     ("D[true||1||2]{true}", "", null),
+    ("D[select|a,b|a?a?b] (0{select}5) + (3{select}4)", "", null),
+    ("D[pick|a,b,c|a?b?c] (0{pick}5{pick}9) + (1{pick}2{pick}3)", "", null),
+    ("D[sum|n,acc|n==0?{acc}?(n-1){sum}({acc}+1)] (5{sum}0) + 7", "", null),
 
     // Fibonacci
     ("D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}] 10{fib}", "", null),
@@ -106,6 +119,8 @@ var testCaseInputs = new (string Source, string StandardInput, Type[]? SkipTypes
     ("5->0", "", null),
     ("(10->20)L[zero]20@", "", null),
     ("((4+6)->(10+10))(20@)", "", null),
+    ("(5->(0-1))((0-1)@)", "", null),
+    ("(7->131072)((131072)@)", "", null),
     ("D[func||(10->20)L[zero]20@] {func} (20@)", "", null),
     ("D[func||((4+6)->(10+10))(20@)] {func} (20@)", "", null),
     ("D[func||(10->20)L[zero]20@] D[get||20@] {func} (20@)", "", null),
@@ -117,6 +132,20 @@ var testCaseInputs = new (string Source, string StandardInput, Type[]? SkipTypes
     ("1+2+I", "A", null),
     ("D[Input||I]{Input}", "A", null),
     ("I", "", null),
+
+    // Byte IO tests
+    ("128P255P0", "", null),
+    ("I", "\xFF", null),
+
+    // Identifier sanitization regression tests
+    ("(1S)(2S[empty])(L+L[empty])", "", null),
+    ("(1S)(2S[default])(L+L[default])", "", null),
+    ("(1S[/])(2S[_2F])(L[/]+L[_2F])", "", null),
+    ("(1S[1])(2S[_1])(L[1]+L[_1])", "", null),
+    ("D[/||1] D[_2F||2] ({/}+{_2F})", "", null),
+    ("D[1||1] D[_1||2] ({1}+{_1})", "", null),
+    ("1S[a-b]L[a-b]", "", null),
+    ("D[a-b||1]{a-b}", "", null),
 };
 
 string outputPath = Path.GetFullPath(Path.Join(new[] { Assembly.GetExecutingAssembly().Location, "..", "..", "..", "..", "..", "Calc4DotNet.Test", "TestCases.cs" }));
