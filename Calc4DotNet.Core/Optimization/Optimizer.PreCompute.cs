@@ -198,10 +198,10 @@ public static partial class Optimizer
             var operand = op.Operand.Accept(this, state);
             var newOp = op with { Operand = operand };
 
-            if (operand is PreComputedOperator preComputed)
+            if (TryGetPrecomputedValue(operand, out var precomputedValue))
             {
                 // Tell the pre-computed value to another operator
-                state[op.VariableName] = (TNumber)preComputed.Value;
+                state[op.VariableName] = precomputedValue;
             }
             else
             {
@@ -227,9 +227,53 @@ public static partial class Optimizer
         public IOperator Visit(BinaryOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
             var left = op.Left.Accept(this, state);
-            var right = op.Right.Accept(this, state);
-            var newOp = op with { Left = left, Right = right };
-            return PreComputeIfPossible(newOp, state);
+
+            if (op.Type is BinaryType.LogicalAnd)
+            {
+                if (TryGetPrecomputedValue(left, out var leftValue))
+                {
+                    if (TNumber.IsZero(leftValue))
+                    {
+                        return new PreComputedOperator(TNumber.Zero);
+                    }
+
+                    var right = op.Right.Accept(this, state);
+                    if (TryGetPrecomputedValue(right, out var rightValue))
+                    {
+                        return new PreComputedOperator(TNumber.IsZero(rightValue) ? TNumber.Zero : TNumber.One);
+                    }
+
+                    var newOp = new BinaryOperator(right, new PreComputedOperator(TNumber.Zero), BinaryType.NotEqual);
+                    return PreComputeIfPossible(newOp, state);
+                }
+            }
+            else if (op.Type is BinaryType.LogicalOr)
+            {
+                if (TryGetPrecomputedValue(left, out var leftValue))
+                {
+                    if (!TNumber.IsZero(leftValue))
+                    {
+                        return new PreComputedOperator(TNumber.One);
+                    }
+
+                    var right = op.Right.Accept(this, state);
+                    if (TryGetPrecomputedValue(right, out var rightValue))
+                    {
+                        return new PreComputedOperator(TNumber.IsZero(rightValue) ? TNumber.Zero : TNumber.One);
+                    }
+
+                    var newOp = new BinaryOperator(right, new PreComputedOperator(TNumber.Zero), BinaryType.NotEqual);
+                    return PreComputeIfPossible(newOp, state);
+                }
+            }
+
+            // Fallback path evaluates right and tries normal precompute with updated operands.
+            // Use a block to keep right scoped and avoid name conflicts.
+            {
+                var right = op.Right.Accept(this, state);
+                var newOp = op with { Left = left, Right = right };
+                return PreComputeIfPossible(newOp, state);
+            }
         }
 
         public IOperator Visit(ConditionalOperator op, OptimizeTimeEvaluationState<TNumber> state)
@@ -255,9 +299,9 @@ public static partial class Optimizer
             // Create new operator
             var newOp = op with { Condition = condition, IfTrue = ifTrue, IfFalse = ifFalse };
 
-            if (PreComputeIfPossible(condition, state) is PreComputedOperator preComputed)
+            if (TryGetPrecomputedValue(PreComputeIfPossible(condition, state), out var conditionValue))
             {
-                return !TNumber.IsZero((TNumber)preComputed.Value) ? ifTrue : ifFalse;
+                return !TNumber.IsZero(conditionValue) ? ifTrue : ifFalse;
             }
             else
             {
@@ -270,6 +314,18 @@ public static partial class Optimizer
             var operands = op.Operands.Select(x => x.Accept(this, state)).ToImmutableArray();
             var newOp = op with { Operands = operands };
             return PreComputeIfPossible(newOp, state);
+        }
+
+        private static bool TryGetPrecomputedValue(IOperator op, out TNumber precomputedValue)
+        {
+            if (op is PreComputedOperator preComputed)
+            {
+                precomputedValue = (TNumber)preComputed.Value;
+                return true;
+            }
+
+            precomputedValue = TNumber.Zero;
+            return false;
         }
     }
 
