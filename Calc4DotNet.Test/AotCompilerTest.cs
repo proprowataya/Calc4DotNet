@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
+using System.Text;
 using Calc4DotNet.Compiler;
 using Xunit;
 using static Calc4DotNet.Test.TestCommon;
@@ -40,6 +41,8 @@ public class AotCompilerTest
         {
             RedirectStandardInput = true,
             RedirectStandardOutput = true,
+            StandardInputEncoding = new UTF8Encoding(false),
+            StandardOutputEncoding = new UTF8Encoding(false),
         });
         if (process is null)
         {
