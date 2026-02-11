@@ -127,6 +127,7 @@ public static class LowLevelCodeGenerator
             List<LowLevelOperation> newList = new List<LowLevelOperation>();
             Dictionary<int, int> labelMap = new Dictionary<int, int>();
 
+            // First pass removes label operations and records their address.
             foreach (var op in list)
             {
                 switch (op.Opcode)
@@ -140,6 +141,7 @@ public static class LowLevelCodeGenerator
                 }
             }
 
+            // Second pass resolves label operands to absolute indices.
             for (int i = 0; i < newList.Count; i++)
             {
                 LowLevelOperation op = newList[i];
@@ -162,6 +164,63 @@ public static class LowLevelCodeGenerator
                     default:
                         // Do nothing
                         break;
+                }
+            }
+
+            // Third pass compresses Goto chains and replaces Goto with Return when the target is Return.
+            // visitId is a marker for the current walk.
+            // visited stores the last visit id for each index.
+            if (newList.Count > 0)
+            {
+                int[] visited = new int[newList.Count];
+                int visitId = 1;
+                for (int i = 0; i < newList.Count; i++)
+                {
+                    LowLevelOperation operation = newList[i];
+
+                    if (operation.Opcode != Opcode.Goto)
+                    {
+                        continue;
+                    }
+
+                    // Get a new visit id for this walk.
+                    visitId++;
+                    if (visitId == 0)
+                    {
+                        // visitId overflowed to zero so we reset markers to avoid false matches.
+                        Array.Clear(visited, 0, visited.Length);
+                        visitId = 1;
+                    }
+
+                    int target = operation.Value + 1;
+                    while (true)
+                    {
+                        if (visited[target] == visitId)
+                        {
+                            // Cycle detected so we keep the original Goto.
+                            break;
+                        }
+                        visited[target] = visitId;
+
+                        LowLevelOperation targetOperation = newList[target];
+                        if (targetOperation.Opcode == Opcode.Goto)
+                        {
+                            // Follow the next Goto in the chain.
+                            target = targetOperation.Value + 1;
+                        }
+                        else if (targetOperation.Opcode == Opcode.Return)
+                        {
+                            // Replace Goto with Return to skip the jump.
+                            newList[i] = targetOperation;
+                            break;
+                        }
+                        else
+                        {
+                            // Replace Goto with the final target.
+                            newList[i] = new LowLevelOperation(operation.Opcode, target - 1);
+                            break;
+                        }
+                    }
                 }
             }
 
