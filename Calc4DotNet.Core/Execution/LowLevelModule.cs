@@ -52,8 +52,11 @@ public sealed class LowLevelModule<TNumber>
                     case Opcode.GotoIfTrue:
                     case Opcode.GotoIfFalse:
                     case Opcode.GotoIfEqual:
+                    case Opcode.GotoIfNotEqual:
                     case Opcode.GotoIfLessThan:
                     case Opcode.GotoIfLessThanOrEqual:
+                    case Opcode.GotoIfGreaterThan:
+                    case Opcode.GotoIfGreaterThanOrEqual:
                         result[index] = new LowLevelOperation(result[index].Opcode,
                                                               result[index].Value + startAddress);
                         break;

@@ -287,6 +287,11 @@ public static class ILCompiler
                     il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IEqualityOperators<TNumber, TNumber, bool>), "op_Equality"));
                     il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
                     break;
+                case Opcode.GotoIfNotEqual:
+                    il.Emit(OpCodes.Constrained, typeof(TNumber));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IEqualityOperators<TNumber, TNumber, bool>), "op_Inequality"));
+                    il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
+                    break;
                 case Opcode.GotoIfLessThan:
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
                     il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IComparisonOperators<TNumber, TNumber, bool>), "op_LessThan"));
@@ -295,6 +300,16 @@ public static class ILCompiler
                 case Opcode.GotoIfLessThanOrEqual:
                     il.Emit(OpCodes.Constrained, typeof(TNumber));
                     il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IComparisonOperators<TNumber, TNumber, bool>), "op_LessThanOrEqual"));
+                    il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
+                    break;
+                case Opcode.GotoIfGreaterThan:
+                    il.Emit(OpCodes.Constrained, typeof(TNumber));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IComparisonOperators<TNumber, TNumber, bool>), "op_GreaterThan"));
+                    il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
+                    break;
+                case Opcode.GotoIfGreaterThanOrEqual:
+                    il.Emit(OpCodes.Constrained, typeof(TNumber));
+                    il.Emit(OpCodes.Call, GetInterfaceMethod(typeof(IComparisonOperators<TNumber, TNumber, bool>), "op_GreaterThanOrEqual"));
                     il.Emit(OpCodes.Brtrue, labels[op.Value + 1]);
                     break;
                 case Opcode.Call:

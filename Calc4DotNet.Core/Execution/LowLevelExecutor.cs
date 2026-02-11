@@ -201,6 +201,15 @@ public static class LowLevelExecutor
                         op = ref Unsafe.Add(ref firstOperation, op.Value);
                     }
                     break;
+                case Opcode.GotoIfNotEqual:
+                    top = ref Unsafe.Add(ref top, -2);
+                    VerifyRange(stack, ref top);
+                    VerifyRange(stack, ref Unsafe.Add(ref top, 1));
+                    if (top != Unsafe.Add(ref top, 1))
+                    {
+                        op = ref Unsafe.Add(ref firstOperation, op.Value);
+                    }
+                    break;
                 case Opcode.GotoIfLessThan:
                     top = ref Unsafe.Add(ref top, -2);
                     VerifyRange(stack, ref top);
@@ -215,6 +224,24 @@ public static class LowLevelExecutor
                     VerifyRange(stack, ref top);
                     VerifyRange(stack, ref Unsafe.Add(ref top, 1));
                     if (top <= Unsafe.Add(ref top, 1))
+                    {
+                        op = ref Unsafe.Add(ref firstOperation, op.Value);
+                    }
+                    break;
+                case Opcode.GotoIfGreaterThan:
+                    top = ref Unsafe.Add(ref top, -2);
+                    VerifyRange(stack, ref top);
+                    VerifyRange(stack, ref Unsafe.Add(ref top, 1));
+                    if (top > Unsafe.Add(ref top, 1))
+                    {
+                        op = ref Unsafe.Add(ref firstOperation, op.Value);
+                    }
+                    break;
+                case Opcode.GotoIfGreaterThanOrEqual:
+                    top = ref Unsafe.Add(ref top, -2);
+                    VerifyRange(stack, ref top);
+                    VerifyRange(stack, ref Unsafe.Add(ref top, 1));
+                    if (top >= Unsafe.Add(ref top, 1))
                     {
                         op = ref Unsafe.Add(ref firstOperation, op.Value);
                     }

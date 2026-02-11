@@ -150,8 +150,11 @@ public static class LowLevelCodeGenerator
                     case Opcode.GotoIfTrue:
                     case Opcode.GotoIfFalse:
                     case Opcode.GotoIfEqual:
+                    case Opcode.GotoIfNotEqual:
                     case Opcode.GotoIfLessThan:
                     case Opcode.GotoIfLessThanOrEqual:
+                    case Opcode.GotoIfGreaterThan:
+                    case Opcode.GotoIfGreaterThanOrEqual:
                         // The destination address in LowLevelOperation should be just before it,
                         // because program counter will be incremented after execution of this operation.
                         newList[i] = new LowLevelOperation(op.Opcode, labelMap[op.Value] - 1);
@@ -203,8 +206,11 @@ public static class LowLevelCodeGenerator
                     // Stacksize will not change
                     break;
                 case Opcode.GotoIfEqual:
+                case Opcode.GotoIfNotEqual:
                 case Opcode.GotoIfLessThan:
                 case Opcode.GotoIfLessThanOrEqual:
+                case Opcode.GotoIfGreaterThan:
+                case Opcode.GotoIfGreaterThanOrEqual:
                     StackSize -= 2;
                     break;
                 case Opcode.Call:
@@ -312,181 +318,207 @@ public static class LowLevelCodeGenerator
 
         public void Visit(BinaryOperator op)
         {
-            void EmitLogical(Opcode opcode, int branchResult, int fallthroughResult)
-            {
-                int branchLabel = nextLabel++, endLabel = nextLabel++;
-
-                op.Left.Accept(this);
-                AddOperation(new LowLevelOperation(opcode, branchLabel));
-                op.Right.Accept(this);
-                AddOperation(new LowLevelOperation(opcode, branchLabel));
-                AddOperation(new LowLevelOperation(Opcode.LoadConst, fallthroughResult));
-                AddOperation(new LowLevelOperation(Opcode.Goto, endLabel));
-                AddOperation(new LowLevelOperation(Opcode.Lavel, branchLabel));
-                AddOperation(new LowLevelOperation(Opcode.LoadConst, branchResult));
-                AddOperation(new LowLevelOperation(Opcode.Lavel, endLabel));
-
-                // StackSize increased by two due to two LoadConst operations.
-                // However, only one of them will be executed.
-                // We modify StackSize here.
-                StackSize--;
-            }
-
-            if (op.Type is BinaryType.LogicalAnd)
-            {
-                EmitLogical(Opcode.GotoIfFalse, branchResult: 0, fallthroughResult: 1);
-                return;
-            }
-            else if (op.Type is BinaryType.LogicalOr)
-            {
-                EmitLogical(Opcode.GotoIfTrue, branchResult: 1, fallthroughResult: 0);
-                return;
-            }
-
-            /* ******************** */
-
-            void EmitComparisonBranch(Opcode opcode, bool reverse)
-            {
-                int ifFalse = nextLabel++, end = nextLabel++;
-
-                AddOperation(new LowLevelOperation(opcode, ifFalse));
-                AddOperation(new LowLevelOperation(Opcode.LoadConst, reverse ? 1 : 0));
-                AddOperation(new LowLevelOperation(Opcode.Goto, end));
-                AddOperation(new LowLevelOperation(Opcode.Lavel, ifFalse));
-                AddOperation(new LowLevelOperation(Opcode.LoadConst, reverse ? 0 : 1));
-                AddOperation(new LowLevelOperation(Opcode.Lavel, end));
-
-                // StackSize increased by two due to two LoadConst operations.
-                // However, only one of them will be executed.
-                // We modify StackSize here.
-                StackSize--;
-            }
-
-            /* ******************** */
-
-            op.Left.Accept(this);
-            op.Right.Accept(this);
-
             switch (op.Type)
             {
                 case BinaryType.Add:
+                    op.Left.Accept(this);
+                    op.Right.Accept(this);
                     AddOperation(new LowLevelOperation(Opcode.Add));
-                    break;
+                    return;
                 case BinaryType.Sub:
+                    op.Left.Accept(this);
+                    op.Right.Accept(this);
                     AddOperation(new LowLevelOperation(Opcode.Sub));
-                    break;
+                    return;
                 case BinaryType.Mult:
+                    op.Left.Accept(this);
+                    op.Right.Accept(this);
                     AddOperation(new LowLevelOperation(Opcode.Mult));
-                    break;
+                    return;
                 case BinaryType.Div:
+                    op.Left.Accept(this);
+                    op.Right.Accept(this);
                     AddOperation(new LowLevelOperation(option.CheckZeroDivision ? Opcode.DivChecked : Opcode.Div));
-                    break;
+                    return;
                 case BinaryType.Mod:
+                    op.Left.Accept(this);
+                    op.Right.Accept(this);
                     AddOperation(new LowLevelOperation(option.CheckZeroDivision ? Opcode.ModChecked : Opcode.Mod));
-                    break;
+                    return;
                 case BinaryType.Equal:
-                    EmitComparisonBranch(Opcode.GotoIfEqual, reverse: false);
-                    break;
                 case BinaryType.NotEqual:
-                    EmitComparisonBranch(Opcode.GotoIfEqual, reverse: true);
-                    break;
                 case BinaryType.LessThan:
-                    EmitComparisonBranch(Opcode.GotoIfLessThan, reverse: false);
-                    break;
                 case BinaryType.LessThanOrEqual:
-                    EmitComparisonBranch(Opcode.GotoIfLessThanOrEqual, reverse: false);
-                    break;
                 case BinaryType.GreaterThanOrEqual:
-                    EmitComparisonBranch(Opcode.GotoIfLessThan, reverse: true);
-                    break;
                 case BinaryType.GreaterThan:
-                    EmitComparisonBranch(Opcode.GotoIfLessThanOrEqual, reverse: true);
-                    break;
                 case BinaryType.LogicalAnd:
                 case BinaryType.LogicalOr:
-                    // These are already handled above.
-                    throw new InvalidOperationException();
+                    {
+                        int ifTrueLabel = nextLabel++, endLabel = nextLabel++;
+
+                        EmitConditionGotoIfTrue(op, ifTrueLabel);
+                        AddOperation(new LowLevelOperation(Opcode.LoadConst, 0));
+                        AddOperation(new LowLevelOperation(Opcode.Goto, endLabel));
+                        AddOperation(new LowLevelOperation(Opcode.Lavel, ifTrueLabel));
+                        AddOperation(new LowLevelOperation(Opcode.LoadConst, 1));
+                        AddOperation(new LowLevelOperation(Opcode.Lavel, endLabel));
+
+                        // StackSize increased by two due to two LoadConst operations.
+                        // However, only one of them will be executed.
+                        // We modify StackSize here.
+                        StackSize--;
+                        return;
+                    }
                 default:
                     throw new InvalidOperationException();
             }
         }
 
-        public void Visit(ConditionalOperator op)
+        private void EmitConditionGoto(IOperator condition, int label, bool gotoIfTrue)
         {
-            int ifTrueLabel = nextLabel++, endLabel = nextLabel++;
-
-            if (op.Condition is BinaryOperator binary)
+            if (condition is ParenthesisOperator parenthesis)
             {
-                // Special optimization for logical operators
-                void EmitBranch(IOperator ifTrue, IOperator ifFalse)
+                ImmutableArray<IOperator> operators = parenthesis.Operators;
+                for (int i = 0; i < operators.Length; i++)
                 {
-                    int savedStackSize = StackSize;
-                    ifFalse.Accept(this);
-                    if (list.Last(x => x.Opcode != Opcode.Lavel).Opcode != Opcode.Goto)
+                    if (i < operators.Length - 1)
                     {
-                        // "list.Last().Opcode == Opcode.Goto" means
-                        // elimination of "Call" (tail-call)
-                        AddOperation(new LowLevelOperation(Opcode.Goto, endLabel));
+                        operators[i].Accept(this);
+                        AddOperation(new LowLevelOperation(Opcode.Pop));
                     }
-                    AddOperation(new LowLevelOperation(Opcode.Lavel, ifTrueLabel));
-                    StackSize = savedStackSize;
-                    ifTrue.Accept(this);
-                    AddOperation(new LowLevelOperation(Opcode.Lavel, endLabel));
+                    else
+                    {
+                        EmitConditionGoto(operators[i], label, gotoIfTrue);
+                    }
                 }
 
-                // Special optimization for comparisons
-                void EmitComparison(Opcode opcode, IOperator ifTrue, IOperator ifFalse)
-                {
-                    binary.Left.Accept(this);
-                    binary.Right.Accept(this);
-                    AddOperation(new LowLevelOperation(opcode, ifTrueLabel));
-                    EmitBranch(ifTrue, ifFalse);
-                }
+                return;
+            }
 
+            if (condition is BinaryOperator binary)
+            {
                 switch (binary.Type)
                 {
                     case BinaryType.Equal:
-                        EmitComparison(Opcode.GotoIfEqual, ifTrue: op.IfTrue, ifFalse: op.IfFalse);
+                        if (IsZeroOperatorValue(binary.Left))
+                        {
+                            binary.Right.Accept(this);
+                            AddOperation(new LowLevelOperation(gotoIfTrue ? Opcode.GotoIfFalse : Opcode.GotoIfTrue, label));
+                            return;
+                        }
+                        if (IsZeroOperatorValue(binary.Right))
+                        {
+                            binary.Left.Accept(this);
+                            AddOperation(new LowLevelOperation(gotoIfTrue ? Opcode.GotoIfFalse : Opcode.GotoIfTrue, label));
+                            return;
+                        }
+                        binary.Left.Accept(this);
+                        binary.Right.Accept(this);
+                        AddOperation(new LowLevelOperation(gotoIfTrue ? Opcode.GotoIfEqual : Opcode.GotoIfNotEqual, label));
                         return;
                     case BinaryType.NotEqual:
-                        // "a != b ? c ? d" is equivalent to "a == b ? d ? c"
-                        EmitComparison(Opcode.GotoIfEqual, ifTrue: op.IfFalse, ifFalse: op.IfTrue);
+                        if (IsZeroOperatorValue(binary.Left))
+                        {
+                            binary.Right.Accept(this);
+                            AddOperation(new LowLevelOperation(gotoIfTrue ? Opcode.GotoIfTrue : Opcode.GotoIfFalse, label));
+                            return;
+                        }
+                        if (IsZeroOperatorValue(binary.Right))
+                        {
+                            binary.Left.Accept(this);
+                            AddOperation(new LowLevelOperation(gotoIfTrue ? Opcode.GotoIfTrue : Opcode.GotoIfFalse, label));
+                            return;
+                        }
+                        binary.Left.Accept(this);
+                        binary.Right.Accept(this);
+                        AddOperation(new LowLevelOperation(gotoIfTrue ? Opcode.GotoIfNotEqual : Opcode.GotoIfEqual, label));
                         return;
                     case BinaryType.LessThan:
-                        EmitComparison(Opcode.GotoIfLessThan, ifTrue: op.IfTrue, ifFalse: op.IfFalse);
+                        binary.Left.Accept(this);
+                        binary.Right.Accept(this);
+                        AddOperation(new LowLevelOperation(gotoIfTrue ? Opcode.GotoIfLessThan : Opcode.GotoIfGreaterThanOrEqual, label));
                         return;
                     case BinaryType.LessThanOrEqual:
-                        EmitComparison(Opcode.GotoIfLessThanOrEqual, ifTrue: op.IfTrue, ifFalse: op.IfFalse);
+                        binary.Left.Accept(this);
+                        binary.Right.Accept(this);
+                        AddOperation(new LowLevelOperation(gotoIfTrue ? Opcode.GotoIfLessThanOrEqual : Opcode.GotoIfGreaterThan, label));
                         return;
                     case BinaryType.GreaterThanOrEqual:
-                        // "a >= b ? c ? d" is equivalent to "a < b ? d ? c"
-                        EmitComparison(Opcode.GotoIfLessThan, ifTrue: op.IfFalse, ifFalse: op.IfTrue);
+                        binary.Left.Accept(this);
+                        binary.Right.Accept(this);
+                        AddOperation(new LowLevelOperation(gotoIfTrue ? Opcode.GotoIfGreaterThanOrEqual : Opcode.GotoIfLessThan, label));
                         return;
                     case BinaryType.GreaterThan:
-                        // "a > b ? c ? d" is equivalent to "a <= b ? d ? c"
-                        EmitComparison(Opcode.GotoIfLessThanOrEqual, ifTrue: op.IfFalse, ifFalse: op.IfTrue);
+                        binary.Left.Accept(this);
+                        binary.Right.Accept(this);
+                        AddOperation(new LowLevelOperation(gotoIfTrue ? Opcode.GotoIfGreaterThan : Opcode.GotoIfLessThanOrEqual, label));
                         return;
                     case BinaryType.LogicalAnd:
-                        binary.Left.Accept(this);
-                        AddOperation(new LowLevelOperation(Opcode.GotoIfFalse, ifTrueLabel));
-                        binary.Right.Accept(this);
-                        AddOperation(new LowLevelOperation(Opcode.GotoIfFalse, ifTrueLabel));
-                        EmitBranch(ifTrue: op.IfFalse, ifFalse: op.IfTrue);
+                        if (gotoIfTrue)
+                        {
+                            int ifFalseLabel = nextLabel++;
+                            EmitConditionGoto(binary.Left, ifFalseLabel, false);
+                            EmitConditionGoto(binary.Right, label, true);
+                            AddOperation(new LowLevelOperation(Opcode.Lavel, ifFalseLabel));
+                        }
+                        else
+                        {
+                            EmitConditionGoto(binary.Left, label, false);
+                            EmitConditionGoto(binary.Right, label, false);
+                        }
                         return;
                     case BinaryType.LogicalOr:
-                        binary.Left.Accept(this);
-                        AddOperation(new LowLevelOperation(Opcode.GotoIfTrue, ifTrueLabel));
-                        binary.Right.Accept(this);
-                        AddOperation(new LowLevelOperation(Opcode.GotoIfTrue, ifTrueLabel));
-                        EmitBranch(ifTrue: op.IfTrue, ifFalse: op.IfFalse);
+                        if (gotoIfTrue)
+                        {
+                            EmitConditionGoto(binary.Left, label, true);
+                            EmitConditionGoto(binary.Right, label, true);
+                        }
+                        else
+                        {
+                            int endLabel = nextLabel++;
+                            EmitConditionGoto(binary.Left, endLabel, true);
+                            EmitConditionGoto(binary.Right, label, false);
+                            AddOperation(new LowLevelOperation(Opcode.Lavel, endLabel));
+                        }
                         return;
                     default:
                         break;
                 }
             }
 
-            op.Condition.Accept(this);
-            AddOperation(new LowLevelOperation(Opcode.GotoIfTrue, ifTrueLabel));
+            condition.Accept(this);
+            AddOperation(new LowLevelOperation(gotoIfTrue ? Opcode.GotoIfTrue : Opcode.GotoIfFalse, label));
+        }
+
+        private void EmitConditionGotoIfTrue(IOperator condition, int ifTrueLabel)
+        {
+            EmitConditionGoto(condition, ifTrueLabel, true);
+        }
+
+        private void EmitConditionGotoIfFalse(IOperator condition, int ifFalseLabel)
+        {
+            EmitConditionGoto(condition, ifFalseLabel, false);
+        }
+
+        private static bool IsZeroOperatorValue(IOperator op)
+        {
+            if (op is ZeroOperator)
+            {
+                return true;
+            }
+
+            if (op is PreComputedOperator preComputed && preComputed.Value is TNumber value)
+            {
+                return TNumber.IsZero(value);
+            }
+
+            return false;
+        }
+
+        public void Visit(ConditionalOperator op)
+        {
+            int ifTrueLabel = nextLabel++, endLabel = nextLabel++;
+            EmitConditionGotoIfTrue(op.Condition, ifTrueLabel);
 
             int savedStackSize = StackSize;
             op.IfFalse.Accept(this);
