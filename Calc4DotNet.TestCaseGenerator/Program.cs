@@ -82,6 +82,8 @@ var testCaseInputs = new (string Source, string StandardInput, Type[]? SkipTypes
     ("D[select|a,b|a?a?b] (0{select}5) + (3{select}4)", "", null),
     ("D[pick|a,b,c|a?b?c] (0{pick}5{pick}9) + (1{pick}2{pick}3)", "", null),
     ("D[sum|n,acc|n==0?{acc}?(n-1){sum}({acc}+1)] (5{sum}0) + 7", "", null),
+    ("((0S[x])&&(1S[y]))(L[y])", "", null),
+    ("(10S[x])(20S[y])((0S[x])&&(1S[y]))(L[y])", "", null),
 
     // Fibonacci
     ("D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}] 10{fib}", "", null),

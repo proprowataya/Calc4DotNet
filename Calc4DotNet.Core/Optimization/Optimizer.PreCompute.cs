@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Exceptions;
@@ -14,6 +15,35 @@ public static partial class Optimizer
     {
         private readonly CompilationContext compilationContext;
         private readonly int maxStep;
+
+        private sealed class RecordingVariableSource : IVariableSource<TNumber>
+        {
+            private readonly IVariableSource<TNumber> inner;
+            private readonly HashSet<string?> writtenVariables;
+
+            public RecordingVariableSource(IVariableSource<TNumber> inner, HashSet<string?> writtenVariables)
+            {
+                this.inner = inner ?? throw new ArgumentNullException(nameof(inner));
+                this.writtenVariables = writtenVariables ?? throw new ArgumentNullException(nameof(writtenVariables));
+            }
+
+            public TNumber this[string? variableName]
+            {
+                get => inner[variableName];
+
+                set
+                {
+                    inner[variableName] = value;
+                    writtenVariables.Add(variableName);
+                }
+            }
+
+            public bool TryGet(string? variableName, [MaybeNullWhen(false)] out TNumber value)
+                => inner.TryGet(variableName, out value);
+
+            public IVariableSource<TNumber> Clone()
+                => new RecordingVariableSource(inner.Clone(), writtenVariables);
+        }
 
         public PreComputeVisitor(CompilationContext context, int maxStep)
         {
@@ -36,12 +66,14 @@ public static partial class Optimizer
             // Otherwise, we try to execute
             TNumber preComputedValue;
             OptimizeTimeEvaluationState<TNumber> stateAferPreCompuation = state.Clone();
+            HashSet<string?> writtenVariables = new();
+            IVariableSource<TNumber> variableSource = new RecordingVariableSource(stateAferPreCompuation, writtenVariables);
             MemoryIOService ioService = new();
             try
             {
                 preComputedValue = Evaluator.Evaluate<TNumber>(op,
                                                                compilationContext,
-                                                               new SimpleEvaluationState<TNumber>(stateAferPreCompuation,
+                                                               new SimpleEvaluationState<TNumber>(variableSource,
                                                                                                   AlwaysThrowGlobalArraySource<TNumber>.Instance,
                                                                                                   ioService),
                                                                maxStep);
@@ -80,8 +112,11 @@ public static partial class Optimizer
 
             var operators = ImmutableArray.CreateBuilder<IOperator>();
 
-            // If this operator writes variables, we keep StoreOperators
-            foreach (var variableName in variables.Order())
+            // If this operator writes variables, we keep StoreOperators.
+            // Note that the optimization state can already contain initial values for variables.
+            // Therefore, we must not rely on just the existence of a value in the post state.
+            // We instead record variables that were actually written during evaluation.
+            foreach (var variableName in writtenVariables.Order())
             {
                 if (stateAferPreCompuation.TryGet(variableName, out var value))
                 {
@@ -89,8 +124,8 @@ public static partial class Optimizer
                 }
                 else
                 {
-                    // This operator did not touch the variable because of blanch conditions.
-                    // We do not need to change the state.
+                    // This should not happen because a write implies the variable is set.
+                    // However, if it does, we conservatively do nothing.
                 }
             }
 
@@ -265,6 +300,18 @@ public static partial class Optimizer
                     var newOp = new BinaryOperator(right, new PreComputedOperator(TNumber.Zero), BinaryType.NotEqual);
                     return PreComputeIfPossible(newOp, state);
                 }
+            }
+
+            if (op.Type is BinaryType.LogicalAnd or BinaryType.LogicalOr)
+            {
+                // The right operand is conditionally evaluated.
+                // We must not commit its effects to the current state at this point.
+                // If we did, PreComputeIfPossible might start evaluation from a state that already includes
+                // the effects of the right operand even when the operator short-circuits.
+                var rightState = state.Clone();
+                var right = op.Right.Accept(this, rightState);
+                var newOp = op with { Left = left, Right = right };
+                return PreComputeIfPossible(newOp, state);
             }
 
             // Fallback path evaluates right and tries normal precompute with updated operands.
