@@ -325,35 +325,75 @@ public static partial class Optimizer
 
         public IOperator Visit(ConditionalOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
+            var stateBeforeCondition = state.Clone();
             var condition = op.Condition.Accept(this, state);
 
-            // From now on, we use cloned object of the evaluation state
-            // because IfTrue and IfFalse will not always be executed.
-
-            // Process IfTrue
+            // The condition always runs first, so state now contains its effects.
+            // IfTrue starts from that post condition state, but its writes must
+            // stay local until we know that this branch is selected.
             var ifTrueState = state.Clone();
             var ifTrue = op.IfTrue.Accept(this, ifTrueState);
 
-            // Process IfFalse
+            // IfFalse also starts from the post condition state.
+            // Its writes must stay local for the same reason.
             var ifFalseState = state.Clone();
             var ifFalse = op.IfFalse.Accept(this, ifFalseState);
-
-            // We must unset variables that have different values after execution of ifTrue and ifFalse.
-            // We calculate intersection of ifTrueState and ifFalseState
-            var intersection = OptimizeTimeEvaluationState<TNumber>.Intersect(ifTrueState, ifFalseState);
-            state.Assign(intersection);
 
             // Create new operator
             var newOp = op with { Condition = condition, IfTrue = ifTrue, IfFalse = ifFalse };
 
-            if (TryGetPrecomputedValue(PreComputeIfPossible(condition, state), out var conditionValue))
+            // Evaluate the condition again from the state before visiting it.
+            // The current state already includes the effects of condition.Accept above.
+            // We need the pre-condition state so that PreComputeIfPossible can
+            // expose the final condition value without losing earlier side effects.
+            var conditionState = stateBeforeCondition.Clone();
+            var precomputedCondition = PreComputeIfPossible(condition, conditionState);
+            var conditionSideEffects = ImmutableArray.CreateBuilder<IOperator>();
+            TNumber conditionValue = TNumber.Zero;
+            bool hasConditionValue = false;
+
+            // PreComputeIfPossible can return either a plain constant or a
+            // parenthesized sequence whose last operator is that constant.
+            // Earlier operators in the sequence are side effects of the condition.
+            if (precomputedCondition is PreComputedOperator preComputed)
             {
-                return !TNumber.IsZero(conditionValue) ? ifTrue : ifFalse;
+                conditionValue = (TNumber)preComputed.Value;
+                hasConditionValue = true;
             }
-            else
+            else if (precomputedCondition is ParenthesisOperator { Operators.Length: > 0 } parenthesis
+                     && parenthesis.Operators[^1] is PreComputedOperator last)
             {
-                return newOp;
+                conditionValue = (TNumber)last.Value;
+                hasConditionValue = true;
+                conditionSideEffects.AddRange(parenthesis.Operators.Take(parenthesis.Operators.Length - 1));
             }
+
+            // When the condition value is known, rebuild only the executed path.
+            // Keep the condition side effects before the selected branch.
+            if (hasConditionValue)
+            {
+                IOperator selectedOperator = !TNumber.IsZero(conditionValue) ? ifTrue : ifFalse;
+                var selectedState = !TNumber.IsZero(conditionValue) ? ifTrueState : ifFalseState;
+                IOperator selectedPath = selectedOperator;
+
+                if (conditionSideEffects.Count > 0)
+                {
+                    conditionSideEffects.Add(selectedOperator);
+                    selectedPath = new ParenthesisOperator(conditionSideEffects.ToImmutable());
+                }
+
+                var selectedPathState = stateBeforeCondition.Clone();
+                var optimizedSelectedPath = PreComputeIfPossible(selectedPath, selectedPathState);
+
+                state.Assign(selectedState);
+                return optimizedSelectedPath;
+            }
+
+            // We must unset variables that have different values after execution of ifTrue and ifFalse.
+            // We calculate intersection of ifTrueState and ifFalseState.
+            var intersection = OptimizeTimeEvaluationState<TNumber>.Intersect(ifTrueState, ifFalseState);
+            state.Assign(intersection);
+            return newOp;
         }
 
         public IOperator Visit(UserDefinedOperator op, OptimizeTimeEvaluationState<TNumber> state)
