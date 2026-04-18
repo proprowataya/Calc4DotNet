@@ -65,9 +65,9 @@ public static partial class Optimizer
 
             // Otherwise, we try to execute
             TNumber preComputedValue;
-            OptimizeTimeEvaluationState<TNumber> stateAferPreCompuation = state.Clone();
+            OptimizeTimeEvaluationState<TNumber> stateAfterPreComputation = state.Clone();
             HashSet<string?> writtenVariables = new();
-            IVariableSource<TNumber> variableSource = new RecordingVariableSource(stateAferPreCompuation, writtenVariables);
+            IVariableSource<TNumber> variableSource = new RecordingVariableSource(stateAfterPreComputation, writtenVariables);
             MemoryIOService ioService = new();
             try
             {
@@ -118,7 +118,7 @@ public static partial class Optimizer
             // We instead record variables that were actually written during evaluation.
             foreach (var variableName in writtenVariables.Order())
             {
-                if (stateAferPreCompuation.TryGet(variableName, out var value))
+                if (stateAfterPreComputation.TryGet(variableName, out var value))
                 {
                     operators.Add(new StoreVariableOperator(new PreComputedOperator(value), variableName));
                 }
@@ -138,7 +138,7 @@ public static partial class Optimizer
             operators.Add(new PreComputedOperator(preComputedValue));
 
             // Tell the variables after pre-computation
-            state.Assign(stateAferPreCompuation);
+            state.Assign(stateAfterPreComputation);
 
             return operators.Count switch
             {
