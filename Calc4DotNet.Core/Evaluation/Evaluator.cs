@@ -107,26 +107,53 @@ public static class Evaluator
 
         public TNumber Visit(BinaryOperator op, TNumber[]? arguments)
         {
-            TNumber left = op.Left.Accept(this, arguments);
-            TNumber right = op.Right.Accept(this, arguments);
-
-            return op.Type switch
+            if (op.Type is BinaryType.LogicalAnd)
             {
-                BinaryType.Add => left + right,
-                BinaryType.Sub => left - right,
-                BinaryType.Mult => left * right,
-                BinaryType.Div => right == TNumber.Zero ? throw new Calc4DotNet.Core.Exceptions.ZeroDivisionException()
-                                                        : left / right,
-                BinaryType.Mod => right == TNumber.Zero ? throw new Calc4DotNet.Core.Exceptions.ZeroDivisionException()
-                                                        : left % right,
-                BinaryType.Equal => left == right ? TNumber.One : TNumber.Zero,
-                BinaryType.NotEqual => left != right ? TNumber.One : TNumber.Zero,
-                BinaryType.LessThan => left < right ? TNumber.One : TNumber.Zero,
-                BinaryType.LessThanOrEqual => left <= right ? TNumber.One : TNumber.Zero,
-                BinaryType.GreaterThanOrEqual => left >= right ? TNumber.One : TNumber.Zero,
-                BinaryType.GreaterThan => left > right ? TNumber.One : TNumber.Zero,
-                _ => throw new InvalidOperationException(),
-            };
+                TNumber left = op.Left.Accept(this, arguments);
+                if (TNumber.IsZero(left))
+                {
+                    return TNumber.Zero;
+                }
+
+                TNumber right = op.Right.Accept(this, arguments);
+                return !TNumber.IsZero(right) ? TNumber.One : TNumber.Zero;
+            }
+            else if (op.Type is BinaryType.LogicalOr)
+            {
+                TNumber left = op.Left.Accept(this, arguments);
+                if (!TNumber.IsZero(left))
+                {
+                    return TNumber.One;
+                }
+
+                TNumber right = op.Right.Accept(this, arguments);
+                return !TNumber.IsZero(right) ? TNumber.One : TNumber.Zero;
+            }
+            else
+            {
+                TNumber left = op.Left.Accept(this, arguments);
+                TNumber right = op.Right.Accept(this, arguments);
+
+                return op.Type switch
+                {
+                    BinaryType.Add => left + right,
+                    BinaryType.Sub => left - right,
+                    BinaryType.Mult => left * right,
+                    BinaryType.Div => right == TNumber.Zero ? throw new Calc4DotNet.Core.Exceptions.ZeroDivisionException()
+                                                            : left / right,
+                    BinaryType.Mod => right == TNumber.Zero ? throw new Calc4DotNet.Core.Exceptions.ZeroDivisionException()
+                                                            : left % right,
+                    BinaryType.Equal => left == right ? TNumber.One : TNumber.Zero,
+                    BinaryType.NotEqual => left != right ? TNumber.One : TNumber.Zero,
+                    BinaryType.LessThan => left < right ? TNumber.One : TNumber.Zero,
+                    BinaryType.LessThanOrEqual => left <= right ? TNumber.One : TNumber.Zero,
+                    BinaryType.GreaterThanOrEqual => left >= right ? TNumber.One : TNumber.Zero,
+                    BinaryType.GreaterThan => left > right ? TNumber.One : TNumber.Zero,
+                    BinaryType.LogicalAnd => throw new InvalidOperationException(), // Treated above
+                    BinaryType.LogicalOr => throw new InvalidOperationException(),  // Treated above
+                    _ => throw new InvalidOperationException(),
+                };
+            }
         }
 
         public TNumber Visit(ConditionalOperator op, TNumber[]? arguments)

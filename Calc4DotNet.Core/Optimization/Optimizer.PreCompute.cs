@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Exceptions;
@@ -14,6 +15,35 @@ public static partial class Optimizer
     {
         private readonly CompilationContext compilationContext;
         private readonly int maxStep;
+
+        private sealed class RecordingVariableSource : IVariableSource<TNumber>
+        {
+            private readonly IVariableSource<TNumber> inner;
+            private readonly HashSet<string?> writtenVariables;
+
+            public RecordingVariableSource(IVariableSource<TNumber> inner, HashSet<string?> writtenVariables)
+            {
+                this.inner = inner ?? throw new ArgumentNullException(nameof(inner));
+                this.writtenVariables = writtenVariables ?? throw new ArgumentNullException(nameof(writtenVariables));
+            }
+
+            public TNumber this[string? variableName]
+            {
+                get => inner[variableName];
+
+                set
+                {
+                    inner[variableName] = value;
+                    writtenVariables.Add(variableName);
+                }
+            }
+
+            public bool TryGet(string? variableName, [MaybeNullWhen(false)] out TNumber value)
+                => inner.TryGet(variableName, out value);
+
+            public IVariableSource<TNumber> Clone()
+                => new RecordingVariableSource(inner.Clone(), writtenVariables);
+        }
 
         public PreComputeVisitor(CompilationContext context, int maxStep)
         {
@@ -35,13 +65,15 @@ public static partial class Optimizer
 
             // Otherwise, we try to execute
             TNumber preComputedValue;
-            OptimizeTimeEvaluationState<TNumber> stateAferPreCompuation = state.Clone();
+            OptimizeTimeEvaluationState<TNumber> stateAfterPreComputation = state.Clone();
+            HashSet<string?> writtenVariables = new();
+            IVariableSource<TNumber> variableSource = new RecordingVariableSource(stateAfterPreComputation, writtenVariables);
             MemoryIOService ioService = new();
             try
             {
                 preComputedValue = Evaluator.Evaluate<TNumber>(op,
                                                                compilationContext,
-                                                               new SimpleEvaluationState<TNumber>(stateAferPreCompuation,
+                                                               new SimpleEvaluationState<TNumber>(variableSource,
                                                                                                   AlwaysThrowGlobalArraySource<TNumber>.Instance,
                                                                                                   ioService),
                                                                maxStep);
@@ -80,17 +112,20 @@ public static partial class Optimizer
 
             var operators = ImmutableArray.CreateBuilder<IOperator>();
 
-            // If this operator writes variables, we keep StoreOperators
-            foreach (var variableName in variables.Order())
+            // If this operator writes variables, we keep StoreOperators.
+            // Note that the optimization state can already contain initial values for variables.
+            // Therefore, we must not rely on just the existence of a value in the post state.
+            // We instead record variables that were actually written during evaluation.
+            foreach (var variableName in writtenVariables.Order())
             {
-                if (stateAferPreCompuation.TryGet(variableName, out var value))
+                if (stateAfterPreComputation.TryGet(variableName, out var value))
                 {
                     operators.Add(new StoreVariableOperator(new PreComputedOperator(value), variableName));
                 }
                 else
                 {
-                    // This operator did not touch the variable because of blanch conditions.
-                    // We do not need to change the state.
+                    // This should not happen because a write implies the variable is set.
+                    // However, if it does, we conservatively do nothing.
                 }
             }
 
@@ -103,7 +138,7 @@ public static partial class Optimizer
             operators.Add(new PreComputedOperator(preComputedValue));
 
             // Tell the variables after pre-computation
-            state.Assign(stateAferPreCompuation);
+            state.Assign(stateAfterPreComputation);
 
             return operators.Count switch
             {
@@ -198,10 +233,10 @@ public static partial class Optimizer
             var operand = op.Operand.Accept(this, state);
             var newOp = op with { Operand = operand };
 
-            if (operand is PreComputedOperator preComputed)
+            if (TryGetPrecomputedValue(operand, out var precomputedValue))
             {
                 // Tell the pre-computed value to another operator
-                state[op.VariableName] = (TNumber)preComputed.Value;
+                state[op.VariableName] = precomputedValue;
             }
             else
             {
@@ -227,42 +262,138 @@ public static partial class Optimizer
         public IOperator Visit(BinaryOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
             var left = op.Left.Accept(this, state);
-            var right = op.Right.Accept(this, state);
-            var newOp = op with { Left = left, Right = right };
-            return PreComputeIfPossible(newOp, state);
+
+            if (op.Type is BinaryType.LogicalAnd)
+            {
+                if (TryGetPrecomputedValue(left, out var leftValue))
+                {
+                    if (TNumber.IsZero(leftValue))
+                    {
+                        return new PreComputedOperator(TNumber.Zero);
+                    }
+
+                    var right = op.Right.Accept(this, state);
+                    if (TryGetPrecomputedValue(right, out var rightValue))
+                    {
+                        return new PreComputedOperator(TNumber.IsZero(rightValue) ? TNumber.Zero : TNumber.One);
+                    }
+
+                    var newOp = new BinaryOperator(right, new PreComputedOperator(TNumber.Zero), BinaryType.NotEqual);
+                    return PreComputeIfPossible(newOp, state);
+                }
+            }
+            else if (op.Type is BinaryType.LogicalOr)
+            {
+                if (TryGetPrecomputedValue(left, out var leftValue))
+                {
+                    if (!TNumber.IsZero(leftValue))
+                    {
+                        return new PreComputedOperator(TNumber.One);
+                    }
+
+                    var right = op.Right.Accept(this, state);
+                    if (TryGetPrecomputedValue(right, out var rightValue))
+                    {
+                        return new PreComputedOperator(TNumber.IsZero(rightValue) ? TNumber.Zero : TNumber.One);
+                    }
+
+                    var newOp = new BinaryOperator(right, new PreComputedOperator(TNumber.Zero), BinaryType.NotEqual);
+                    return PreComputeIfPossible(newOp, state);
+                }
+            }
+
+            if (op.Type is BinaryType.LogicalAnd or BinaryType.LogicalOr)
+            {
+                // The right operand is conditionally evaluated.
+                // We must not commit its effects to the current state at this point.
+                // If we did, PreComputeIfPossible might start evaluation from a state that already includes
+                // the effects of the right operand even when the operator short-circuits.
+                var rightState = state.Clone();
+                var right = op.Right.Accept(this, rightState);
+                var newOp = op with { Left = left, Right = right };
+                return PreComputeIfPossible(newOp, state);
+            }
+
+            // Fallback path evaluates right and tries normal precompute with updated operands.
+            // Use a block to keep right scoped and avoid name conflicts.
+            {
+                var right = op.Right.Accept(this, state);
+                var newOp = op with { Left = left, Right = right };
+                return PreComputeIfPossible(newOp, state);
+            }
         }
 
         public IOperator Visit(ConditionalOperator op, OptimizeTimeEvaluationState<TNumber> state)
         {
+            var stateBeforeCondition = state.Clone();
             var condition = op.Condition.Accept(this, state);
 
-            // From now on, we use cloned object of the evaluation state
-            // because IfTrue and IfFalse will not always be executed.
-
-            // Process IfTrue
+            // The condition always runs first, so state now contains its effects.
+            // IfTrue starts from that post condition state, but its writes must
+            // stay local until we know that this branch is selected.
             var ifTrueState = state.Clone();
             var ifTrue = op.IfTrue.Accept(this, ifTrueState);
 
-            // Process IfFalse
+            // IfFalse also starts from the post condition state.
+            // Its writes must stay local for the same reason.
             var ifFalseState = state.Clone();
             var ifFalse = op.IfFalse.Accept(this, ifFalseState);
-
-            // We must unset variables that have different values after execution of ifTrue and ifFalse.
-            // We calculate intersection of ifTrueState and ifFalseState
-            var intersection = OptimizeTimeEvaluationState<TNumber>.Intersect(ifTrueState, ifFalseState);
-            state.Assign(intersection);
 
             // Create new operator
             var newOp = op with { Condition = condition, IfTrue = ifTrue, IfFalse = ifFalse };
 
-            if (PreComputeIfPossible(condition, state) is PreComputedOperator preComputed)
+            // Evaluate the condition again from the state before visiting it.
+            // The current state already includes the effects of condition.Accept above.
+            // We need the pre-condition state so that PreComputeIfPossible can
+            // expose the final condition value without losing earlier side effects.
+            var conditionState = stateBeforeCondition.Clone();
+            var precomputedCondition = PreComputeIfPossible(condition, conditionState);
+            var conditionSideEffects = ImmutableArray.CreateBuilder<IOperator>();
+            TNumber conditionValue = TNumber.Zero;
+            bool hasConditionValue = false;
+
+            // PreComputeIfPossible can return either a plain constant or a
+            // parenthesized sequence whose last operator is that constant.
+            // Earlier operators in the sequence are side effects of the condition.
+            if (precomputedCondition is PreComputedOperator preComputed)
             {
-                return !TNumber.IsZero((TNumber)preComputed.Value) ? ifTrue : ifFalse;
+                conditionValue = (TNumber)preComputed.Value;
+                hasConditionValue = true;
             }
-            else
+            else if (precomputedCondition is ParenthesisOperator { Operators.Length: > 0 } parenthesis
+                     && parenthesis.Operators[^1] is PreComputedOperator last)
             {
-                return newOp;
+                conditionValue = (TNumber)last.Value;
+                hasConditionValue = true;
+                conditionSideEffects.AddRange(parenthesis.Operators.Take(parenthesis.Operators.Length - 1));
             }
+
+            // When the condition value is known, rebuild only the executed path.
+            // Keep the condition side effects before the selected branch.
+            if (hasConditionValue)
+            {
+                IOperator selectedOperator = !TNumber.IsZero(conditionValue) ? ifTrue : ifFalse;
+                var selectedState = !TNumber.IsZero(conditionValue) ? ifTrueState : ifFalseState;
+                IOperator selectedPath = selectedOperator;
+
+                if (conditionSideEffects.Count > 0)
+                {
+                    conditionSideEffects.Add(selectedOperator);
+                    selectedPath = new ParenthesisOperator(conditionSideEffects.ToImmutable());
+                }
+
+                var selectedPathState = stateBeforeCondition.Clone();
+                var optimizedSelectedPath = PreComputeIfPossible(selectedPath, selectedPathState);
+
+                state.Assign(selectedState);
+                return optimizedSelectedPath;
+            }
+
+            // We must unset variables that have different values after execution of ifTrue and ifFalse.
+            // We calculate intersection of ifTrueState and ifFalseState.
+            var intersection = OptimizeTimeEvaluationState<TNumber>.Intersect(ifTrueState, ifFalseState);
+            state.Assign(intersection);
+            return newOp;
         }
 
         public IOperator Visit(UserDefinedOperator op, OptimizeTimeEvaluationState<TNumber> state)
@@ -270,6 +401,18 @@ public static partial class Optimizer
             var operands = op.Operands.Select(x => x.Accept(this, state)).ToImmutableArray();
             var newOp = op with { Operands = operands };
             return PreComputeIfPossible(newOp, state);
+        }
+
+        private static bool TryGetPrecomputedValue(IOperator op, out TNumber precomputedValue)
+        {
+            if (op is PreComputedOperator preComputed)
+            {
+                precomputedValue = (TNumber)preComputed.Value;
+                return true;
+            }
+
+            precomputedValue = TNumber.Zero;
+            return false;
         }
     }
 

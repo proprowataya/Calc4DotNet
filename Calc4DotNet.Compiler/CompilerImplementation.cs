@@ -6,6 +6,7 @@ using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Evaluation;
@@ -107,6 +108,14 @@ internal static class CompilerImplementation
         il.Emit(OpCodes.Newobj, compiledModule.GetConstructor([])!);
         il.Emit(OpCodes.Newobj, typeof(DefaultVariableSource<TNumber>).GetConstructor([])!);
         il.Emit(OpCodes.Newobj, typeof(DefaultArraySource<TNumber>).GetConstructor([])!);
+        // Get BOM-less UTF-8 encoding.
+        il.Emit(OpCodes.Ldc_I4_0);
+        il.Emit(OpCodes.Newobj, typeof(UTF8Encoding).GetConstructor([typeof(bool)])!);
+        il.Emit(OpCodes.Call, typeof(Console).GetProperty(nameof(Console.InputEncoding))!.SetMethod!);
+        // Get BOM-less UTF-8 encoding.
+        il.Emit(OpCodes.Ldc_I4_0);
+        il.Emit(OpCodes.Newobj, typeof(UTF8Encoding).GetConstructor([typeof(bool)])!);
+        il.Emit(OpCodes.Call, typeof(Console).GetProperty(nameof(Console.OutputEncoding))!.SetMethod!);
         il.Emit(OpCodes.Call, typeof(Console).GetProperty(nameof(Console.In))!.GetMethod!);
         il.Emit(OpCodes.Call, typeof(Console).GetProperty(nameof(Console.Out))!.GetMethod!);
         il.Emit(OpCodes.Newobj, typeof(TextReaderWriterIOService).GetConstructor([typeof(TextReader), typeof(TextWriter)])!);
