@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Collections.Immutable;
+using System.Numerics;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Execution;
@@ -116,11 +117,20 @@ public class ExecutionTest
             // Test result
             Assert.Equal(expected, actual);
 
-            // Test variables after execution
-            foreach (var (name, value) in testCase.VariablesAfterExecution)
-            {
-                Assert.Equal(TNumber.CreateTruncating(value), state.Variables[name.Value]);
-            }
+            // Test variables and array after execution. Both snapshots omit zero-valued
+            // entries (see DefaultVariableSource / DefaultArraySource ToImmutableDictionary),
+            // which matches Calc4's zero-init semantics where "bound to zero" and "never
+            // bound" are externally indistinguishable.
+
+            var expectedVariables = testCase.VariablesAfterExecution.ToImmutableDictionary(
+                p => p.Key, p => TNumber.CreateTruncating(p.Value));
+            var actualVariables = ((DefaultVariableSource<TNumber>)state.Variables).ToImmutableDictionary();
+            Assert.Equal(expectedVariables, actualVariables);
+
+            var expectedArray = testCase.ArrayAfterExecution.ToImmutableDictionary(
+                p => TNumber.CreateTruncating(p.Key), p => TNumber.CreateTruncating(p.Value));
+            var actualArray = ((DefaultArraySource<TNumber>)state.GlobalArray).ToImmutableDictionary();
+            Assert.Equal(expectedArray, actualArray);
 
             // Test console output
             string actualConsoleOutput = ((MemoryIOService)state.IOService).GetHistory();

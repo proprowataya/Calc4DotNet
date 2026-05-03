@@ -41,6 +41,12 @@ internal struct CSharpSerializer
         WriteLine(",", insertIndent: false);
         indent--;
 
+        WriteLine($"{nameof(TestCase.ArrayAfterExecution)}:");
+        indent++;
+        Serialize(testCase.ArrayAfterExecution);
+        WriteLine(",", insertIndent: false);
+        indent--;
+
         WriteLine($"{nameof(TestCase.ExpectedWhenNotOptimized)}:");
         indent++;
         Serialize(testCase.ExpectedWhenNotOptimized);
@@ -256,6 +262,30 @@ internal struct CSharpSerializer
                 Serialize((dynamic)value, insertIndentFirst: false);
             }
 
+            WriteLine("),", insertIndent: false);
+        }
+
+        indent--;
+        WriteLine("}");
+        indent--;
+        Write(")");
+    }
+
+    public void Serialize(ImmutableDictionary<Int32, Int32> dictionary, bool insertIndentFirst = true)
+    {
+        WriteLine($"{nameof(ImmutableDictionary)}.{nameof(ImmutableDictionary.CreateRange)}(", insertIndentFirst);
+
+        indent++;
+        WriteLine($"new {nameof(KeyValuePair<Int32, Int32>)}<{nameof(Int32)}, {nameof(Int32)}>[]");
+        WriteLine("{");
+        indent++;
+
+        foreach (var (key, value) in dictionary.OrderBy(pair => pair.Key))
+        {
+            Write($"new {nameof(KeyValuePair<Int32, Int32>)}<{nameof(Int32)}, {nameof(Int32)}>(");
+            Serialize(key, insertIndentFirst: false);
+            Write(", ", insertIndent: false);
+            Serialize(value, insertIndentFirst: false);
             WriteLine("),", insertIndent: false);
         }
 

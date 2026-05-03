@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Collections.Immutable;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Calc4DotNet.Core;
@@ -66,6 +67,39 @@ public sealed class DefaultArraySource<TNumber> : IArraySource<TNumber>
     public DefaultArraySource<TNumber> Clone()
     {
         return new DefaultArraySource<TNumber>((TNumber[])array.Clone(), dictionary is not null ? new(dictionary) : null);
+    }
+
+    public ImmutableDictionary<TNumber, TNumber> ToImmutableDictionary()
+    {
+        // Calc4's memory is conceptually pre-populated with zero for every
+        // index, so "bound to zero" and "never bound" are externally indistinguishable.
+        // Drop zero entries so the snapshot reflects observable state only.
+
+        var builder = ImmutableDictionary.CreateBuilder<TNumber, TNumber>();
+
+        for (int i = 0; i < array.Length; i++)
+        {
+            TNumber value = array[i];
+
+            if (!TNumber.IsZero(value))
+            {
+                TNumber index = TNumber.CreateTruncating(i) + BaseOffset;
+                builder[index] = value;
+            }
+        }
+
+        if (dictionary is not null)
+        {
+            foreach (var (index, value) in dictionary)
+            {
+                if (!TNumber.IsZero(value))
+                {
+                    builder[index] = value;
+                }
+            }
+        }
+
+        return builder.ToImmutable();
     }
 
     IArraySource<TNumber> IArraySource<TNumber>.Clone()

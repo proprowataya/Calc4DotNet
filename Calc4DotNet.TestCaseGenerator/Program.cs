@@ -207,9 +207,10 @@ static TestCase GenerateTestCase(string source, string standardInput, Type[]? sk
     List<IToken> tokens = Lexer.Lex(source, ref context);
     IOperator op = Parser.Parse(tokens, ref context);
     DefaultVariableSource<int> variables = new();
+    DefaultArraySource<Int32> arraySource = new();
     MemoryIOService ioService = new(standardInput);
     int expectedValue = Evaluator.Evaluate(op, context, new SimpleEvaluationState<int>(variables,
-                                                                                       new DefaultArraySource<Int32>(),
+                                                                                       arraySource,
                                                                                        ioService));
     string? expectedConsoleOutput = ioService.GetHistory() is string output && output.Length > 0 ? output : null;
 
@@ -222,6 +223,7 @@ static TestCase GenerateTestCase(string source, string standardInput, Type[]? sk
                         standardInput,
                         expectedValue,
                         variables.ToImmutableDictionary(),
+                        arraySource.ToImmutableDictionary(),
                         expectedWhenOptimized,
                         expectedWhenNotOptimized,
                         skipTypes,
