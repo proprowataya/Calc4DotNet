@@ -42,7 +42,10 @@ public sealed class DefaultVariableSource<TNumber> : IVariableSource<TNumber>
 
     public ImmutableDictionary<ValueBox<string>, TNumber> ToImmutableDictionary()
     {
-        return variables.ToImmutableDictionary();
+        // Calc4's variable space is conceptually pre-populated with zero for every
+        // name, so "bound to zero" and "never bound" are externally indistinguishable.
+        // Drop zero entries so the snapshot reflects observable state only.
+        return ImmutableDictionary.CreateRange(variables.Where(p => !TNumber.IsZero(p.Value)));
     }
 
     public DefaultVariableSource<TNumber> Clone()

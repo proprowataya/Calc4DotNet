@@ -8987,7 +8987,6 @@ internal static class TestCases
                 ImmutableDictionary.CreateRange(
                     new KeyValuePair<ValueBox<string>, Int32>[]
                     {
-                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create("x"), 0),
                     }
                 ),
             ExpectedWhenNotOptimized:
@@ -9120,7 +9119,6 @@ internal static class TestCases
                 ImmutableDictionary.CreateRange(
                     new KeyValuePair<ValueBox<string>, Int32>[]
                     {
-                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create("x"), 0),
                         new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create("y"), 20),
                     }
                 ),
