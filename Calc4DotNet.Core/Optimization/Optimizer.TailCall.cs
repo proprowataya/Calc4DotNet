@@ -39,13 +39,13 @@ public static partial class Optimizer
 
         public IOperator Visit(LoadArrayOperator op, bool isTailCall)
         {
-            var index = op.Index.Accept(this, isTailCall);
+            var index = op.Index.Accept(this, false);
             return op with { Index = index };
         }
 
         public IOperator Visit(PrintCharOperator op, bool isTailCall)
         {
-            var character = op.Character.Accept(this, isTailCall);
+            var character = op.Character.Accept(this, false);
             return op with { Character = character };
         }
 
@@ -69,13 +69,13 @@ public static partial class Optimizer
 
         public IOperator Visit(StoreVariableOperator op, bool isTailCall)
         {
-            return op with { Operand = op.Operand.Accept(this, true) };
+            return op with { Operand = op.Operand.Accept(this, false) };
         }
 
         public IOperator Visit(StoreArrayOperator op, bool isTailCall)
         {
-            var value = op.Value.Accept(this, isTailCall);
-            var index = op.Index.Accept(this, isTailCall);
+            var value = op.Value.Accept(this, false);
+            var index = op.Index.Accept(this, false);
             return op with { Value = value, Index = index };
         }
 

@@ -151,6 +151,14 @@ var testCaseInputs = new (string Source, string StandardInput, Type[]? SkipTypes
     ("D[1||1] D[_1||2] ({1}+{_1})", "", null),
     ("1S[a-b]L[a-b]", "", null),
     ("D[a-b||1]{a-b}", "", null),
+
+    // Tail-call marking must not cross operations that still need to run
+    // after evaluating their operands.
+    ("D[f|n|n==0?0?((n-1){f}P)] I{f}", "\u0001", null),
+    ("D[f|n|n==0?65?((n-1){f}S[x])] I{f} L[x]", "\u0001", null),
+    ("D[f|n|n==0?5?((n-1){f}@)] (99->5) I{f}", "\u0001", null),
+    ("D[f|n|n==0?5?((n-1){f}->2)] I{f} 2@", "\u0001", null),
+    ("D[f|n|n==0?2?(5->(n-1){f})] I{f} 2@", "\u0001", null),
 };
 
 string outputPath = Path.GetFullPath(Path.Join(new[] { Assembly.GetExecutingAssembly().Location, "..", "..", "..", "..", "..", "Calc4DotNet.Test", "TestCases.cs" }));

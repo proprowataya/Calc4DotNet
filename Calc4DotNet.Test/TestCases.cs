@@ -13524,7 +13524,7 @@ internal static class TestCases
                                         Value: 20
                                     )
                                 }.ToImmutableArray(),
-                                IsTailCall: true,
+                                IsTailCall: false,
                                 SupplementaryText: null
                             ),
                             SupplementaryText: null
@@ -20681,6 +20681,1348 @@ internal static class TestCases
                                         /* 01 */ new LowLevelOperation(Opcode.Return, 0)
                                     }.ToImmutableArray(),
                                     1)
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            SkipTypes: null
+        ),
+        new TestCase(
+            Source: "D[f|n|n==0?0?((n-1){f}P)] I{f}",
+            StandardInput: "\u0001",
+            ExpectedValue: 0,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
+            ExpectedWhenNotOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new UserDefinedOperator(
+                        Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                        Operands: new IOperator[]
+                        {
+                            new ParenthesisOperator(
+                                Operators: new IOperator[]
+                                {
+                                    new DefineOperator(
+                                        SupplementaryText: "f|n|n==0?0?((n-1){f}P)"
+                                    ),
+                                    new InputOperator(
+                                        SupplementaryText: null
+                                    )
+                                }.ToImmutableArray(),
+                                SupplementaryText: null
+                            )
+                        }.ToImmutableArray(),
+                        IsTailCall: null,
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                                new OperatorImplement(
+                                    Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    IsOptimized: false,
+                                    Operator: new ConditionalOperator(
+                                        Condition: new BinaryOperator(
+                                            Left: new ArgumentOperator(
+                                                Index: 0,
+                                                SupplementaryText: null
+                                            ),
+                                            Right: new DecimalOperator(
+                                                Operand: new ZeroOperator(),
+                                                Value: 0,
+                                                SupplementaryText: null
+                                            ),
+                                            Type: BinaryType.Equal,
+                                            SupplementaryText: null
+                                        ),
+                                        IfTrue: new DecimalOperator(
+                                            Operand: new ZeroOperator(),
+                                            Value: 0,
+                                            SupplementaryText: null
+                                        ),
+                                        IfFalse: new PrintCharOperator(
+                                            Character: new UserDefinedOperator(
+                                                Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                                Operands: new IOperator[]
+                                                {
+                                                    new BinaryOperator(
+                                                        Left: new ArgumentOperator(
+                                                            Index: 0,
+                                                            SupplementaryText: null
+                                                        ),
+                                                        Right: new DecimalOperator(
+                                                            Operand: new ZeroOperator(),
+                                                            Value: 1,
+                                                            SupplementaryText: null
+                                                        ),
+                                                        Type: BinaryType.Sub,
+                                                        SupplementaryText: null
+                                                    )
+                                                }.ToImmutableArray(),
+                                                IsTailCall: null,
+                                                SupplementaryText: null
+                                            ),
+                                            SupplementaryText: null
+                                        ),
+                                        SupplementaryText: null
+                                    )
+                                )
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 02 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.Call, 0),
+                                /* 04 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                                new LowLevelUserDefinedOperator(
+                                    new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    new LowLevelOperation[]
+                                    {
+                                        /* 00 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 01 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 02 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 03 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 04 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 05 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 06 */ new LowLevelOperation(Opcode.GotoIfEqual, 16),
+                                        /* 07 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 08 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 09 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 10 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 11 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 12 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 13 */ new LowLevelOperation(Opcode.Sub, 0),
+                                        /* 14 */ new LowLevelOperation(Opcode.Call, 0),
+                                        /* 15 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                        /* 16 */ new LowLevelOperation(Opcode.Return, 1),
+                                        /* 17 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 18 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 19 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 20 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 21 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 22 */ new LowLevelOperation(Opcode.Return, 1)
+                                    }.ToImmutableArray(),
+                                    3)
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            ExpectedWhenOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new UserDefinedOperator(
+                        Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                        Operands: new IOperator[]
+                        {
+                            new InputOperator(
+                                SupplementaryText: null
+                            )
+                        }.ToImmutableArray(),
+                        IsTailCall: true,
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                                new OperatorImplement(
+                                    Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    IsOptimized: true,
+                                    Operator: new ConditionalOperator(
+                                        Condition: new BinaryOperator(
+                                            Left: new ArgumentOperator(
+                                                Index: 0,
+                                                SupplementaryText: null
+                                            ),
+                                            Right: new PreComputedOperator(
+                                                Value: 0
+                                            ),
+                                            Type: BinaryType.Equal,
+                                            SupplementaryText: null
+                                        ),
+                                        IfTrue: new PreComputedOperator(
+                                            Value: 0
+                                        ),
+                                        IfFalse: new PrintCharOperator(
+                                            Character: new UserDefinedOperator(
+                                                Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                                Operands: new IOperator[]
+                                                {
+                                                    new BinaryOperator(
+                                                        Left: new ArgumentOperator(
+                                                            Index: 0,
+                                                            SupplementaryText: null
+                                                        ),
+                                                        Right: new PreComputedOperator(
+                                                            Value: 1
+                                                        ),
+                                                        Type: BinaryType.Sub,
+                                                        SupplementaryText: null
+                                                    )
+                                                }.ToImmutableArray(),
+                                                IsTailCall: false,
+                                                SupplementaryText: null
+                                            ),
+                                            SupplementaryText: null
+                                        ),
+                                        SupplementaryText: null
+                                    )
+                                )
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Call, 0),
+                                /* 02 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                                new LowLevelUserDefinedOperator(
+                                    new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    new LowLevelOperation[]
+                                    {
+                                        /* 00 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 01 */ new LowLevelOperation(Opcode.GotoIfFalse, 7),
+                                        /* 02 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 03 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 04 */ new LowLevelOperation(Opcode.Sub, 0),
+                                        /* 05 */ new LowLevelOperation(Opcode.Call, 0),
+                                        /* 06 */ new LowLevelOperation(Opcode.PrintChar, 0),
+                                        /* 07 */ new LowLevelOperation(Opcode.Return, 1),
+                                        /* 08 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 09 */ new LowLevelOperation(Opcode.Return, 1)
+                                    }.ToImmutableArray(),
+                                    2)
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            SkipTypes: null,
+            ExpectedConsoleOutput: "\0"
+        ),
+        new TestCase(
+            Source: "D[f|n|n==0?65?((n-1){f}S[x])] I{f} L[x]",
+            StandardInput: "\u0001",
+            ExpectedValue: 65,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                        new KeyValuePair<ValueBox<string>, Int32>(ValueBox.Create("x"), 65),
+                    }
+                ),
+            ExpectedWhenNotOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new ParenthesisOperator(
+                        Operators: new IOperator[]
+                        {
+                            new UserDefinedOperator(
+                                Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                Operands: new IOperator[]
+                                {
+                                    new ParenthesisOperator(
+                                        Operators: new IOperator[]
+                                        {
+                                            new DefineOperator(
+                                                SupplementaryText: "f|n|n==0?65?((n-1){f}S[x])"
+                                            ),
+                                            new InputOperator(
+                                                SupplementaryText: null
+                                            )
+                                        }.ToImmutableArray(),
+                                        SupplementaryText: null
+                                    )
+                                }.ToImmutableArray(),
+                                IsTailCall: null,
+                                SupplementaryText: null
+                            ),
+                            new LoadVariableOperator(
+                                SupplementaryText: "x"
+                            )
+                        }.ToImmutableArray(),
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                                new OperatorImplement(
+                                    Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    IsOptimized: false,
+                                    Operator: new ConditionalOperator(
+                                        Condition: new BinaryOperator(
+                                            Left: new ArgumentOperator(
+                                                Index: 0,
+                                                SupplementaryText: null
+                                            ),
+                                            Right: new DecimalOperator(
+                                                Operand: new ZeroOperator(),
+                                                Value: 0,
+                                                SupplementaryText: null
+                                            ),
+                                            Type: BinaryType.Equal,
+                                            SupplementaryText: null
+                                        ),
+                                        IfTrue: new DecimalOperator(
+                                            Operand: new DecimalOperator(
+                                                Operand: new ZeroOperator(),
+                                                Value: 6,
+                                                SupplementaryText: null
+                                            ),
+                                            Value: 5,
+                                            SupplementaryText: null
+                                        ),
+                                        IfFalse: new StoreVariableOperator(
+                                            Operand: new UserDefinedOperator(
+                                                Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                                Operands: new IOperator[]
+                                                {
+                                                    new BinaryOperator(
+                                                        Left: new ArgumentOperator(
+                                                            Index: 0,
+                                                            SupplementaryText: null
+                                                        ),
+                                                        Right: new DecimalOperator(
+                                                            Operand: new ZeroOperator(),
+                                                            Value: 1,
+                                                            SupplementaryText: null
+                                                        ),
+                                                        Type: BinaryType.Sub,
+                                                        SupplementaryText: null
+                                                    )
+                                                }.ToImmutableArray(),
+                                                IsTailCall: null,
+                                                SupplementaryText: null
+                                            ),
+                                            SupplementaryText: "x"
+                                        ),
+                                        SupplementaryText: null
+                                    )
+                                )
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 02 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.Call, 0),
+                                /* 04 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 05 */ new LowLevelOperation(Opcode.LoadVariable, 0),
+                                /* 06 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                                new LowLevelUserDefinedOperator(
+                                    new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    new LowLevelOperation[]
+                                    {
+                                        /* 00 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 01 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 02 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 03 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 04 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 05 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 06 */ new LowLevelOperation(Opcode.GotoIfEqual, 16),
+                                        /* 07 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 08 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 09 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 10 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 11 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 12 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 13 */ new LowLevelOperation(Opcode.Sub, 0),
+                                        /* 14 */ new LowLevelOperation(Opcode.Call, 0),
+                                        /* 15 */ new LowLevelOperation(Opcode.StoreVariable, 0),
+                                        /* 16 */ new LowLevelOperation(Opcode.Return, 1),
+                                        /* 17 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 18 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 19 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 20 */ new LowLevelOperation(Opcode.LoadConst, 6),
+                                        /* 21 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 22 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 23 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 24 */ new LowLevelOperation(Opcode.LoadConst, 5),
+                                        /* 25 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 26 */ new LowLevelOperation(Opcode.Return, 1)
+                                    }.ToImmutableArray(),
+                                    3)
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                                "x"
+                            }.ToImmutableArray()
+                        )
+                ),
+            ExpectedWhenOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new ParenthesisOperator(
+                        Operators: new IOperator[]
+                        {
+                            new UserDefinedOperator(
+                                Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                Operands: new IOperator[]
+                                {
+                                    new InputOperator(
+                                        SupplementaryText: null
+                                    )
+                                }.ToImmutableArray(),
+                                IsTailCall: false,
+                                SupplementaryText: null
+                            ),
+                            new LoadVariableOperator(
+                                SupplementaryText: "x"
+                            )
+                        }.ToImmutableArray(),
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                                new OperatorImplement(
+                                    Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    IsOptimized: true,
+                                    Operator: new ConditionalOperator(
+                                        Condition: new BinaryOperator(
+                                            Left: new ArgumentOperator(
+                                                Index: 0,
+                                                SupplementaryText: null
+                                            ),
+                                            Right: new PreComputedOperator(
+                                                Value: 0
+                                            ),
+                                            Type: BinaryType.Equal,
+                                            SupplementaryText: null
+                                        ),
+                                        IfTrue: new PreComputedOperator(
+                                            Value: 65
+                                        ),
+                                        IfFalse: new StoreVariableOperator(
+                                            Operand: new UserDefinedOperator(
+                                                Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                                Operands: new IOperator[]
+                                                {
+                                                    new BinaryOperator(
+                                                        Left: new ArgumentOperator(
+                                                            Index: 0,
+                                                            SupplementaryText: null
+                                                        ),
+                                                        Right: new PreComputedOperator(
+                                                            Value: 1
+                                                        ),
+                                                        Type: BinaryType.Sub,
+                                                        SupplementaryText: null
+                                                    )
+                                                }.ToImmutableArray(),
+                                                IsTailCall: false,
+                                                SupplementaryText: null
+                                            ),
+                                            SupplementaryText: "x"
+                                        ),
+                                        SupplementaryText: null
+                                    )
+                                )
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Call, 0),
+                                /* 02 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.LoadVariable, 0),
+                                /* 04 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                                new LowLevelUserDefinedOperator(
+                                    new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    new LowLevelOperation[]
+                                    {
+                                        /* 00 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 01 */ new LowLevelOperation(Opcode.GotoIfFalse, 7),
+                                        /* 02 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 03 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 04 */ new LowLevelOperation(Opcode.Sub, 0),
+                                        /* 05 */ new LowLevelOperation(Opcode.Call, 0),
+                                        /* 06 */ new LowLevelOperation(Opcode.StoreVariable, 0),
+                                        /* 07 */ new LowLevelOperation(Opcode.Return, 1),
+                                        /* 08 */ new LowLevelOperation(Opcode.LoadConst, 65),
+                                        /* 09 */ new LowLevelOperation(Opcode.Return, 1)
+                                    }.ToImmutableArray(),
+                                    2)
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                                "x"
+                            }.ToImmutableArray()
+                        )
+                ),
+            SkipTypes: null
+        ),
+        new TestCase(
+            Source: "D[f|n|n==0?5?((n-1){f}@)] (99->5) I{f}",
+            StandardInput: "\u0001",
+            ExpectedValue: 99,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
+            ExpectedWhenNotOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new UserDefinedOperator(
+                        Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                        Operands: new IOperator[]
+                        {
+                            new ParenthesisOperator(
+                                Operators: new IOperator[]
+                                {
+                                    new DefineOperator(
+                                        SupplementaryText: "f|n|n==0?5?((n-1){f}@)"
+                                    ),
+                                    new StoreArrayOperator(
+                                        Value: new DecimalOperator(
+                                            Operand: new DecimalOperator(
+                                                Operand: new ZeroOperator(),
+                                                Value: 9,
+                                                SupplementaryText: null
+                                            ),
+                                            Value: 9,
+                                            SupplementaryText: null
+                                        ),
+                                        Index: new DecimalOperator(
+                                            Operand: new ZeroOperator(),
+                                            Value: 5,
+                                            SupplementaryText: null
+                                        ),
+                                        SupplementaryText: null
+                                    ),
+                                    new InputOperator(
+                                        SupplementaryText: null
+                                    )
+                                }.ToImmutableArray(),
+                                SupplementaryText: null
+                            )
+                        }.ToImmutableArray(),
+                        IsTailCall: null,
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                                new OperatorImplement(
+                                    Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    IsOptimized: false,
+                                    Operator: new ConditionalOperator(
+                                        Condition: new BinaryOperator(
+                                            Left: new ArgumentOperator(
+                                                Index: 0,
+                                                SupplementaryText: null
+                                            ),
+                                            Right: new DecimalOperator(
+                                                Operand: new ZeroOperator(),
+                                                Value: 0,
+                                                SupplementaryText: null
+                                            ),
+                                            Type: BinaryType.Equal,
+                                            SupplementaryText: null
+                                        ),
+                                        IfTrue: new DecimalOperator(
+                                            Operand: new ZeroOperator(),
+                                            Value: 5,
+                                            SupplementaryText: null
+                                        ),
+                                        IfFalse: new LoadArrayOperator(
+                                            Index: new UserDefinedOperator(
+                                                Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                                Operands: new IOperator[]
+                                                {
+                                                    new BinaryOperator(
+                                                        Left: new ArgumentOperator(
+                                                            Index: 0,
+                                                            SupplementaryText: null
+                                                        ),
+                                                        Right: new DecimalOperator(
+                                                            Operand: new ZeroOperator(),
+                                                            Value: 1,
+                                                            SupplementaryText: null
+                                                        ),
+                                                        Type: BinaryType.Sub,
+                                                        SupplementaryText: null
+                                                    )
+                                                }.ToImmutableArray(),
+                                                IsTailCall: null,
+                                                SupplementaryText: null
+                                            ),
+                                            SupplementaryText: null
+                                        ),
+                                        SupplementaryText: null
+                                    )
+                                )
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 02 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 04 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 05 */ new LowLevelOperation(Opcode.LoadConst, 9),
+                                /* 06 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 07 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 08 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 09 */ new LowLevelOperation(Opcode.LoadConst, 9),
+                                /* 10 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 11 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 12 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 13 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 14 */ new LowLevelOperation(Opcode.LoadConst, 5),
+                                /* 15 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 16 */ new LowLevelOperation(Opcode.StoreArrayElement, 0),
+                                /* 17 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 18 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 19 */ new LowLevelOperation(Opcode.Call, 0),
+                                /* 20 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                                new LowLevelUserDefinedOperator(
+                                    new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    new LowLevelOperation[]
+                                    {
+                                        /* 00 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 01 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 02 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 03 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 04 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 05 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 06 */ new LowLevelOperation(Opcode.GotoIfEqual, 16),
+                                        /* 07 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 08 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 09 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 10 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 11 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 12 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 13 */ new LowLevelOperation(Opcode.Sub, 0),
+                                        /* 14 */ new LowLevelOperation(Opcode.Call, 0),
+                                        /* 15 */ new LowLevelOperation(Opcode.LoadArrayElement, 0),
+                                        /* 16 */ new LowLevelOperation(Opcode.Return, 1),
+                                        /* 17 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 18 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 19 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 20 */ new LowLevelOperation(Opcode.LoadConst, 5),
+                                        /* 21 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 22 */ new LowLevelOperation(Opcode.Return, 1)
+                                    }.ToImmutableArray(),
+                                    3)
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            ExpectedWhenOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new UserDefinedOperator(
+                        Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                        Operands: new IOperator[]
+                        {
+                            new ParenthesisOperator(
+                                Operators: new IOperator[]
+                                {
+                                    new StoreArrayOperator(
+                                        Value: new PreComputedOperator(
+                                            Value: 99
+                                        ),
+                                        Index: new PreComputedOperator(
+                                            Value: 5
+                                        ),
+                                        SupplementaryText: null
+                                    ),
+                                    new InputOperator(
+                                        SupplementaryText: null
+                                    )
+                                }.ToImmutableArray(),
+                                SupplementaryText: null
+                            )
+                        }.ToImmutableArray(),
+                        IsTailCall: true,
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                                new OperatorImplement(
+                                    Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    IsOptimized: true,
+                                    Operator: new ConditionalOperator(
+                                        Condition: new BinaryOperator(
+                                            Left: new ArgumentOperator(
+                                                Index: 0,
+                                                SupplementaryText: null
+                                            ),
+                                            Right: new PreComputedOperator(
+                                                Value: 0
+                                            ),
+                                            Type: BinaryType.Equal,
+                                            SupplementaryText: null
+                                        ),
+                                        IfTrue: new PreComputedOperator(
+                                            Value: 5
+                                        ),
+                                        IfFalse: new LoadArrayOperator(
+                                            Index: new UserDefinedOperator(
+                                                Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                                Operands: new IOperator[]
+                                                {
+                                                    new BinaryOperator(
+                                                        Left: new ArgumentOperator(
+                                                            Index: 0,
+                                                            SupplementaryText: null
+                                                        ),
+                                                        Right: new PreComputedOperator(
+                                                            Value: 1
+                                                        ),
+                                                        Type: BinaryType.Sub,
+                                                        SupplementaryText: null
+                                                    )
+                                                }.ToImmutableArray(),
+                                                IsTailCall: false,
+                                                SupplementaryText: null
+                                            ),
+                                            SupplementaryText: null
+                                        ),
+                                        SupplementaryText: null
+                                    )
+                                )
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 99),
+                                /* 01 */ new LowLevelOperation(Opcode.LoadConst, 5),
+                                /* 02 */ new LowLevelOperation(Opcode.StoreArrayElement, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 04 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 05 */ new LowLevelOperation(Opcode.Call, 0),
+                                /* 06 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                                new LowLevelUserDefinedOperator(
+                                    new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    new LowLevelOperation[]
+                                    {
+                                        /* 00 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 01 */ new LowLevelOperation(Opcode.GotoIfFalse, 7),
+                                        /* 02 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 03 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 04 */ new LowLevelOperation(Opcode.Sub, 0),
+                                        /* 05 */ new LowLevelOperation(Opcode.Call, 0),
+                                        /* 06 */ new LowLevelOperation(Opcode.LoadArrayElement, 0),
+                                        /* 07 */ new LowLevelOperation(Opcode.Return, 1),
+                                        /* 08 */ new LowLevelOperation(Opcode.LoadConst, 5),
+                                        /* 09 */ new LowLevelOperation(Opcode.Return, 1)
+                                    }.ToImmutableArray(),
+                                    2)
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            SkipTypes: null
+        ),
+        new TestCase(
+            Source: "D[f|n|n==0?5?((n-1){f}->2)] I{f} 2@",
+            StandardInput: "\u0001",
+            ExpectedValue: 0,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
+            ExpectedWhenNotOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new LoadArrayOperator(
+                        Index: new DecimalOperator(
+                            Operand: new UserDefinedOperator(
+                                Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                Operands: new IOperator[]
+                                {
+                                    new ParenthesisOperator(
+                                        Operators: new IOperator[]
+                                        {
+                                            new DefineOperator(
+                                                SupplementaryText: "f|n|n==0?5?((n-1){f}->2)"
+                                            ),
+                                            new InputOperator(
+                                                SupplementaryText: null
+                                            )
+                                        }.ToImmutableArray(),
+                                        SupplementaryText: null
+                                    )
+                                }.ToImmutableArray(),
+                                IsTailCall: null,
+                                SupplementaryText: null
+                            ),
+                            Value: 2,
+                            SupplementaryText: null
+                        ),
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                                new OperatorImplement(
+                                    Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    IsOptimized: false,
+                                    Operator: new ConditionalOperator(
+                                        Condition: new BinaryOperator(
+                                            Left: new ArgumentOperator(
+                                                Index: 0,
+                                                SupplementaryText: null
+                                            ),
+                                            Right: new DecimalOperator(
+                                                Operand: new ZeroOperator(),
+                                                Value: 0,
+                                                SupplementaryText: null
+                                            ),
+                                            Type: BinaryType.Equal,
+                                            SupplementaryText: null
+                                        ),
+                                        IfTrue: new DecimalOperator(
+                                            Operand: new ZeroOperator(),
+                                            Value: 5,
+                                            SupplementaryText: null
+                                        ),
+                                        IfFalse: new StoreArrayOperator(
+                                            Value: new UserDefinedOperator(
+                                                Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                                Operands: new IOperator[]
+                                                {
+                                                    new BinaryOperator(
+                                                        Left: new ArgumentOperator(
+                                                            Index: 0,
+                                                            SupplementaryText: null
+                                                        ),
+                                                        Right: new DecimalOperator(
+                                                            Operand: new ZeroOperator(),
+                                                            Value: 1,
+                                                            SupplementaryText: null
+                                                        ),
+                                                        Type: BinaryType.Sub,
+                                                        SupplementaryText: null
+                                                    )
+                                                }.ToImmutableArray(),
+                                                IsTailCall: null,
+                                                SupplementaryText: null
+                                            ),
+                                            Index: new DecimalOperator(
+                                                Operand: new ZeroOperator(),
+                                                Value: 2,
+                                                SupplementaryText: null
+                                            ),
+                                            SupplementaryText: null
+                                        ),
+                                        SupplementaryText: null
+                                    )
+                                )
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 02 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.Call, 0),
+                                /* 04 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 05 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 06 */ new LowLevelOperation(Opcode.LoadConst, 2),
+                                /* 07 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 08 */ new LowLevelOperation(Opcode.LoadArrayElement, 0),
+                                /* 09 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                                new LowLevelUserDefinedOperator(
+                                    new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    new LowLevelOperation[]
+                                    {
+                                        /* 00 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 01 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 02 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 03 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 04 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 05 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 06 */ new LowLevelOperation(Opcode.GotoIfEqual, 21),
+                                        /* 07 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 08 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 09 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 10 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 11 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 12 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 13 */ new LowLevelOperation(Opcode.Sub, 0),
+                                        /* 14 */ new LowLevelOperation(Opcode.Call, 0),
+                                        /* 15 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 16 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 17 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 18 */ new LowLevelOperation(Opcode.LoadConst, 2),
+                                        /* 19 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 20 */ new LowLevelOperation(Opcode.StoreArrayElement, 0),
+                                        /* 21 */ new LowLevelOperation(Opcode.Return, 1),
+                                        /* 22 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 23 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 24 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 25 */ new LowLevelOperation(Opcode.LoadConst, 5),
+                                        /* 26 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 27 */ new LowLevelOperation(Opcode.Return, 1)
+                                    }.ToImmutableArray(),
+                                    3)
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            ExpectedWhenOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new LoadArrayOperator(
+                        Index: new DecimalOperator(
+                            Operand: new UserDefinedOperator(
+                                Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                Operands: new IOperator[]
+                                {
+                                    new InputOperator(
+                                        SupplementaryText: null
+                                    )
+                                }.ToImmutableArray(),
+                                IsTailCall: false,
+                                SupplementaryText: null
+                            ),
+                            Value: 2,
+                            SupplementaryText: null
+                        ),
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                                new OperatorImplement(
+                                    Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    IsOptimized: true,
+                                    Operator: new ConditionalOperator(
+                                        Condition: new BinaryOperator(
+                                            Left: new ArgumentOperator(
+                                                Index: 0,
+                                                SupplementaryText: null
+                                            ),
+                                            Right: new PreComputedOperator(
+                                                Value: 0
+                                            ),
+                                            Type: BinaryType.Equal,
+                                            SupplementaryText: null
+                                        ),
+                                        IfTrue: new PreComputedOperator(
+                                            Value: 5
+                                        ),
+                                        IfFalse: new StoreArrayOperator(
+                                            Value: new UserDefinedOperator(
+                                                Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                                Operands: new IOperator[]
+                                                {
+                                                    new BinaryOperator(
+                                                        Left: new ArgumentOperator(
+                                                            Index: 0,
+                                                            SupplementaryText: null
+                                                        ),
+                                                        Right: new PreComputedOperator(
+                                                            Value: 1
+                                                        ),
+                                                        Type: BinaryType.Sub,
+                                                        SupplementaryText: null
+                                                    )
+                                                }.ToImmutableArray(),
+                                                IsTailCall: false,
+                                                SupplementaryText: null
+                                            ),
+                                            Index: new PreComputedOperator(
+                                                Value: 2
+                                            ),
+                                            SupplementaryText: null
+                                        ),
+                                        SupplementaryText: null
+                                    )
+                                )
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Call, 0),
+                                /* 02 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 03 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 04 */ new LowLevelOperation(Opcode.LoadConst, 2),
+                                /* 05 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 06 */ new LowLevelOperation(Opcode.LoadArrayElement, 0),
+                                /* 07 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                                new LowLevelUserDefinedOperator(
+                                    new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    new LowLevelOperation[]
+                                    {
+                                        /* 00 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 01 */ new LowLevelOperation(Opcode.GotoIfFalse, 8),
+                                        /* 02 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 03 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 04 */ new LowLevelOperation(Opcode.Sub, 0),
+                                        /* 05 */ new LowLevelOperation(Opcode.Call, 0),
+                                        /* 06 */ new LowLevelOperation(Opcode.LoadConst, 2),
+                                        /* 07 */ new LowLevelOperation(Opcode.StoreArrayElement, 0),
+                                        /* 08 */ new LowLevelOperation(Opcode.Return, 1),
+                                        /* 09 */ new LowLevelOperation(Opcode.LoadConst, 5),
+                                        /* 10 */ new LowLevelOperation(Opcode.Return, 1)
+                                    }.ToImmutableArray(),
+                                    2)
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            SkipTypes: null
+        ),
+        new TestCase(
+            Source: "D[f|n|n==0?2?(5->(n-1){f})] I{f} 2@",
+            StandardInput: "\u0001",
+            ExpectedValue: 0,
+            VariablesAfterExecution:
+                ImmutableDictionary.CreateRange(
+                    new KeyValuePair<ValueBox<string>, Int32>[]
+                    {
+                    }
+                ),
+            ExpectedWhenNotOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new LoadArrayOperator(
+                        Index: new DecimalOperator(
+                            Operand: new UserDefinedOperator(
+                                Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                Operands: new IOperator[]
+                                {
+                                    new ParenthesisOperator(
+                                        Operators: new IOperator[]
+                                        {
+                                            new DefineOperator(
+                                                SupplementaryText: "f|n|n==0?2?(5->(n-1){f})"
+                                            ),
+                                            new InputOperator(
+                                                SupplementaryText: null
+                                            )
+                                        }.ToImmutableArray(),
+                                        SupplementaryText: null
+                                    )
+                                }.ToImmutableArray(),
+                                IsTailCall: null,
+                                SupplementaryText: null
+                            ),
+                            Value: 2,
+                            SupplementaryText: null
+                        ),
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                                new OperatorImplement(
+                                    Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    IsOptimized: false,
+                                    Operator: new ConditionalOperator(
+                                        Condition: new BinaryOperator(
+                                            Left: new ArgumentOperator(
+                                                Index: 0,
+                                                SupplementaryText: null
+                                            ),
+                                            Right: new DecimalOperator(
+                                                Operand: new ZeroOperator(),
+                                                Value: 0,
+                                                SupplementaryText: null
+                                            ),
+                                            Type: BinaryType.Equal,
+                                            SupplementaryText: null
+                                        ),
+                                        IfTrue: new DecimalOperator(
+                                            Operand: new ZeroOperator(),
+                                            Value: 2,
+                                            SupplementaryText: null
+                                        ),
+                                        IfFalse: new StoreArrayOperator(
+                                            Value: new DecimalOperator(
+                                                Operand: new ZeroOperator(),
+                                                Value: 5,
+                                                SupplementaryText: null
+                                            ),
+                                            Index: new UserDefinedOperator(
+                                                Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                                Operands: new IOperator[]
+                                                {
+                                                    new BinaryOperator(
+                                                        Left: new ArgumentOperator(
+                                                            Index: 0,
+                                                            SupplementaryText: null
+                                                        ),
+                                                        Right: new DecimalOperator(
+                                                            Operand: new ZeroOperator(),
+                                                            Value: 1,
+                                                            SupplementaryText: null
+                                                        ),
+                                                        Type: BinaryType.Sub,
+                                                        SupplementaryText: null
+                                                    )
+                                                }.ToImmutableArray(),
+                                                IsTailCall: null,
+                                                SupplementaryText: null
+                                            ),
+                                            SupplementaryText: null
+                                        ),
+                                        SupplementaryText: null
+                                    )
+                                )
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Pop, 0),
+                                /* 02 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 03 */ new LowLevelOperation(Opcode.Call, 0),
+                                /* 04 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 05 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 06 */ new LowLevelOperation(Opcode.LoadConst, 2),
+                                /* 07 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 08 */ new LowLevelOperation(Opcode.LoadArrayElement, 0),
+                                /* 09 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                                new LowLevelUserDefinedOperator(
+                                    new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    new LowLevelOperation[]
+                                    {
+                                        /* 00 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 01 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 02 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 03 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 04 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 05 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 06 */ new LowLevelOperation(Opcode.GotoIfEqual, 21),
+                                        /* 07 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 08 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 09 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 10 */ new LowLevelOperation(Opcode.LoadConst, 5),
+                                        /* 11 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 12 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 13 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 14 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 15 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 16 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 17 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 18 */ new LowLevelOperation(Opcode.Sub, 0),
+                                        /* 19 */ new LowLevelOperation(Opcode.Call, 0),
+                                        /* 20 */ new LowLevelOperation(Opcode.StoreArrayElement, 0),
+                                        /* 21 */ new LowLevelOperation(Opcode.Return, 1),
+                                        /* 22 */ new LowLevelOperation(Opcode.LoadConst, 0),
+                                        /* 23 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                        /* 24 */ new LowLevelOperation(Opcode.Mult, 0),
+                                        /* 25 */ new LowLevelOperation(Opcode.LoadConst, 2),
+                                        /* 26 */ new LowLevelOperation(Opcode.Add, 0),
+                                        /* 27 */ new LowLevelOperation(Opcode.Return, 1)
+                                    }.ToImmutableArray(),
+                                    4)
+                            }.ToImmutableArray(),
+                            new String[]
+                            {
+                            }.ToImmutableArray()
+                        )
+                ),
+            ExpectedWhenOptimized:
+                new CompilationResult<Int32>(
+                    Operator: new LoadArrayOperator(
+                        Index: new DecimalOperator(
+                            Operand: new UserDefinedOperator(
+                                Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                Operands: new IOperator[]
+                                {
+                                    new InputOperator(
+                                        SupplementaryText: null
+                                    )
+                                }.ToImmutableArray(),
+                                IsTailCall: false,
+                                SupplementaryText: null
+                            ),
+                            Value: 2,
+                            SupplementaryText: null
+                        ),
+                        SupplementaryText: null
+                    ),
+                    Context:
+                        CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+                            new OperatorImplement[]
+                            {
+                                new OperatorImplement(
+                                    Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    IsOptimized: true,
+                                    Operator: new ConditionalOperator(
+                                        Condition: new BinaryOperator(
+                                            Left: new ArgumentOperator(
+                                                Index: 0,
+                                                SupplementaryText: null
+                                            ),
+                                            Right: new PreComputedOperator(
+                                                Value: 0
+                                            ),
+                                            Type: BinaryType.Equal,
+                                            SupplementaryText: null
+                                        ),
+                                        IfTrue: new PreComputedOperator(
+                                            Value: 2
+                                        ),
+                                        IfFalse: new StoreArrayOperator(
+                                            Value: new PreComputedOperator(
+                                                Value: 5
+                                            ),
+                                            Index: new UserDefinedOperator(
+                                                Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
+                                                Operands: new IOperator[]
+                                                {
+                                                    new BinaryOperator(
+                                                        Left: new ArgumentOperator(
+                                                            Index: 0,
+                                                            SupplementaryText: null
+                                                        ),
+                                                        Right: new PreComputedOperator(
+                                                            Value: 1
+                                                        ),
+                                                        Type: BinaryType.Sub,
+                                                        SupplementaryText: null
+                                                    )
+                                                }.ToImmutableArray(),
+                                                IsTailCall: false,
+                                                SupplementaryText: null
+                                            ),
+                                            SupplementaryText: null
+                                        ),
+                                        SupplementaryText: null
+                                    )
+                                )
+                            }
+                        ),
+                    Module:
+                        new LowLevelModule<Int32>(
+                            new LowLevelOperation[]
+                            {
+                                /* 00 */ new LowLevelOperation(Opcode.Input, 0),
+                                /* 01 */ new LowLevelOperation(Opcode.Call, 0),
+                                /* 02 */ new LowLevelOperation(Opcode.LoadConst, 10),
+                                /* 03 */ new LowLevelOperation(Opcode.Mult, 0),
+                                /* 04 */ new LowLevelOperation(Opcode.LoadConst, 2),
+                                /* 05 */ new LowLevelOperation(Opcode.Add, 0),
+                                /* 06 */ new LowLevelOperation(Opcode.LoadArrayElement, 0),
+                                /* 07 */ new LowLevelOperation(Opcode.Halt, 0)
+                            }.ToImmutableArray(),
+                            new Int32[]
+                            {
+                            }.ToImmutableArray(),
+                            new LowLevelUserDefinedOperator[]
+                            {
+                                new LowLevelUserDefinedOperator(
+                                    new OperatorDefinition(Name: "f", NumOperands: 1),
+                                    new LowLevelOperation[]
+                                    {
+                                        /* 00 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 01 */ new LowLevelOperation(Opcode.GotoIfFalse, 8),
+                                        /* 02 */ new LowLevelOperation(Opcode.LoadConst, 5),
+                                        /* 03 */ new LowLevelOperation(Opcode.LoadArg, 1),
+                                        /* 04 */ new LowLevelOperation(Opcode.LoadConst, 1),
+                                        /* 05 */ new LowLevelOperation(Opcode.Sub, 0),
+                                        /* 06 */ new LowLevelOperation(Opcode.Call, 0),
+                                        /* 07 */ new LowLevelOperation(Opcode.StoreArrayElement, 0),
+                                        /* 08 */ new LowLevelOperation(Opcode.Return, 1),
+                                        /* 09 */ new LowLevelOperation(Opcode.LoadConst, 2),
+                                        /* 10 */ new LowLevelOperation(Opcode.Return, 1)
+                                    }.ToImmutableArray(),
+                                    3)
                             }.ToImmutableArray(),
                             new String[]
                             {
