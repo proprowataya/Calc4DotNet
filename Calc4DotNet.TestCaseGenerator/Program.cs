@@ -159,6 +159,12 @@ var testCaseInputs = new (string Source, string StandardInput, Type[]? SkipTypes
     ("D[f|n|n==0?5?((n-1){f}@)] (99->5) I{f}", "\u0001", null),
     ("D[f|n|n==0?5?((n-1){f}->2)] I{f} 2@", "\u0001", null),
     ("D[f|n|n==0?2?(5->(n-1){f})] I{f} 2@", "\u0001", null),
+
+    // A nested tail-call jump in the false branch must not let other false-branch paths
+    // fall through into the true branch. The first case takes the non-recursive false path
+    // directly, while the second reaches that path after taking tail-call jumps.
+    ("D[f|n|n<0?111?(n>0?(n-1){f}?222)] I{f}", "\0", null),
+    ("D[f|n|n<0?111?(n>0?(n-1){f}?222)] I{f}", "\u0002", null),
 };
 
 string outputPath = Path.GetFullPath(Path.Join(new[] { Assembly.GetExecutingAssembly().Location, "..", "..", "..", "..", "..", "Calc4DotNet.Test", "TestCases.cs" }));

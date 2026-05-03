@@ -581,12 +581,11 @@ public static class LowLevelCodeGenerator
 
             int savedStackSize = StackSize;
             op.IfFalse.Accept(this);
-            if (list.Last(x => x.Opcode != Opcode.Lavel).Opcode != Opcode.Goto)
-            {
-                // "list.Last().Opcode == Opcode.Goto" means
-                // elimination of "Call" (tail-call)
-                AddOperation(new LowLevelOperation(Opcode.Goto, endLabel));
-            }
+            // Always jump over the true branch after evaluating the false branch. A trailing
+            // Goto inside the false branch does not necessarily mean every false-branch path
+            // has left the current control flow. It may belong to a nested conditional or
+            // a tail-call path only. Emitting this jump is harmless when it is unreachable.
+            AddOperation(new LowLevelOperation(Opcode.Goto, endLabel));
             AddOperation(new LowLevelOperation(Opcode.Lavel, ifTrueLabel));
             StackSize = savedStackSize;
             op.IfTrue.Accept(this);
