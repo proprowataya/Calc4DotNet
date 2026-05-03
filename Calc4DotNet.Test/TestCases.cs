@@ -19452,11 +19452,11 @@ internal static class TestCases
                         )
                 ),
             SkipTypes: null,
-            ExpectedConsoleOutput: "ÿ"
+            ExpectedConsoleOutput: "\u0080\u00FF"
         ),
         new TestCase(
             Source: "I",
-            StandardInput: "ÿ",
+            StandardInput: "\u00FF",
             ExpectedValue: 255,
             VariablesAfterExecution:
                 ImmutableDictionary.CreateRange(
