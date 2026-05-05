@@ -78,6 +78,7 @@ var testCaseInputs = new (string Source, string StandardInput, Type[]? SkipTypes
     ("(1<2)||(2<1)", "", null),
     ("(0-1)&&1", "", null),
     ("(0-1)||0", "", null),
+    ("(I&&(1S[x]))L[x]", "A", null),
     ("D[true||1||2]{true}", "", null),
     ("D[select|a,b|a?a?b] (0{select}5) + (3{select}4)", "", null),
     ("D[pick|a,b,c|a?b?c] (0{pick}5{pick}9) + (1{pick}2{pick}3)", "", null),
@@ -87,6 +88,9 @@ var testCaseInputs = new (string Source, string StandardInput, Type[]? SkipTypes
     ("(((1S[y])?0?(0S[y]))||(L[y]S[x]))", "", null),
     ("((0S[x])&&(1S[y]))(L[y])", "", null),
     ("(10S[x])(20S[y])((0S[x])&&(1S[y]))(L[y])", "", null),
+    ("((0S[x])&&((5->2)(3S[y])))((2)@)+(L[y])", "", null),
+    ("((1S[x])||((5->2)(3S[y])))((2)@)+(L[y])", "", null),
+    ("D[write||(5->2)(3S[y])] (0&&{write})((2@)+(L[y]))", "", null),
 
     // Fibonacci
     ("D[fib|n|n<=1?n?(n-1){fib}+(n-2){fib}] 10{fib}", "", null),
@@ -108,6 +112,7 @@ var testCaseInputs = new (string Source, string StandardInput, Type[]? SkipTypes
     ("(123S[var])L[var]*L[var]", "", null),
     ("((100+20+3)S)L*L", "", null),
     ("((100+20+3)S[var])L[var]*L[var]", "", null),
+    ("(I?(1S[x])?(2S[x]))L[x]", "A", null),
     ("D[op||(123S)L*L]{op}", "", null),
     ("D[op||L*L](123S){op}", "", null),
     ("D[fib|n|n<=1?n?((n-1){fib}+(n-2){fib})] (20{fib}S)+L", "", null),
@@ -124,6 +129,8 @@ var testCaseInputs = new (string Source, string StandardInput, Type[]? SkipTypes
     ("5->0", "", null),
     ("(10->20)L[zero]20@", "", null),
     ("((4+6)->(10+10))(20@)", "", null),
+    ("(10->20)(0->20)(20@)", "", null),
+    ("(I?(1->5)?(2->5))(5@)", "A", null),
     ("(5->(0-1))((0-1)@)", "", null),
     ("(7->131072)((131072)@)", "", null),
     ("D[func||(10->20)L[zero]20@] {func} (20@)", "", null),
@@ -136,6 +143,8 @@ var testCaseInputs = new (string Source, string StandardInput, Type[]? SkipTypes
     ("I+I", "AB", null),
     ("1+2+I", "A", null),
     ("D[Input||I]{Input}", "A", null),
+    ("(I?5->2?7->2)(2@)", "A", null),
+    ("(I?5->2?7->2)(2@)", "\0", null),
     ("I", "", null),
 
     // Byte IO tests
@@ -165,6 +174,79 @@ var testCaseInputs = new (string Source, string StandardInput, Type[]? SkipTypes
     // directly, while the second reaches that path after taking tail-call jumps.
     ("D[f|n|n<0?111?(n>0?(n-1){f}?222)] I{f}", "\0", null),
     ("D[f|n|n<0?111?(n>0?(n-1){f}?222)] I{f}", "\u0002", null),
+
+    // Algebraic simplification, single-constant rewrites.
+    ("I+0", "A", null),
+    ("0+I", "A", null),
+    ("I-0", "A", null),
+    ("I*1", "A", null),
+    ("1*I", "A", null),
+    ("I*0", "A", null),
+    ("0*I", "A", null),
+    ("I/1", "A", null),
+    ("I%1", "A", null),
+    // Multiply-by-zero must preserve side effects of the non-constant side.
+    ("(65P)*0", "", null),
+    ("0*(65P)", "", null),
+    // Self operations on repeated input operands must not fold.
+    // Each I reads independently, so the operands are not the same pure value.
+    ("I-I", "A", null),
+    ("I==I", "A", null),
+    ("I!=I", "A", null),
+    // Conditional with two identical branches keeps the condition effects,
+    // then uses the branch value.
+    ("I?5?5", "A", null),
+    ("I?(1+2)?(1+2)", "A", null),
+
+    // Short-circuit with a constant right side that has no observable effect.
+    ("I&&0", "A", null),        // Result becomes sequence I then 0.
+    ("I&&5", "A", null),        // Result becomes I != 0.
+    ("I||0", "A", null),        // Result becomes I != 0.
+    ("I||5", "A", null),        // Result becomes sequence I then 1.
+    // Right has side effects, short-circuit simplification does NOT apply.
+    ("I&&(65P)", "A", null),
+
+    // Pure statements in a sequence whose value is discarded should be dropped.
+    // In user-defined operator bodies variables start unknown, so the inner LoadVariable
+    // is not constant-folded away. It is removed only because its value is unused
+    // and it has no observable effects.
+    ("D[op||(L[x])(I)] {op}", "A", null),       // L[x] pure unused, drop it and keep I.
+    ("D[op||(L[x])(L[y])(I)] {op}", "A", null), // Multiple pure reads dropped
+    ("D[op||(L[x])(65P)] {op}", "", null),      // Pure read dropped, PrintChar kept
+    ("D[op||(L[x]/(1+1))(I)] {op}", "A", null),
+    ("D[op||(L[x]%(1+1))(I)] {op}", "A", null),
+
+    // Partial specialization with constant operands.
+    // A body with input cannot be fully precomputed, but constants can still be
+    // substituted so the smaller body can be inlined.
+    ("D[f|n|n*2+I] 5{f}", "A", null),           // Body becomes 10+I.
+    ("D[f|x,y|x+y] 10{f}I", "A", null),         // Body becomes 10 plus the second operand value.
+    ("D[g|a|a*a+I] 7{g}", "A", null),           // Body becomes 49+I.
+    ("D[h|a,b|(aP)(bP)] 65{h}I", "A", null),    // Body prints 65 then the second operand value.
+    // Constant operands with side effects keep their effects before the inlined body.
+    ("D[f|x|x+I] (65P){f}", "A", null),
+    ("D[f|x|x+I] (1S[a]){f}", "A", null),
+    // Calls with non-constant operands preserve operand evaluation order and single evaluation.
+    ("D[double|x|x+x] I{double}", "A", null),
+    ("D[add1|x|x+1] D[caller|y|(y+1){add1}] I{caller}", "A", null),
+    ("D[ignore|x|1] D[caller|y|(y+1){ignore}] I{caller}", "A", null),
+    ("D[double|x|x+x] D[caller|y|(y+1){double}] I{caller}", "A", null),
+    ("D[ignore|x|(66P)] (IP){ignore}", "A", null),
+    // Zero-operand calls can be inlined even when their body is not constant.
+    ("D[get||L] D[op||{get}] {get}", "", null),
+
+    // Specialized calls with input cannot be fully precomputed, but their exit-state
+    // deltas should still keep known variable and array writes visible to following
+    // operations.
+    ("D[setx|flag|{flag}?((5S[x])I)?((7S[y])I)] 1{setx} L[x]", "A", null),
+    ("D[setx|flag|{flag}?((5S[x])I)?((7S[y])I)] 0{setx} L[x]", "A", null),
+    ("D[setarr|flag|{flag}?((5->2)I)?((7->3)I)] 1{setarr} (2@)", "A", null),
+    ("D[setarr|flag|{flag}?((5->2)I)?((7->3)I)] 0{setarr} (2@)", "A", null),
+    ("D[setarr|i|((9->i)(5->2)I)] I{setarr} (2@)", "AB", null),
+    // Existing caller facts that are unrelated to the specialization delta should
+    // survive the delta application.
+    ("D[setx|flag|{flag}?((5S[x])I)?((7S[y])I)] (9S[z]) (1{setx}) L[z]", "A", null),
+    ("D[setarr|flag|{flag}?((5->2)I)?((7->3)I)] (9->4) (1{setarr}) (4)@", "A", null),
 };
 
 string outputPath = Path.GetFullPath(Path.Join(new[] { Assembly.GetExecutingAssembly().Location, "..", "..", "..", "..", "..", "Calc4DotNet.Test", "TestCases.cs" }));
