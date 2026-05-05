@@ -6,7 +6,6 @@ public interface IIOService
 {
     void PrintChar(char c);
     int GetChar();
-    IIOService Clone();
 }
 
 public sealed class TextReaderWriterIOService : IIOService
@@ -29,16 +28,6 @@ public sealed class TextReaderWriterIOService : IIOService
     {
         return reader.Read();
     }
-
-    public TextReaderWriterIOService Clone()
-    {
-        return this;
-    }
-
-    IIOService IIOService.Clone()
-    {
-        return Clone();
-    }
 }
 
 internal sealed class InputIsNotSupportedException : Exception
@@ -47,25 +36,16 @@ internal sealed class InputIsNotSupportedException : Exception
 public sealed class MemoryIOService : IIOService
 {
     private readonly string? input;
-    private readonly List<char> history;
+    private readonly List<char> history = [];
     private int nextInputIndex = 0;
 
     public MemoryIOService()
-        : this(null, new())
+        : this(null)
     { }
 
     public MemoryIOService(string? input)
-        : this(input, new())
-    { }
-
-    private MemoryIOService(List<char> history)
-        : this(null, history)
-    { }
-
-    public MemoryIOService(string? input, List<char> history)
     {
         this.input = input;
-        this.history = history;
     }
 
     public void PrintChar(char c)
@@ -94,15 +74,5 @@ public sealed class MemoryIOService : IIOService
     {
         Span<char> span = CollectionsMarshal.AsSpan(history);
         return span.ToString();
-    }
-
-    public MemoryIOService Clone()
-    {
-        return new MemoryIOService(input, new(history));
-    }
-
-    IIOService IIOService.Clone()
-    {
-        return Clone();
     }
 }

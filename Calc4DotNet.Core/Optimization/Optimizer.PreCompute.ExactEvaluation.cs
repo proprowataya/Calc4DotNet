@@ -12,18 +12,11 @@ public static partial class Optimizer
         where TNumber : INumber<TNumber>
     {
         private readonly PreComputeState<TNumber> initialState;
-        private readonly Dictionary<ValueBox<string>, TNumber> values;
+        private readonly Dictionary<ValueBox<string>, TNumber> values = [];
 
         public RecordingKnownVariableSource(PreComputeState<TNumber> initialState)
         {
             this.initialState = initialState;
-            values = [];
-        }
-
-        private RecordingKnownVariableSource(RecordingKnownVariableSource<TNumber> source)
-        {
-            initialState = source.initialState;
-            values = new(source.values);
         }
 
         public TNumber this[string? variableName]
@@ -70,34 +63,17 @@ public static partial class Optimizer
             return values.OrderBy(p => p.Key.Value)
                          .Select(p => KeyValuePair.Create(p.Key.Value, p.Value));
         }
-
-        public RecordingKnownVariableSource<TNumber> Clone()
-        {
-            return new RecordingKnownVariableSource<TNumber>(this);
-        }
-
-        IVariableSource<TNumber> IVariableSource<TNumber>.Clone()
-        {
-            return Clone();
-        }
     }
 
     private sealed class RecordingKnownArraySource<TNumber> : IArraySource<TNumber>
         where TNumber : INumber<TNumber>
     {
         private readonly PreComputeState<TNumber> initialState;
-        private readonly Dictionary<TNumber, TNumber> values;
+        private readonly Dictionary<TNumber, TNumber> values = [];
 
         public RecordingKnownArraySource(PreComputeState<TNumber> initialState)
         {
             this.initialState = initialState;
-            values = [];
-        }
-
-        private RecordingKnownArraySource(RecordingKnownArraySource<TNumber> source)
-        {
-            initialState = source.initialState;
-            values = new(source.values);
         }
 
         public TNumber this[TNumber index]
@@ -131,16 +107,6 @@ public static partial class Optimizer
         public IEnumerable<KeyValuePair<TNumber, TNumber>> EnumerateWrittenArrayValues()
         {
             return values.OrderBy(p => p.Key);
-        }
-
-        public RecordingKnownArraySource<TNumber> Clone()
-        {
-            return new RecordingKnownArraySource<TNumber>(this);
-        }
-
-        IArraySource<TNumber> IArraySource<TNumber>.Clone()
-        {
-            return Clone();
         }
     }
 }

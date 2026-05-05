@@ -14,24 +14,12 @@ public interface IVariableSource<TNumber>
     // Returns a snapshot of all observable non-zero variable values.
     // Zero-valued entries may be omitted and are interpreted as zero by optimizers.
     ImmutableDictionary<ValueBox<string>, TNumber> ToImmutableDictionary();
-
-    IVariableSource<TNumber> Clone();
 }
 
 public sealed class DefaultVariableSource<TNumber> : IVariableSource<TNumber>
     where TNumber : INumber<TNumber>
 {
-    private readonly Dictionary<ValueBox<string>, TNumber> variables;
-
-    public DefaultVariableSource()
-    {
-        this.variables = new Dictionary<ValueBox<string>, TNumber>();
-    }
-
-    private DefaultVariableSource(Dictionary<ValueBox<string>, TNumber> variables)
-    {
-        this.variables = variables;
-    }
+    private readonly Dictionary<ValueBox<string>, TNumber> variables = [];
 
     public TNumber this[string? variableName]
     {
@@ -51,15 +39,5 @@ public sealed class DefaultVariableSource<TNumber> : IVariableSource<TNumber>
         // name, so "bound to zero" and "never bound" are externally indistinguishable.
         // Drop zero entries so the snapshot reflects observable state only.
         return ImmutableDictionary.CreateRange(variables.Where(p => !TNumber.IsZero(p.Value)));
-    }
-
-    public DefaultVariableSource<TNumber> Clone()
-    {
-        return new DefaultVariableSource<TNumber>(new(variables));
-    }
-
-    IVariableSource<TNumber> IVariableSource<TNumber>.Clone()
-    {
-        return Clone();
     }
 }

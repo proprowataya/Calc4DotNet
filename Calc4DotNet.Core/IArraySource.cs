@@ -12,8 +12,6 @@ public interface IArraySource<TNumber>
     // Returns a snapshot of all observable non-zero array values.
     // Zero-valued entries may be omitted and are interpreted as zero by optimizers.
     ImmutableDictionary<TNumber, TNumber> ToImmutableDictionary();
-
-    IArraySource<TNumber> Clone();
 }
 
 public sealed class DefaultArraySource<TNumber> : IArraySource<TNumber>
@@ -22,18 +20,8 @@ public sealed class DefaultArraySource<TNumber> : IArraySource<TNumber>
     private const int ArrayLength = 2048;
     private static TNumber BaseOffset => TNumber.CreateTruncating(-1024);
 
-    private readonly TNumber[] array;
-    private Dictionary<TNumber, TNumber>? dictionary;   // [index] = value
-
-    public DefaultArraySource()
-        : this(new TNumber[ArrayLength], null)
-    { }
-
-    private DefaultArraySource(TNumber[] array, Dictionary<TNumber, TNumber>? dictionary)
-    {
-        this.array = array;
-        this.dictionary = dictionary;
-    }
+    private readonly TNumber[] array = new TNumber[ArrayLength];
+    private Dictionary<TNumber, TNumber>? dictionary = null;    // [index] = value
 
     public TNumber this[TNumber index]
     {
@@ -63,15 +51,10 @@ public sealed class DefaultArraySource<TNumber> : IArraySource<TNumber>
             }
             else
             {
-                dictionary ??= new();
+                dictionary ??= [];
                 dictionary[index] = value;
             }
         }
-    }
-
-    public DefaultArraySource<TNumber> Clone()
-    {
-        return new DefaultArraySource<TNumber>((TNumber[])array.Clone(), dictionary is not null ? new(dictionary) : null);
     }
 
     public ImmutableDictionary<TNumber, TNumber> ToImmutableDictionary()
@@ -105,11 +88,6 @@ public sealed class DefaultArraySource<TNumber> : IArraySource<TNumber>
         }
 
         return builder.ToImmutable();
-    }
-
-    IArraySource<TNumber> IArraySource<TNumber>.Clone()
-    {
-        return Clone();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -151,6 +129,4 @@ internal sealed class AlwaysThrowGlobalArraySource<TNumber> : IArraySource<TNumb
     {
         throw new ArrayElementNotSetException();
     }
-
-    public IArraySource<TNumber> Clone() => this;
 }
