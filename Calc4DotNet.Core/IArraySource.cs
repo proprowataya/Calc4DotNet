@@ -8,6 +8,11 @@ public interface IArraySource<TNumber>
     where TNumber : INumber<TNumber>
 {
     TNumber this[TNumber index] { get; set; }
+
+    // Returns a snapshot of all observable non-zero array values.
+    // Zero-valued entries may be omitted and are interpreted as zero by optimizers.
+    ImmutableDictionary<TNumber, TNumber> ToImmutableDictionary();
+
     IArraySource<TNumber> Clone();
 }
 
@@ -140,6 +145,11 @@ internal sealed class AlwaysThrowGlobalArraySource<TNumber> : IArraySource<TNumb
     {
         get => throw new ArrayElementNotSetException();
         set => throw new ArrayElementNotSetException();
+    }
+
+    public ImmutableDictionary<TNumber, TNumber> ToImmutableDictionary()
+    {
+        throw new ArrayElementNotSetException();
     }
 
     public IArraySource<TNumber> Clone() => this;

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Numerics;
 using Calc4DotNet.Core.Operators;
 
@@ -15,12 +16,17 @@ public enum OptimizeTarget
 
 public static partial class Optimizer
 {
-    private const int MaxPreEvaluationStep = 100;
+    private const int MaxPreEvaluationUserDefinedCalls = 100;
+
+    // Maximum node count for a partially specialized body that can be inlined at a call site.
+    // Setting this value too high can make the generated code much larger.
+    private const int MaxInlineSize = 32;
 
     public static void Optimize<TNumber>(ref IOperator op,
                                          ref CompilationContext context,
                                          OptimizeTarget target,
-                                         IVariableSource<TNumber>? initalVariableValues = null)
+                                         IVariableSource<TNumber>? initalVariableValues = null,
+                                         IArraySource<TNumber>? initialGlobalArray = null)
         where TNumber : INumber<TNumber>
     {
         if (target == OptimizeTarget.None)
@@ -30,6 +36,7 @@ public static partial class Optimizer
         }
 
         HashSet<string?> allVariableNames = GatherVariableNames(op, context);
+        ImmutableDictionary<string, PotentialEffects> effects = ComputePotentialEffects<TNumber>(context);
 
         if (target.HasFlag(OptimizeTarget.UserDefinedOperators))
         {
@@ -38,7 +45,7 @@ public static partial class Optimizer
             {
                 if (!implement.IsOptimized)
                 {
-                    OptimizeUserDefinedOperator<TNumber>(implement, ref context, allVariableNames);
+                    OptimizeUserDefinedOperator<TNumber>(implement, ref context, allVariableNames, effects);
                 }
             }
         }
@@ -46,31 +53,40 @@ public static partial class Optimizer
         if (target.HasFlag(OptimizeTarget.MainOperator))
         {
             // Optimize main operator
-            op = OptimizeCore<TNumber>(op, context, allVariableNames, initalVariableValues);
+            op = OptimizeCore<TNumber>(op, context, allVariableNames, initalVariableValues, initialGlobalArray, effects);
         }
     }
 
     private static void OptimizeUserDefinedOperator<TNumber>(OperatorImplement implement,
                                                              ref CompilationContext context,
-                                                             HashSet<string?> allVariableNames)
+                                                             HashSet<string?> allVariableNames,
+                                                             ImmutableDictionary<string, PotentialEffects> effects)
         where TNumber : INumber<TNumber>
     {
         Debug.Assert(!implement.IsOptimized);
 
         var op = implement.Operator;
         Debug.Assert(op is not null);
-        var newRoot = OptimizeCore<TNumber>(op, context, allVariableNames, initalVariableValues: null);
+        // User-defined operators are invoked in the middle of a program.
+        // Their caller's variable and array states are inherited and cannot be assumed.
+        var newRoot = OptimizeCore<TNumber>(op,
+                                            context,
+                                            allVariableNames,
+                                            initalVariableValues: null,
+                                            initialGlobalArray: null,
+                                            effects);
         context = context.WithAddOrUpdateOperatorImplement(implement with { Operator = newRoot, IsOptimized = true });
     }
 
     private static IOperator OptimizeCore<TNumber>(IOperator op,
                                                    CompilationContext context,
                                                    HashSet<string?> allVariableNames,
-                                                   IVariableSource<TNumber>? initalVariableValues)
+                                                   IVariableSource<TNumber>? initalVariableValues,
+                                                   IArraySource<TNumber>? initialGlobalArray,
+                                                   ImmutableDictionary<string, PotentialEffects> effects)
         where TNumber : INumber<TNumber>
     {
-        // Create a dictionary given to OptimizeTimeEvaluationState
-        Dictionary<ValueBox<string>, TNumber> dictionary = new();
+        var state = PreComputeState<TNumber>.Create(arraysZeroInitialized: initialGlobalArray is not null);
 
         if (initalVariableValues is not null)
         {
@@ -78,14 +94,28 @@ public static partial class Optimizer
             {
                 if (initalVariableValues.TryGet(variableName, out var value))
                 {
-                    dictionary[ValueBox.Create(variableName)] = value;
+                    state = state.SetVariable(variableName, value);
                 }
             }
         }
 
-        op = op.Accept(new PreComputeVisitor<TNumber>(context, MaxPreEvaluationStep),
-                       new OptimizeTimeEvaluationState<TNumber>(dictionary, allVariableNames));
+        if (initialGlobalArray is not null)
+        {
+            foreach (var (index, value) in initialGlobalArray.ToImmutableDictionary())
+            {
+                state = state.SetArrayValue(index, value);
+            }
+        }
+
+        // Evaluate expressions that can be resolved before execution.
+        var budget = new UserDefinedCallBudget(MaxPreEvaluationUserDefinedCalls);
+        var frame = new PreComputeFrame<TNumber>(state, budget, []);
+        var result = new PreComputeVisitor<TNumber>(context, effects, op).Evaluate(op, frame);
+        op = result.Operator;
+
+        // Mark calls that are in tail position for later execution.
         op = op.Accept(new TailCallVisitor(), /* isTailCall */ true);
+
         return op;
     }
 
@@ -117,7 +147,7 @@ public static partial class Optimizer
             }
         }
 
-        HashSet<string?> variables = new();
+        HashSet<string?> variables = [];
 
         // Process main operator
         Process(op, variables);

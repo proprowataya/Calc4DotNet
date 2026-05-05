@@ -192,6 +192,9 @@ internal struct CSharpSerializer
         Serialize(module.EntryPoint);
         WriteLine(",", insertIndent: false);
 
+        Serialize(module.EntryPointLocalCount);
+        WriteLine(",", insertIndent: false);
+
         Serialize(module.ConstTable);
         WriteLine(",", insertIndent: false);
 
@@ -304,6 +307,8 @@ internal struct CSharpSerializer
         Serialize(op.Operations);
         WriteLine(",", insertIndent: false);
         Serialize(op.MaxStackSize);
+        WriteLine(",", insertIndent: false);
+        Serialize(op.LocalCount);
         indent--;
         Write(")", insertIndent: false);
     }

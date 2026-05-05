@@ -22,6 +22,11 @@ public static partial class Optimizer
             return op;
         }
 
+        public IOperator Visit(LetVariableOperator op, bool isTailCall)
+        {
+            return op;
+        }
+
         public IOperator Visit(DefineOperator op, bool isTailCall)
         {
             return op;
@@ -92,6 +97,13 @@ public static partial class Optimizer
             var ifTrue = op.IfTrue.Accept(this, isTailCall);
             var ifFalse = op.IfFalse.Accept(this, isTailCall);
             return op with { Condition = condition, IfTrue = ifTrue, IfFalse = ifFalse };
+        }
+
+        public IOperator Visit(LetOperator op, bool isTailCall)
+        {
+            var value = op.Value.Accept(this, false);
+            var body = op.Body.Accept(this, isTailCall);
+            return op with { Value = value, Body = body };
         }
 
         public IOperator Visit(UserDefinedOperator op, bool isTailCall)

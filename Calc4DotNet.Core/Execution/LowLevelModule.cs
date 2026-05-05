@@ -9,23 +9,26 @@ public sealed class LowLevelModule<TNumber>
     where TNumber : INumber<TNumber>
 {
     public ImmutableArray<LowLevelOperation> EntryPoint { get; }
+    public int EntryPointLocalCount { get; }
     public ImmutableArray<TNumber> ConstTable { get; }
     public ImmutableArray<LowLevelUserDefinedOperator> UserDefinedOperators { get; }
     public ImmutableArray<string?> Variables { get; }
 
-    public LowLevelModule(ImmutableArray<LowLevelOperation> entryPoint, ImmutableArray<TNumber> constTable, ImmutableArray<LowLevelUserDefinedOperator> userDefinedOperators, ImmutableArray<string?> variables)
+    public LowLevelModule(ImmutableArray<LowLevelOperation> entryPoint, int entryPointLocalCount, ImmutableArray<TNumber> constTable, ImmutableArray<LowLevelUserDefinedOperator> userDefinedOperators, ImmutableArray<string?> variables)
     {
         EntryPoint = entryPoint;
+        EntryPointLocalCount = entryPointLocalCount;
         ConstTable = constTable;
         UserDefinedOperators = userDefinedOperators;
         Variables = variables;
     }
 
-    public (LowLevelOperation[] Operations, int[] MaxStackSizes) FlattenOperations()
+    public (LowLevelOperation[] Operations, int[] MaxStackSizes, int[] LocalFrameSizes) FlattenOperations()
     {
         int totalNumOperations = EntryPoint.Length + UserDefinedOperators.Sum(t => t.Operations.Length);
         LowLevelOperation[] result = new LowLevelOperation[totalNumOperations];
         int[] maxStackSizes = new int[totalNumOperations];
+        int[] localFrameSizes = new int[totalNumOperations];
         int[] startAddresses = new int[UserDefinedOperators.Length];
 
         int index = 0;
@@ -79,13 +82,14 @@ public sealed class LowLevelModule<TNumber>
                     int operatorNo = result[i].Value;
                     result[i] = new LowLevelOperation(result[i].Opcode, startAddresses[operatorNo] - 1);
                     maxStackSizes[result[i].Value] = UserDefinedOperators[operatorNo].MaxStackSize;
+                    localFrameSizes[result[i].Value] = UserDefinedOperators[operatorNo].LocalCount;
                     break;
                 default:
                     break;
             }
         }
 
-        return (result, maxStackSizes);
+        return (result, maxStackSizes, localFrameSizes);
     }
 
     public void Serialize(Stream stream)

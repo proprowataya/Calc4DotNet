@@ -59,6 +59,21 @@ public sealed record ArgumentOperator(int Index, string? SupplementaryText = nul
     public override string ToString() => this.ToStringImplement();
 }
 
+public sealed record LetVariableOperator(int LocalIndex, string? SupplementaryText = null) : IOperator
+{
+    public IOperator[] GetOperands() => [];
+    public (string Name, object? Value)[] GetProperties() =>
+    [
+        (nameof(SupplementaryText), SupplementaryText),
+        (nameof(LocalIndex), LocalIndex),
+    ];
+
+    public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+    public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+    public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+    public override string ToString() => this.ToStringImplement();
+}
+
 public sealed record DefineOperator(string? SupplementaryText = null) : IOperator
 {
     public IOperator[] GetOperands() => [];
@@ -235,6 +250,21 @@ public sealed record ConditionalOperator(IOperator Condition, IOperator IfTrue, 
     public (string Name, object? Value)[] GetProperties() =>
     [
         (nameof(SupplementaryText), SupplementaryText),
+    ];
+
+    public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);
+    public TResult Accept<TResult>(IOperatorVisitor<TResult> visitor) => visitor.Visit(this);
+    public TResult Accept<TResult, TParam>(IOperatorVisitor<TResult, TParam> visitor, TParam param) => visitor.Visit(this, param);
+    public override string ToString() => this.ToStringImplement();
+}
+
+public sealed record LetOperator(int LocalIndex, IOperator Value, IOperator Body, string? SupplementaryText = null) : IOperator
+{
+    public IOperator[] GetOperands() => [Value, Body];
+    public (string Name, object? Value)[] GetProperties() =>
+    [
+        (nameof(SupplementaryText), SupplementaryText),
+        (nameof(LocalIndex), LocalIndex),
     ];
 
     public void Accept(IOperatorVisitor visitor) => visitor.Visit(this);

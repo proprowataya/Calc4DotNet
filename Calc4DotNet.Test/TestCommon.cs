@@ -27,7 +27,11 @@ internal static class TestCommon
         IOperator op = Parser.Parse(tokens, ref context);
         if (target is not null)
         {
-            Optimizer.Optimize<TNumber>(ref op, ref context, target.GetValueOrDefault(), new DefaultVariableSource<TNumber>());
+            Optimizer.Optimize<TNumber>(ref op,
+                                        ref context,
+                                        target.GetValueOrDefault(),
+                                        new DefaultVariableSource<TNumber>(),
+                                        new DefaultArraySource<TNumber>());
         }
         LowLevelModule<TNumber> module = LowLevelCodeGenerator.Generate<TNumber>(op, context, LowLevelCodeGenerationOption.Default);
 

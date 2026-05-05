@@ -26,6 +26,7 @@ public static class Evaluator
         private readonly CompilationContext compilationContext;
         private readonly IEvaluationState<TNumber> evaluationState;
         private readonly int maxStep = 0;
+        private readonly Stack<Dictionary<int, TNumber>> letFrames = [];
         private int step;
 
         public Visitor(CompilationContext compilationContext, IEvaluationState<TNumber> evaluationState, int maxStep)
@@ -33,6 +34,7 @@ public static class Evaluator
             this.compilationContext = compilationContext;
             this.evaluationState = evaluationState;
             this.maxStep = maxStep;
+            letFrames.Push([]);
         }
 
         /* ******************** */
@@ -48,6 +50,16 @@ public static class Evaluator
             if (arguments is null)
                 throw new EvaluationArgumentNotSetException();
             return arguments[op.Index];
+        }
+
+        public TNumber Visit(LetVariableOperator op, TNumber[]? arguments)
+        {
+            if (letFrames.Peek().TryGetValue(op.LocalIndex, out var value))
+            {
+                return value;
+            }
+
+            throw new EvaluationArgumentNotSetException();
         }
 
         public TNumber Visit(DefineOperator op, TNumber[]? arguments)
@@ -162,6 +174,31 @@ public static class Evaluator
             return !TNumber.IsZero(condition) ? op.IfTrue.Accept(this, arguments) : op.IfFalse.Accept(this, arguments);
         }
 
+        public TNumber Visit(LetOperator op, TNumber[]? arguments)
+        {
+            TNumber value = op.Value.Accept(this, arguments);
+            Dictionary<int, TNumber> frame = letFrames.Peek();
+            bool hadPrevious = frame.TryGetValue(op.LocalIndex, out var previous);
+            frame[op.LocalIndex] = value;
+
+            try
+            {
+                return op.Body.Accept(this, arguments);
+            }
+            finally
+            {
+                if (hadPrevious)
+                {
+                    Debug.Assert(previous is not null);
+                    frame[op.LocalIndex] = previous;
+                }
+                else
+                {
+                    frame.Remove(op.LocalIndex);
+                }
+            }
+        }
+
         public TNumber Visit(UserDefinedOperator op, TNumber[]? arguments)
         {
             if (++step > maxStep)
@@ -178,7 +215,15 @@ public static class Evaluator
 
             var userDefinedOperatorBody = compilationContext.LookupOperatorImplement(op.Definition.Name).Operator;
             Debug.Assert(userDefinedOperatorBody is not null);
-            return userDefinedOperatorBody.Accept(this, stack);
+            letFrames.Push([]);
+            try
+            {
+                return userDefinedOperatorBody.Accept(this, stack);
+            }
+            finally
+            {
+                letFrames.Pop();
+            }
         }
     }
 }

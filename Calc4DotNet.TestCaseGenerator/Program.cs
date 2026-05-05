@@ -216,7 +216,11 @@ static TestCase GenerateTestCase(string source, string standardInput, Type[]? sk
 
     CompilationResult<Int32> expectedWhenNotOptimized = new(op, context, LowLevelCodeGenerator.Generate<Int32>(op, context, LowLevelCodeGenerationOption.Default));
 
-    Optimizer.Optimize<int>(ref op, ref context, OptimizeTarget.All, new DefaultVariableSource<Int32>());
+    Optimizer.Optimize<int>(ref op,
+                            ref context,
+                            OptimizeTarget.All,
+                            new DefaultVariableSource<Int32>(),
+                            new DefaultArraySource<Int32>());
     CompilationResult<Int32> expectedWhenOptimized = new(op, context, LowLevelCodeGenerator.Generate<Int32>(op, context, LowLevelCodeGenerationOption.Default));
 
     return new TestCase(source,

@@ -44,7 +44,7 @@ internal abstract class Calc4Base<TNumber>
             // Optimize
             if (setting.Optimize)
             {
-                Optimizer.Optimize<TNumber>(ref op, ref context, OptimizeTarget.All, state.Variables);
+                Optimizer.Optimize<TNumber>(ref op, ref context, OptimizeTarget.All, state.Variables, state.GlobalArray);
             }
 
             // Generate low-level code and IL module

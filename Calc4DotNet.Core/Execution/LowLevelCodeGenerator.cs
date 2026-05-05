@@ -34,23 +34,29 @@ public static class LowLevelCodeGenerator
             {
                 throw new InvalidOperationException($"Stacksize is not zero: {visitor.StackSize}");
             }
-            userDefinedOperators.Add(new LowLevelUserDefinedOperator(implement.Definition, visitor.Operations.ToImmutableArray(), visitor.MaxStackSize));
+            userDefinedOperators.Add(new LowLevelUserDefinedOperator(implement.Definition,
+                                                                     visitor.Operations.ToImmutableArray(),
+                                                                     visitor.MaxStackSize,
+                                                                     visitor.LocalCount));
         }
 
         // Generate Main code
         ImmutableArray<LowLevelOperation> entryPoint;
+        int entryPointLocalCount;
         {
             var visitor = new Visitor<TNumber>(context, option, constTable, operatorLabels, null, variableIndices);
             visitor.Generate(op);
             entryPoint = visitor.Operations.ToImmutableArray();
+            entryPointLocalCount = visitor.LocalCount;
         }
 
         // Assert all variable indicies are consecutive
         Debug.Assert(variableIndices.Select(pair => pair.Value).Order().SequenceEqual(Enumerable.Range(0, variableIndices.Count)));
 
         return new LowLevelModule<TNumber>(entryPoint,
+                                           entryPointLocalCount,
                                            constTable.ToImmutableArray(),
-                                           userDefinedOperators.ToImmutable(),
+                                           userDefinedOperators.DrainToImmutable(),
                                            variableIndices.OrderBy(pair => pair.Value).Select(pair => pair.Key.Value).ToImmutableArray());
     }
 
@@ -65,6 +71,7 @@ public static class LowLevelCodeGenerator
         private readonly Dictionary<OperatorDefinition, int> operatorLabels;
         private readonly OperatorDefinition? definition;
         private readonly Dictionary<ValueBox<string>, int> variableIndices;
+        private readonly Dictionary<int, int> localIndices = [];
 
         private List<LowLevelOperation> list = new List<LowLevelOperation>();
         private int nextLabel = OperatorBeginLabel;
@@ -89,6 +96,8 @@ public static class LowLevelCodeGenerator
         }
 
         public int MaxStackSize => maxStackSize;
+
+        public int LocalCount => localIndices.Count;
 
         public Visitor(CompilationContext context, LowLevelCodeGenerationOption option, List<TNumber> constTable, Dictionary<OperatorDefinition, int> operatorLabels, OperatorDefinition? definition, Dictionary<ValueBox<string>, int> variableIndices)
         {
@@ -238,12 +247,14 @@ public static class LowLevelCodeGenerator
                 case Opcode.LoadConst:
                 case Opcode.LoadConstTable:
                 case Opcode.LoadArg:
+                case Opcode.LoadLocal:
                 case Opcode.LoadVariable:
                 case Opcode.Input:
                     StackSize++;
                     break;
                 case Opcode.Pop:
                 case Opcode.StoreArg:
+                case Opcode.StoreLocal:
                 case Opcode.StoreArrayElement:
                 case Opcode.Add:
                 case Opcode.Sub:
@@ -313,6 +324,11 @@ public static class LowLevelCodeGenerator
         {
             Debug.Assert(definition is not null);
             AddOperation(new LowLevelOperation(Opcode.LoadArg, GetArgumentAddress(definition.NumOperands, op.Index)));
+        }
+
+        public void Visit(LetVariableOperator op)
+        {
+            AddOperation(new LowLevelOperation(Opcode.LoadLocal, GetOrCreateLocalIndex(op.LocalIndex)));
         }
 
         public void Visit(DefineOperator op)
@@ -592,6 +608,14 @@ public static class LowLevelCodeGenerator
             AddOperation(new LowLevelOperation(Opcode.Lavel, endLabel));
         }
 
+        public void Visit(LetOperator op)
+        {
+            int localIndex = GetOrCreateLocalIndex(op.LocalIndex);
+            op.Value.Accept(this);
+            AddOperation(new LowLevelOperation(Opcode.StoreLocal, localIndex));
+            op.Body.Accept(this);
+        }
+
         public void Visit(UserDefinedOperator op)
         {
             for (int i = 0; i < op.Operands.Length; i++)
@@ -638,6 +662,18 @@ public static class LowLevelCodeGenerator
                 variableIndices[ValueBox.Create(variableName)] = index;
                 return index;
             }
+        }
+
+        private int GetOrCreateLocalIndex(int localIndex)
+        {
+            if (localIndices.TryGetValue(localIndex, out var index))
+            {
+                return index;
+            }
+
+            index = localIndices.Count;
+            localIndices[localIndex] = index;
+            return index;
         }
 
         private static int GetArgumentAddress(int numOperands, int index) => numOperands - index;

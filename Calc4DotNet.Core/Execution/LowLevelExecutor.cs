@@ -39,21 +39,24 @@ public static class LowLevelExecutor
     private static TNumber ExecuteCore<TNumber>(LowLevelModule<TNumber> module, TNumber[] variables, DefaultArraySource<TNumber> array, IIOService ioService)
         where TNumber : INumber<TNumber>
     {
-        var (operationsArray, maxStackSizesArray) = module.FlattenOperations();
+        var (operationsArray, maxStackSizesArray, localFrameSizesArray) = module.FlattenOperations();
         Span<LowLevelOperation> operations = stackalloc LowLevelOperation[operationsArray.Length];
         Span<int> maxStackSizes = stackalloc int[maxStackSizesArray.Length];
+        Span<int> localFrameSizes = stackalloc int[localFrameSizesArray.Length];
         operationsArray.AsSpan().CopyTo(operations);
         maxStackSizesArray.AsSpan().CopyTo(maxStackSizes);
+        localFrameSizesArray.AsSpan().CopyTo(localFrameSizes);
         ref LowLevelOperation firstOperation = ref operations[0];
         ref int firstStackSizes = ref maxStackSizes[0];
+        ref int firstLocalFrameSizes = ref localFrameSizes[0];
 
         TNumber[] stack = new TNumber[StackSize];
         int[] ptrStack = new int[PtrStackSize];
-        ref TNumber top = ref stack[0];
-        ref TNumber bottom = ref stack[0];
-        ref int ptrTop = ref ptrStack[0];
         ref TNumber stackBegin = ref stack[0];
         ref TNumber stackEnd = ref stack[^1];
+        ref TNumber top = ref Unsafe.Add(ref stackBegin, module.EntryPointLocalCount);
+        ref TNumber bottom = ref stackBegin;
+        ref int ptrTop = ref ptrStack[0];
         ref int ptrStackEnd = ref ptrStack[^1];
         ref TNumber firstVariable = ref (variables.Length > 0 ? ref variables[0] : ref Unsafe.NullRef<TNumber>());
         ref LowLevelOperation op = ref firstOperation;
@@ -92,6 +95,18 @@ public static class LowLevelExecutor
                     VerifyRange(stack, ref top);
                     VerifyRange(stack, ref Unsafe.Add(ref bottom, -op.Value));
                     Unsafe.Add(ref bottom, -op.Value) = top;
+                    break;
+                case Opcode.LoadLocal:
+                    VerifyRange(stack, ref Unsafe.Add(ref bottom, op.Value));
+                    VerifyRange(stack, ref top);
+                    top = Unsafe.Add(ref bottom, op.Value);
+                    top = ref Unsafe.Add(ref top, 1);
+                    break;
+                case Opcode.StoreLocal:
+                    top = ref Unsafe.Add(ref top, -1);
+                    VerifyRange(stack, ref top);
+                    VerifyRange(stack, ref Unsafe.Add(ref bottom, op.Value));
+                    Unsafe.Add(ref bottom, op.Value) = top;
                     break;
                 case Opcode.LoadVariable:
                     VerifyRange(variables, ref Unsafe.Add(ref firstVariable, op.Value));
@@ -249,8 +264,11 @@ public static class LowLevelExecutor
                 case Opcode.Call:
                     // Check stack overflow
                     VerifyRange(maxStackSizes, ref Unsafe.Add(ref firstStackSizes, op.Value));
-                    if (Unsafe.IsAddressGreaterThan(ref Unsafe.Add(ref top, Unsafe.Add(ref firstStackSizes, op.Value)),
-                                                    ref stackEnd))
+                    VerifyRange(localFrameSizes, ref Unsafe.Add(ref firstLocalFrameSizes, op.Value));
+
+                    int frameSize = Unsafe.Add(ref firstLocalFrameSizes, op.Value)
+                                  + Unsafe.Add(ref firstStackSizes, op.Value);
+                    if (Unsafe.IsAddressGreaterThan(ref Unsafe.Add(ref top, frameSize), ref stackEnd))
                     {
                         ThrowStackOverflowException();
                     }
@@ -272,6 +290,7 @@ public static class LowLevelExecutor
 
                     // Create new stack frame
                     bottom = ref top;
+                    top = ref Unsafe.Add(ref bottom, Unsafe.Add(ref firstLocalFrameSizes, op.Value));
 
                     // Branch
                     op = ref Unsafe.Add(ref firstOperation, op.Value);
