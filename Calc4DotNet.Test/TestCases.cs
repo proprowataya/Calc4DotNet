@@ -12711,7 +12711,7 @@ internal static class TestCases
                             }.ToImmutableArray()
                         )
                 ),
-            SkipTypes: new[] { typeof(Double) }
+            SkipTypes: null
         ),
         new TestCase(
             Source: "D[tarai|x,y,z|x <= y ? y ? (((x - 1){tarai}y{tarai}z){tarai}((y - 1){tarai}z{tarai}x){tarai}((z - 1){tarai}x{tarai}y))] 10{tarai}5{tarai}5",
