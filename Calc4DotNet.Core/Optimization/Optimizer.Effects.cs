@@ -297,9 +297,6 @@ public static partial class Optimizer
                 break;
         }
 
-        foreach (var operand in op.GetOperands())
-        {
-            CollectEffectsFromTree<TNumber>(operand, effects, collectUserDefined);
-        }
+        op.ForEachOperand(operand => CollectEffectsFromTree<TNumber>(operand, effects, collectUserDefined));
     }
 }

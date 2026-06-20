@@ -693,15 +693,16 @@ public static partial class Optimizer
                 }
             }
 
-            foreach (var operand in op.GetOperands())
+            bool contains = false;
+            op.ForEachOperand(operand =>
             {
-                if (ContainsUnresolvedArgument(operand))
+                if (!contains && ContainsUnresolvedArgument(operand))
                 {
-                    return true;
+                    contains = true;
                 }
-            }
+            });
 
-            return false;
+            return contains;
         }
 
         private static string BuildSpecializationKey(string operatorName, ImmutableDictionary<int, TNumber>.Builder bindings)

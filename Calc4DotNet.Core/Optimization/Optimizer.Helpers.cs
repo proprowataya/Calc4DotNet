@@ -115,7 +115,6 @@ public static partial class Optimizer
     private static int CountNodes(IOperator op)
     {
         int count = 1;
-
         if (op is ParenthesisOperator parenthesis)
         {
             foreach (var inner in parenthesis.Operators)
@@ -124,10 +123,7 @@ public static partial class Optimizer
             }
         }
 
-        foreach (var operand in op.GetOperands())
-        {
-            count += CountNodes(operand);
-        }
+        op.ForEachOperand(operand => count += CountNodes(operand));
 
         return count;
     }
@@ -164,10 +160,7 @@ public static partial class Optimizer
             }
         }
 
-        foreach (var operand in op.GetOperands())
-        {
-            nextIndex = Math.Max(nextIndex, FindNextLetLocalIndex(operand));
-        }
+        op.ForEachOperand(operand => nextIndex = Math.Max(nextIndex, FindNextLetLocalIndex(operand)));
 
         return nextIndex;
     }
@@ -250,10 +243,7 @@ public static partial class Optimizer
             }
         }
 
-        foreach (var operand in op.GetOperands())
-        {
-            CountLetVariableReferences(operand, localIndices, counts);
-        }
+        op.ForEachOperand(operand => CountLetVariableReferences(operand, localIndices, counts));
     }
 
     private static IOperator RewriteChildren<TState>(IOperator op, TState state, Func<IOperator, TState, IOperator> rewrite)

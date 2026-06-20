@@ -123,10 +123,7 @@ public static partial class Optimizer
     {
         static void Process(IOperator op, HashSet<string?> variables)
         {
-            foreach (var operand in op.GetOperands())
-            {
-                Process(operand, variables);
-            }
+            op.ForEachOperand(operand => Process(operand, variables));
 
             switch (op)
             {
