@@ -6,6 +6,7 @@ public interface IIOService
 {
     void PrintChar(char c);
     int GetChar();
+    bool TryGetChar(out int c);
 }
 
 public sealed class TextReaderWriterIOService : IIOService
@@ -27,6 +28,12 @@ public sealed class TextReaderWriterIOService : IIOService
     public int GetChar()
     {
         return reader.Read();
+    }
+
+    public bool TryGetChar(out int c)
+    {
+        c = reader.Read();
+        return true;
     }
 }
 
@@ -68,6 +75,18 @@ public sealed class MemoryIOService : IIOService
         }
 
         return -1;
+    }
+
+    public bool TryGetChar(out int c)
+    {
+        if (input is null)
+        {
+            c = 0;
+            return false;
+        }
+
+        c = GetChar();
+        return true;
     }
 
     public string GetHistory()

@@ -80,12 +80,7 @@ public static partial class Optimizer
         {
             get
             {
-                if (values.TryGetValue(index, out var value))
-                {
-                    return value;
-                }
-
-                if (initialState.TryGetArrayValue(index, out value))
+                if (TryGet(index, out var value))
                 {
                     return value;
                 }
@@ -97,6 +92,23 @@ public static partial class Optimizer
             {
                 values[index] = value;
             }
+        }
+
+        public bool TryGet(TNumber index, out TNumber value)
+        {
+            if (values.TryGetValue(index, out var foundValue))
+            {
+                value = foundValue;
+                return true;
+            }
+
+            return initialState.TryGetArrayValue(index, out value);
+        }
+
+        public bool TrySet(TNumber index, TNumber value)
+        {
+            values[index] = value;
+            return true;
         }
 
         public ImmutableDictionary<TNumber, TNumber> ToImmutableDictionary()

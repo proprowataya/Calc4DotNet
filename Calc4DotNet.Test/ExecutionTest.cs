@@ -4,6 +4,7 @@ using Calc4DotNet.Core;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Execution;
 using Calc4DotNet.Core.ILCompilation;
+using Calc4DotNet.Core.Operators;
 using Calc4DotNet.Core.Optimization;
 using Calc4DotNet.Core.SyntaxAnalysis;
 using Xunit;
@@ -180,5 +181,106 @@ public class ExecutionTest
                                                      new MemoryIOService());
 
         Assert.Equal(123, LowLevelExecutor.Execute(module, state));
+    }
+
+    [Fact]
+    public static void TryEvaluateReturnsFalseForPreEvaluationFailures()
+    {
+        var state = new SimpleEvaluationState<Int32>(new UnknownVariableSource<Int32>(),
+                                                     new UnknownArraySource<Int32>(),
+                                                     new MemoryIOService());
+        var context = CompilationContext.Empty;
+
+        Assert.False(Evaluator.TryEvaluate<Int32>(new LoadVariableOperator("x"), context, state, 100, out _));
+        Assert.False(Evaluator.TryEvaluate<Int32>(new LoadArrayOperator(new PreComputedOperator(0)), context, state, 100, out _));
+        Assert.False(Evaluator.TryEvaluate<Int32>(new InputOperator(), context, state, 100, out _));
+        Assert.False(Evaluator.TryEvaluate<Int32>(new BinaryOperator(new PreComputedOperator(1),
+                                                                     new PreComputedOperator(0),
+                                                                     BinaryType.Div),
+                                                  context,
+                                                  state,
+                                                  100,
+                                                  out _));
+    }
+
+    [Fact]
+    public static void TryEvaluateKeepsSuccessfulEvaluationBehavior()
+    {
+        var variables = new DefaultVariableSource<Int32>();
+        var ioService = new MemoryIOService("A");
+        var state = new SimpleEvaluationState<Int32>(variables,
+                                                     new DefaultArraySource<Int32>(),
+                                                     ioService);
+        IOperator op = new ParenthesisOperator(
+        [
+            new PrintCharOperator(new InputOperator()),
+            new StoreVariableOperator(new PreComputedOperator(42), "x"),
+            new LoadVariableOperator("x"),
+        ]);
+
+        Assert.True(Evaluator.TryEvaluate<Int32>(op, CompilationContext.Empty, state, 100, out var value));
+        Assert.Equal(42, value);
+        Assert.Equal(42, variables["x"]);
+        Assert.Equal("A", ioService.GetHistory());
+    }
+
+    [Fact]
+    public static void EvaluateThrowsVariableNotSetExceptionForUnknownVariable()
+    {
+        var state = new SimpleEvaluationState<Int32>(new UnknownVariableSource<Int32>(),
+                                                     new DefaultArraySource<Int32>(),
+                                                     new MemoryIOService());
+
+        Assert.Throws<EvaluationVariableNotSetException>(
+            () => Evaluator.Evaluate<Int32>(new LoadVariableOperator("x"),
+                                            CompilationContext.Empty,
+                                            state));
+    }
+
+    private sealed class UnknownVariableSource<TNumber> : IVariableSource<TNumber>
+        where TNumber : INumber<TNumber>
+    {
+        public TNumber this[string? variableName]
+        {
+            get => throw new InvalidOperationException();
+            set => throw new InvalidOperationException();
+        }
+
+        public bool TryGet(string? variableName, out TNumber value)
+        {
+            value = TNumber.Zero;
+            return false;
+        }
+
+        public ImmutableDictionary<ValueBox<string>, TNumber> ToImmutableDictionary()
+        {
+            return [];
+        }
+    }
+
+    private sealed class UnknownArraySource<TNumber> : IArraySource<TNumber>
+        where TNumber : INumber<TNumber>
+    {
+        public TNumber this[TNumber index]
+        {
+            get => throw new InvalidOperationException();
+            set => throw new InvalidOperationException();
+        }
+
+        public bool TryGet(TNumber index, out TNumber value)
+        {
+            value = TNumber.Zero;
+            return false;
+        }
+
+        public bool TrySet(TNumber index, TNumber value)
+        {
+            return false;
+        }
+
+        public ImmutableDictionary<TNumber, TNumber> ToImmutableDictionary()
+        {
+            return [];
+        }
     }
 }

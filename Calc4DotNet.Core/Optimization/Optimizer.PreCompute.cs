@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Text;
 using Calc4DotNet.Core.Evaluation;
-using Calc4DotNet.Core.Exceptions;
 using Calc4DotNet.Core.Operators;
 
 namespace Calc4DotNet.Core.Optimization;
@@ -731,35 +730,16 @@ public static partial class Optimizer
             var arraySource = new RecordingKnownArraySource<TNumber>(frame.State);
             var ioService = new MemoryIOService();
 
-            try
+            if (Evaluator.TryEvaluate(op,
+                                      compilationContext,
+                                      new SimpleEvaluationState<TNumber>(variableSource,
+                                                                         arraySource,
+                                                                         ioService),
+                                      frame.Budget.RemainingUserDefinedCalls,
+                                      out var value))
             {
-                var value = Evaluator.Evaluate(op,
-                                               compilationContext,
-                                               new SimpleEvaluationState<TNumber>(variableSource,
-                                                                                  arraySource,
-                                                                                  ioService),
-                                               frame.Budget.RemainingUserDefinedCalls);
-
                 result = CreateExactEvaluationResult(frame.State, variableSource, arraySource, ioService.GetHistory(), value);
                 return true;
-            }
-            catch (EvaluationStepLimitExceedException)
-            {
-            }
-            catch (UnknownVariableValueException)
-            {
-            }
-            catch (ArrayElementNotSetException)
-            {
-            }
-            catch (EvaluationArgumentNotSetException)
-            {
-            }
-            catch (InputIsNotSupportedException)
-            {
-            }
-            catch (ZeroDivisionException)
-            {
             }
 
             result = null;

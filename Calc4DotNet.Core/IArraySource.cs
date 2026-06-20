@@ -9,6 +9,9 @@ public interface IArraySource<TNumber>
 {
     TNumber this[TNumber index] { get; set; }
 
+    bool TryGet(TNumber index, out TNumber value);
+    bool TrySet(TNumber index, TNumber value);
+
     // Returns a snapshot of all observable non-zero array values.
     // Zero-valued entries may be omitted and are interpreted as zero by optimizers.
     ImmutableDictionary<TNumber, TNumber> ToImmutableDictionary();
@@ -55,6 +58,18 @@ public sealed class DefaultArraySource<TNumber> : IArraySource<TNumber>
                 dictionary[index] = value;
             }
         }
+    }
+
+    public bool TryGet(TNumber index, out TNumber value)
+    {
+        value = this[index];
+        return true;
+    }
+
+    public bool TrySet(TNumber index, TNumber value)
+    {
+        this[index] = value;
+        return true;
     }
 
     public ImmutableDictionary<TNumber, TNumber> ToImmutableDictionary()
@@ -123,6 +138,17 @@ internal sealed class AlwaysThrowGlobalArraySource<TNumber> : IArraySource<TNumb
     {
         get => throw new ArrayElementNotSetException();
         set => throw new ArrayElementNotSetException();
+    }
+
+    public bool TryGet(TNumber index, out TNumber value)
+    {
+        value = TNumber.Zero;
+        return false;
+    }
+
+    public bool TrySet(TNumber index, TNumber value)
+    {
+        return false;
     }
 
     public ImmutableDictionary<TNumber, TNumber> ToImmutableDictionary()
