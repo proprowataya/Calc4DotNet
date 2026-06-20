@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using System.Text;
+using System.Runtime.CompilerServices;
 using Calc4DotNet.Core.Evaluation;
 using Calc4DotNet.Core.Operators;
 
@@ -10,16 +10,91 @@ namespace Calc4DotNet.Core.Optimization;
 
 public static partial class Optimizer
 {
+    private sealed class PreComputeSession<TNumber>
+        where TNumber : INumber<TNumber>
+    {
+        public Dictionary<SpecializationCacheKey<TNumber>, SpecializationCacheEntry<TNumber>?> SpecializationCache { get; } = [];
+        public Dictionary<SpecializationCacheKey<TNumber>, LetInlineCacheEntry<TNumber>> LetInlineCache { get; } = [];
+        public Dictionary<IOperator, ImmutableArray<int>> ExistingLetLocalIndicesCache { get; } = new(ReferenceEqualityComparer.Instance);
+    }
+
+    private readonly record struct SpecializationBinding<TNumber>(int Index, TNumber Value)
+        where TNumber : INumber<TNumber>;
+
+    private sealed record SpecializationCacheEntry<TNumber>(SpecializationResult<TNumber> Specialization,
+                                                            ImmutableArray<int> GeneratedLocalIndices)
+        where TNumber : INumber<TNumber>;
+
+    private sealed record LetInlineCacheEntry<TNumber>(SpecializationResult<TNumber> Specialization,
+                                                       ImmutableDictionary<int, int> UsageCounts,
+                                                       ImmutableArray<int> GeneratedLocalIndices)
+        where TNumber : INumber<TNumber>;
+
+    private readonly struct SpecializationCacheKey<TNumber> : IEquatable<SpecializationCacheKey<TNumber>>
+        where TNumber : INumber<TNumber>
+    {
+        private readonly string operatorName;
+        private readonly IOperator operatorBody;
+        private readonly ImmutableArray<SpecializationBinding<TNumber>> bindings;
+        private readonly int hashCode;
+
+        public SpecializationCacheKey(string operatorName,
+                                      IOperator operatorBody,
+                                      ImmutableArray<SpecializationBinding<TNumber>> bindings)
+        {
+            this.operatorName = operatorName;
+            this.operatorBody = operatorBody;
+            this.bindings = bindings;
+
+            HashCode hash = new();
+            hash.Add(operatorName);
+            hash.Add(RuntimeHelpers.GetHashCode(operatorBody));
+            foreach (var binding in bindings)
+            {
+                hash.Add(binding);
+            }
+
+            hashCode = hash.ToHashCode();
+        }
+
+        public bool Equals(SpecializationCacheKey<TNumber> other)
+        {
+            if (operatorName != other.operatorName
+                || !ReferenceEquals(operatorBody, other.operatorBody)
+                || bindings.Length != other.bindings.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < bindings.Length; i++)
+            {
+                if (!bindings[i].Equals(other.bindings[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is SpecializationCacheKey<TNumber> other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return hashCode;
+        }
+    }
+
     private sealed class PreComputeVisitor<TNumber> : IOperatorVisitor<PartialEvaluationResult<TNumber>, PreComputeFrame<TNumber>>
         where TNumber : INumber<TNumber>
     {
         private const int NoTemporaryLetLocalIndex = 0;
         private readonly CompilationContext compilationContext;
         private readonly ImmutableDictionary<string, PotentialEffects> effectsByOperators;
-
-        // Cache keyed by (operator name, serialized constant-argument bindings).
-        // A null cached value means specialization was attempted but proved non-inlinable.
-        private readonly Dictionary<string, SpecializationResult<TNumber>?> specializationCache = [];
+        private readonly PreComputeSession<TNumber> session;
 
         // Names of operators currently being specialized. Used to break infinite chains
         // when a recursive operator's body calls itself with a different binding pattern.
@@ -29,14 +104,19 @@ public static partial class Optimizer
         private readonly HashSet<string> specializationInProgress = [];
 
         private int nextLetLocalIndex;
-        private int nextTemporaryLetLocalIndex = -1;
 
-        public PreComputeVisitor(CompilationContext context, ImmutableDictionary<string, PotentialEffects> effects, IOperator root)
+        public PreComputeVisitor(CompilationContext context,
+                                 ImmutableDictionary<string, PotentialEffects> effects,
+                                 PreComputeSession<TNumber> session,
+                                 int nextLetLocalIndex)
         {
             compilationContext = context ?? throw new ArgumentNullException(nameof(context));
             effectsByOperators = effects ?? throw new ArgumentNullException(nameof(effects));
-            nextLetLocalIndex = Math.Max(FindNextLetLocalIndex(context), FindNextLetLocalIndex(root));
+            this.session = session ?? throw new ArgumentNullException(nameof(session));
+            this.nextLetLocalIndex = nextLetLocalIndex;
         }
+
+        public int NextLetLocalIndex => nextLetLocalIndex;
 
         public PartialEvaluationResult<TNumber> Evaluate(IOperator op, PreComputeFrame<TNumber> frame)
         {
@@ -379,11 +459,13 @@ public static partial class Optimizer
             }
 
             var bindings = ImmutableDictionary.CreateBuilder<int, TNumber>();
+            var keyBindings = ImmutableArray.CreateBuilder<SpecializationBinding<TNumber>>(operandResults.Length);
             for (int i = 0; i < operandResults.Length; i++)
             {
                 if (operandResults[i] is ConstantEvaluationResult<TNumber> constantOperand)
                 {
                     bindings[i] = constantOperand.ConstantValue;
+                    keyBindings.Add(new SpecializationBinding<TNumber>(i, constantOperand.ConstantValue));
                 }
             }
 
@@ -393,28 +475,41 @@ public static partial class Optimizer
                 return false;
             }
 
-            var key = BuildSpecializationKey(op.Definition.Name, bindings);
+            var operatorBody = LookupOperatorBody(op.Definition.Name);
+            var key = new SpecializationCacheKey<TNumber>(op.Definition.Name, operatorBody, keyBindings.DrainToImmutable());
 
-            if (!specializationCache.TryGetValue(key, out var cached))
+            bool cacheHit;
+            SpecializationCacheEntry<TNumber>? cachedEntry;
+            if (session.SpecializationCache.TryGetValue(key, out var found))
             {
+                cacheHit = true;
+                cachedEntry = found;
+            }
+            else
+            {
+                cacheHit = false;
                 specializationInProgress.Add(op.Definition.Name);
                 try
                 {
-                    cached = ComputeSpecialization(op.Definition.Name, bindings.ToImmutable(), bodyBudget);
+                    cachedEntry = ComputeSpecialization(operatorBody, bindings.ToImmutable(), bodyBudget);
                 }
                 finally
                 {
                     specializationInProgress.Remove(op.Definition.Name);
                 }
 
-                specializationCache[key] = cached;
+                session.SpecializationCache[key] = cachedEntry;
             }
 
-            if (cached is null)
+            if (cachedEntry is null)
             {
                 result = null;
                 return false;
             }
+
+            var cached = cacheHit
+                ? RemapGeneratedLocalIndices(cachedEntry.Specialization, cachedEntry.GeneratedLocalIndices)
+                : cachedEntry.Specialization;
 
             // Keep any operand whose evaluation is still observable at the call site.
             var pieces = new List<IOperator>();
@@ -461,6 +556,7 @@ public static partial class Optimizer
             var replacements = ImmutableDictionary.CreateBuilder<int, IOperator>();
             var temporaryLocalIndices = Enumerable.Repeat(NoTemporaryLetLocalIndex, operandResults.Length).ToArray();
             var prefixOperators = new IOperator?[operandResults.Length];
+            var keyBindings = ImmutableArray.CreateBuilder<SpecializationBinding<TNumber>>(operandResults.Length);
             bool hasLetBinding = false;
 
             for (int i = 0; i < operandResults.Length; i++)
@@ -469,6 +565,7 @@ public static partial class Optimizer
                 if (operandResults[i] is ConstantEvaluationResult<TNumber> constantOperand)
                 {
                     replacements[i] = new PreComputedOperator(constantOperand.ConstantValue);
+                    keyBindings.Add(new SpecializationBinding<TNumber>(i, constantOperand.ConstantValue));
                     if (!IsPure<TNumber>(rewrittenOperand, effectsByOperators))
                     {
                         prefixOperators[i] = rewrittenOperand;
@@ -476,7 +573,7 @@ public static partial class Optimizer
                 }
                 else
                 {
-                    int localIndex = AllocateTemporaryLetLocalIndex();
+                    int localIndex = GetCanonicalTemporaryLetLocalIndex(i);
                     temporaryLocalIndices[i] = localIndex;
                     replacements[i] = new LetVariableOperator(localIndex);
                     hasLetBinding = true;
@@ -489,27 +586,41 @@ public static partial class Optimizer
                 return false;
             }
 
-            SpecializationResult<TNumber>? specialized;
-            specializationInProgress.Add(op.Definition.Name);
-            try
-            {
-                specialized = ComputeLetInlineBody(op.Definition.Name, replacements.ToImmutable(), bodyBudget);
-            }
-            finally
-            {
-                specializationInProgress.Remove(op.Definition.Name);
-            }
-
-            if (specialized is null)
-            {
-                nextLetLocalIndex = savedNextLetLocalIndex;
-                result = null;
-                return false;
-            }
-
             var trackedLocals = temporaryLocalIndices.Where(localIndex => localIndex < 0)
                                                      .ToImmutableHashSet();
-            var usageCounts = CountLetVariableReferences(specialized.Body, trackedLocals);
+            var operatorBody = LookupOperatorBody(op.Definition.Name);
+            var key = new SpecializationCacheKey<TNumber>(op.Definition.Name, operatorBody, keyBindings.DrainToImmutable());
+            bool cacheHit;
+            LetInlineCacheEntry<TNumber> cached;
+            if (session.LetInlineCache.TryGetValue(key, out var found))
+            {
+                cacheHit = true;
+                cached = found;
+            }
+            else
+            {
+                cacheHit = false;
+
+                specializationInProgress.Add(op.Definition.Name);
+                try
+                {
+                    cached = ComputeLetInlineBody(operatorBody,
+                                                  replacements.ToImmutable(),
+                                                  trackedLocals,
+                                                  bodyBudget);
+                }
+                finally
+                {
+                    specializationInProgress.Remove(op.Definition.Name);
+                }
+
+                session.LetInlineCache[key] = cached;
+            }
+
+            var specialized = cacheHit
+                ? RemapGeneratedLocalIndices(cached.Specialization, cached.GeneratedLocalIndices)
+                : cached.Specialization;
+            var usageCounts = cached.UsageCounts;
             var bodyReplacements = ImmutableDictionary.CreateBuilder<int, IOperator>();
             var letLocalIndices = Enumerable.Repeat(-1, operandResults.Length).ToArray();
 
@@ -557,7 +668,7 @@ public static partial class Optimizer
                 }
             }
 
-            if (CountNodes(rewritten) > MaxInlineSize)
+            if (HasMoreThanNodes(rewritten, MaxInlineSize))
             {
                 nextLetLocalIndex = savedNextLetLocalIndex;
                 result = null;
@@ -572,60 +683,79 @@ public static partial class Optimizer
             return true;
         }
 
-        private SpecializationResult<TNumber>? ComputeSpecialization(string operatorName,
-                                                                     ImmutableDictionary<int, TNumber> bindings,
-                                                                     UserDefinedCallBudget bodyBudget)
+        private SpecializationCacheEntry<TNumber>? ComputeSpecialization(IOperator operatorBody,
+                                                                         ImmutableDictionary<int, TNumber> bindings,
+                                                                         UserDefinedCallBudget bodyBudget)
         {
-            var implement = compilationContext.LookupOperatorImplement(operatorName);
-            Debug.Assert(implement.Operator is not null);
-
             var argumentOperators = ImmutableDictionary.CreateBuilder<int, IOperator>();
             foreach (var (index, value) in bindings)
             {
                 argumentOperators[index] = new PreComputedOperator(value);
             }
 
-            var substituted = SubstituteArguments(implement.Operator, argumentOperators.ToImmutable());
+            int generatedLocalStart = nextLetLocalIndex;
+            var remappedBody = RemapExistingLetLocalIndices(operatorBody);
+            var substituted = SubstituteArguments(remappedBody, argumentOperators.ToImmutable());
 
             // Optimize the substituted body in a fresh state: variables start unknown and
             // arrays cannot be assumed zero because we are mid-program.
             var fresh = PreComputeState<TNumber>.Create(arraysZeroInitialized: false);
             var frame = new PreComputeFrame<TNumber>(fresh, bodyBudget, []);
             var specResult = Evaluate(substituted, frame);
+            int generatedLocalEnd = nextLetLocalIndex;
 
-            // The body must be self-contained (no unresolved arg refs) and small enough to
-            // inline without blowing up code size.
-            if (ContainsUnresolvedArgument(specResult.Operator)
-                || CountNodes(specResult.Operator) > MaxInlineSize)
+            // The body must be self-contained and small enough to inline without blowing up code size.
+            if (ContainsUnresolvedArgument(specResult.Operator))
             {
+                nextLetLocalIndex = generatedLocalStart;
+                return null;
+            }
+
+            if (HasMoreThanNodes(specResult.Operator, MaxInlineSize))
+            {
+                nextLetLocalIndex = generatedLocalStart;
                 return null;
             }
 
             var exitDelta = CreateSpecializationStateDelta(specResult);
+            var generatedLocalIndices = CollectLetLocalIndices(specResult.Operator, generatedLocalStart, generatedLocalEnd);
             return specResult is ConstantEvaluationResult<TNumber> constantSpecResult
-                ? new ConstantSpecializationResult<TNumber>(specResult.Operator, exitDelta, constantSpecResult.ConstantValue)
-                : new UnknownSpecializationResult<TNumber>(specResult.Operator, exitDelta);
+                ? new SpecializationCacheEntry<TNumber>(
+                    new ConstantSpecializationResult<TNumber>(specResult.Operator, exitDelta, constantSpecResult.ConstantValue),
+                    generatedLocalIndices)
+                : new SpecializationCacheEntry<TNumber>(
+                    new UnknownSpecializationResult<TNumber>(specResult.Operator, exitDelta),
+                    generatedLocalIndices);
         }
 
-        private SpecializationResult<TNumber>? ComputeLetInlineBody(string operatorName,
-                                                                    ImmutableDictionary<int, IOperator> replacements,
-                                                                    UserDefinedCallBudget bodyBudget)
+        private LetInlineCacheEntry<TNumber> ComputeLetInlineBody(IOperator operatorBody,
+                                                                  ImmutableDictionary<int, IOperator> replacements,
+                                                                  ImmutableHashSet<int> trackedLocalIndices,
+                                                                  UserDefinedCallBudget bodyBudget)
         {
-            var implement = compilationContext.LookupOperatorImplement(operatorName);
-            Debug.Assert(implement.Operator is not null);
-
-            var substituted = SubstituteArguments(implement.Operator, replacements);
+            int generatedLocalStart = nextLetLocalIndex;
+            var remappedBody = RemapExistingLetLocalIndices(operatorBody);
+            var substituted = SubstituteArguments(remappedBody, replacements);
             var fresh = PreComputeState<TNumber>.Create(arraysZeroInitialized: false);
             var frame = new PreComputeFrame<TNumber>(fresh, bodyBudget, []);
             var specResult = Evaluate(substituted, frame);
+            int generatedLocalEnd = nextLetLocalIndex;
 
             // All call arguments were replaced before evaluation, so unresolved arguments indicate an invalid tree.
             Debug.Assert(!ContainsUnresolvedArgument(specResult.Operator));
 
             var exitDelta = CreateSpecializationStateDelta(specResult);
+            var usageCounts = CountLetVariableReferences(specResult.Operator, trackedLocalIndices);
+            var generatedLocalIndices = CollectLetLocalIndices(specResult.Operator, generatedLocalStart, generatedLocalEnd);
             return specResult is ConstantEvaluationResult<TNumber> constantSpecResult
-                ? new ConstantSpecializationResult<TNumber>(specResult.Operator, exitDelta, constantSpecResult.ConstantValue)
-                : new UnknownSpecializationResult<TNumber>(specResult.Operator, exitDelta);
+                ? new LetInlineCacheEntry<TNumber>(
+                    new ConstantSpecializationResult<TNumber>(specResult.Operator, exitDelta, constantSpecResult.ConstantValue),
+                    usageCounts,
+                    generatedLocalIndices)
+                : new LetInlineCacheEntry<TNumber>(
+                    new UnknownSpecializationResult<TNumber>(specResult.Operator, exitDelta),
+                    usageCounts,
+                    generatedLocalIndices);
         }
 
         private SpecializationStateDelta<TNumber> CreateSpecializationStateDelta(PartialEvaluationResult<TNumber> result)
@@ -669,9 +799,130 @@ public static partial class Optimizer
             return nextLetLocalIndex++;
         }
 
-        private int AllocateTemporaryLetLocalIndex()
+        private IOperator RemapExistingLetLocalIndices(IOperator operatorBody)
         {
-            return nextTemporaryLetLocalIndex--;
+            var existingLocalIndices = GetExistingLetLocalIndices(operatorBody);
+            if (existingLocalIndices.IsDefaultOrEmpty)
+            {
+                return operatorBody;
+            }
+
+            var replacements = ImmutableDictionary.CreateBuilder<int, int>();
+            foreach (int localIndex in existingLocalIndices)
+            {
+                replacements[localIndex] = AllocateLetLocalIndex();
+            }
+
+            return ReplaceLetLocalIndices(operatorBody, replacements.ToImmutable());
+        }
+
+        private ImmutableArray<int> GetExistingLetLocalIndices(IOperator operatorBody)
+        {
+            if (session.ExistingLetLocalIndicesCache.TryGetValue(operatorBody, out var existingLocalIndices))
+            {
+                return existingLocalIndices;
+            }
+
+            existingLocalIndices = CollectLetLocalIndices(operatorBody);
+            session.ExistingLetLocalIndicesCache[operatorBody] = existingLocalIndices;
+            return existingLocalIndices;
+        }
+
+        private SpecializationResult<TNumber> RemapGeneratedLocalIndices(SpecializationResult<TNumber> specialization,
+                                                                         ImmutableArray<int> generatedLocalIndices)
+        {
+            if (generatedLocalIndices.IsDefaultOrEmpty)
+            {
+                return specialization;
+            }
+
+            var replacements = ImmutableDictionary.CreateBuilder<int, int>();
+            foreach (int localIndex in generatedLocalIndices)
+            {
+                replacements[localIndex] = AllocateLetLocalIndex();
+            }
+
+            var body = ReplaceLetLocalIndices(specialization.Body, replacements.ToImmutable());
+            return specialization is ConstantSpecializationResult<TNumber> constant
+                ? new ConstantSpecializationResult<TNumber>(body, constant.ExitDelta, constant.ConstantValue)
+                : new UnknownSpecializationResult<TNumber>(body, specialization.ExitDelta);
+        }
+
+        private static int GetCanonicalTemporaryLetLocalIndex(int operandIndex)
+        {
+            return -operandIndex - 1;
+        }
+
+        private static ImmutableArray<int> CollectLetLocalIndices(IOperator op)
+        {
+            HashSet<int> indices = [];
+            CollectLetLocalIndices(op, indices);
+            return indices.Order().ToImmutableArray();
+        }
+
+        private static void CollectLetLocalIndices(IOperator op, HashSet<int> indices)
+        {
+            switch (op)
+            {
+                case LetOperator let:
+                    indices.Add(let.LocalIndex);
+                    break;
+                case LetVariableOperator letVariable:
+                    indices.Add(letVariable.LocalIndex);
+                    break;
+                default:
+                    break;
+            }
+
+            if (op is ParenthesisOperator parenthesis)
+            {
+                foreach (var inner in parenthesis.Operators)
+                {
+                    CollectLetLocalIndices(inner, indices);
+                }
+            }
+
+            op.ForEachOperand(operand => CollectLetLocalIndices(operand, indices));
+        }
+
+        private static ImmutableArray<int> CollectLetLocalIndices(IOperator op, int minInclusive, int maxExclusive)
+        {
+            if (minInclusive >= maxExclusive)
+            {
+                return [];
+            }
+
+            HashSet<int> indices = [];
+            CollectLetLocalIndices(op, minInclusive, maxExclusive, indices);
+            return indices.Order().ToImmutableArray();
+        }
+
+        private static void CollectLetLocalIndices(IOperator op,
+                                                   int minInclusive,
+                                                   int maxExclusive,
+                                                   HashSet<int> indices)
+        {
+            switch (op)
+            {
+                case LetOperator let when let.LocalIndex >= minInclusive && let.LocalIndex < maxExclusive:
+                    indices.Add(let.LocalIndex);
+                    break;
+                case LetVariableOperator letVariable when letVariable.LocalIndex >= minInclusive && letVariable.LocalIndex < maxExclusive:
+                    indices.Add(letVariable.LocalIndex);
+                    break;
+                default:
+                    break;
+            }
+
+            if (op is ParenthesisOperator parenthesis)
+            {
+                foreach (var inner in parenthesis.Operators)
+                {
+                    CollectLetLocalIndices(inner, minInclusive, maxExclusive, indices);
+                }
+            }
+
+            op.ForEachOperand(operand => CollectLetLocalIndices(operand, minInclusive, maxExclusive, indices));
         }
 
         private static bool ContainsUnresolvedArgument(IOperator op)
@@ -704,16 +955,11 @@ public static partial class Optimizer
             return contains;
         }
 
-        private static string BuildSpecializationKey(string operatorName, ImmutableDictionary<int, TNumber>.Builder bindings)
+        private IOperator LookupOperatorBody(string operatorName)
         {
-            var sb = new StringBuilder(operatorName);
-            sb.Append('|');
-            foreach (var p in bindings.OrderBy(p => p.Key))
-            {
-                sb.Append($"{p.Key}={p.Value};");
-            }
-
-            return sb.ToString();
+            var implement = compilationContext.LookupOperatorImplement(operatorName);
+            Debug.Assert(implement.Operator is not null);
+            return implement.Operator;
         }
 
         private PotentialEffects LookupEffects(string operatorName)

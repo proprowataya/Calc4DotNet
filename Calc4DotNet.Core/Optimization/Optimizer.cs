@@ -37,6 +37,8 @@ public static partial class Optimizer
 
         HashSet<string?> allVariableNames = GatherVariableNames(op, context);
         ImmutableDictionary<string, PotentialEffects> effects = ComputePotentialEffects<TNumber>(context);
+        PreComputeSession<TNumber> session = new();
+        int nextLetLocalIndex = Math.Max(FindNextLetLocalIndex(context), FindNextLetLocalIndex(op));
 
         if (target.HasFlag(OptimizeTarget.UserDefinedOperators))
         {
@@ -45,7 +47,7 @@ public static partial class Optimizer
             {
                 if (!implement.IsOptimized)
                 {
-                    OptimizeUserDefinedOperator<TNumber>(implement, ref context, allVariableNames, effects);
+                    OptimizeUserDefinedOperator<TNumber>(implement, ref context, allVariableNames, effects, session, ref nextLetLocalIndex);
                 }
             }
         }
@@ -53,14 +55,16 @@ public static partial class Optimizer
         if (target.HasFlag(OptimizeTarget.MainOperator))
         {
             // Optimize main operator
-            op = OptimizeCore<TNumber>(op, context, allVariableNames, initalVariableValues, initialGlobalArray, effects);
+            op = OptimizeCore<TNumber>(op, context, allVariableNames, initalVariableValues, initialGlobalArray, effects, session, ref nextLetLocalIndex);
         }
     }
 
     private static void OptimizeUserDefinedOperator<TNumber>(OperatorImplement implement,
                                                              ref CompilationContext context,
                                                              HashSet<string?> allVariableNames,
-                                                             ImmutableDictionary<string, PotentialEffects> effects)
+                                                             ImmutableDictionary<string, PotentialEffects> effects,
+                                                             PreComputeSession<TNumber> session,
+                                                             ref int nextLetLocalIndex)
         where TNumber : INumber<TNumber>
     {
         Debug.Assert(!implement.IsOptimized);
@@ -74,7 +78,9 @@ public static partial class Optimizer
                                             allVariableNames,
                                             initalVariableValues: null,
                                             initialGlobalArray: null,
-                                            effects);
+                                            effects,
+                                            session,
+                                            ref nextLetLocalIndex);
         context = context.WithAddOrUpdateOperatorImplement(implement with { Operator = newRoot, IsOptimized = true });
     }
 
@@ -83,7 +89,9 @@ public static partial class Optimizer
                                                    HashSet<string?> allVariableNames,
                                                    IVariableSource<TNumber>? initalVariableValues,
                                                    IArraySource<TNumber>? initialGlobalArray,
-                                                   ImmutableDictionary<string, PotentialEffects> effects)
+                                                   ImmutableDictionary<string, PotentialEffects> effects,
+                                                   PreComputeSession<TNumber> session,
+                                                   ref int nextLetLocalIndex)
         where TNumber : INumber<TNumber>
     {
         var state = PreComputeState<TNumber>.Create(arraysZeroInitialized: initialGlobalArray is not null);
@@ -110,8 +118,10 @@ public static partial class Optimizer
         // Evaluate expressions that can be resolved before execution.
         var budget = new UserDefinedCallBudget(MaxPreEvaluationUserDefinedCalls);
         var frame = new PreComputeFrame<TNumber>(state, budget, []);
-        var result = new PreComputeVisitor<TNumber>(context, effects, op).Evaluate(op, frame);
+        var visitor = new PreComputeVisitor<TNumber>(context, effects, session, nextLetLocalIndex);
+        var result = visitor.Evaluate(op, frame);
         op = result.Operator;
+        nextLetLocalIndex = visitor.NextLetLocalIndex;
 
         // Mark calls that are in tail position for later execution.
         op = op.Accept(new TailCallVisitor(), /* isTailCall */ true);

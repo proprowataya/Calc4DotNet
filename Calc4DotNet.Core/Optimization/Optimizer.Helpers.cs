@@ -114,16 +114,43 @@ public static partial class Optimizer
 
     private static int CountNodes(IOperator op)
     {
+        return CountNodesUpTo(op, int.MaxValue);
+    }
+
+    private static bool HasMoreThanNodes(IOperator op, int limit)
+    {
+        return CountNodesUpTo(op, limit + 1) > limit;
+    }
+
+    private static int CountNodesUpTo(IOperator op, int limit)
+    {
+        if (limit <= 0)
+        {
+            return 0;
+        }
+
         int count = 1;
+
         if (op is ParenthesisOperator parenthesis)
         {
             foreach (var inner in parenthesis.Operators)
             {
-                count += CountNodes(inner);
+                if (count >= limit)
+                {
+                    break;
+                }
+
+                count += CountNodesUpTo(inner, limit - count);
             }
         }
 
-        op.ForEachOperand(operand => count += CountNodes(operand));
+        op.ForEachOperand(operand =>
+        {
+            if (count < limit)
+            {
+                count += CountNodesUpTo(operand, limit - count);
+            }
+        });
 
         return count;
     }
@@ -333,6 +360,34 @@ public static partial class Optimizer
                 };
             default:
                 return RewriteChildren(op, replacements, ReplaceLetVariables);
+        }
+    }
+
+    private static IOperator ReplaceLetLocalIndices(IOperator op, ImmutableDictionary<int, int> replacements)
+    {
+        if (replacements.IsEmpty)
+        {
+            return op;
+        }
+
+        switch (op)
+        {
+            case LetVariableOperator letVariable:
+                return replacements.TryGetValue(letVariable.LocalIndex, out int replacement)
+                    ? letVariable with { LocalIndex = replacement }
+                    : letVariable;
+            case LetOperator let:
+                int localIndex = replacements.TryGetValue(let.LocalIndex, out int localReplacement)
+                    ? localReplacement
+                    : let.LocalIndex;
+                return let with
+                {
+                    LocalIndex = localIndex,
+                    Value = ReplaceLetLocalIndices(let.Value, replacements),
+                    Body = ReplaceLetLocalIndices(let.Body, replacements),
+                };
+            default:
+                return RewriteChildren(op, replacements, ReplaceLetLocalIndices);
         }
     }
 

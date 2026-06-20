@@ -184,6 +184,60 @@ public class ExecutionTest
     }
 
     [Fact]
+    public static void OptimizerFreshensPreExistingLetLocalsWhenInlining()
+    {
+        var inner = new OperatorDefinition("inner", 2);
+        var caller = new OperatorDefinition("caller", 3);
+
+        // Simulate a previously optimized operator body. Reusing this body at multiple
+        // inline sites must alpha-rename its local, otherwise nested inlining can make
+        // LowLevelCodeGenerator reuse the same local slot for two simultaneously-live lets.
+        IOperator innerBody = new LetOperator(
+            0,
+            new ArgumentOperator(1),
+            new BinaryOperator(new ArgumentOperator(0), new LetVariableOperator(0), BinaryType.Add));
+
+        IOperator callerBody = new UserDefinedOperator(
+            inner,
+            [
+                new UserDefinedOperator(
+                    inner,
+                    [new ArgumentOperator(0), new ArgumentOperator(1)],
+                    null),
+                new ArgumentOperator(2),
+            ],
+            null);
+
+        var context = CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
+        [
+            new OperatorImplement(inner, IsOptimized: true, innerBody),
+            new OperatorImplement(caller, IsOptimized: false, callerBody),
+        ]);
+
+        IOperator op = new UserDefinedOperator(
+            caller,
+            [
+                new LoadVariableOperator("a"),
+                new LoadVariableOperator("b"),
+                new LoadVariableOperator("c"),
+            ],
+            null);
+
+        Optimizer.Optimize<Int32>(ref op, ref context, OptimizeTarget.UserDefinedOperators);
+        var module = LowLevelCodeGenerator.Generate<Int32>(op, context, LowLevelCodeGenerationOption.Default);
+
+        var variables = new DefaultVariableSource<Int32>();
+        variables["a"] = 1;
+        variables["b"] = 2;
+        variables["c"] = 3;
+        var state = new SimpleEvaluationState<Int32>(variables,
+                                                     new DefaultArraySource<Int32>(),
+                                                     new MemoryIOService());
+
+        Assert.Equal(6, LowLevelExecutor.Execute(module, state));
+    }
+
+    [Fact]
     public static void TryEvaluateReturnsFalseForPreEvaluationFailures()
     {
         var state = new SimpleEvaluationState<Int32>(new UnknownVariableSource<Int32>(),

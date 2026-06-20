@@ -25592,14 +25592,14 @@ internal static class TestCases
             ExpectedWhenOptimized:
                 new CompilationResult<Int32>(
                     Operator: new LetOperator(
-                        LocalIndex: 1,
+                        LocalIndex: 2,
                         Value: new InputOperator(
                             SupplementaryText: null
                         ),
                         Body: new ConditionalOperator(
                             Condition: new BinaryOperator(
                                 Left: new LetVariableOperator(
-                                    LocalIndex: 1,
+                                    LocalIndex: 2,
                                     SupplementaryText: null
                                 ),
                                 Right: new PreComputedOperator(
@@ -25613,10 +25613,10 @@ internal static class TestCases
                             ),
                             IfFalse: new PrintCharOperator(
                                 Character: new LetOperator(
-                                    LocalIndex: 0,
+                                    LocalIndex: 1,
                                     Value: new BinaryOperator(
                                         Left: new LetVariableOperator(
-                                            LocalIndex: 1,
+                                            LocalIndex: 2,
                                             SupplementaryText: null
                                         ),
                                         Right: new PreComputedOperator(
@@ -25628,7 +25628,7 @@ internal static class TestCases
                                     Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new LetVariableOperator(
-                                                LocalIndex: 0,
+                                                LocalIndex: 1,
                                                 SupplementaryText: null
                                             ),
                                             Right: new PreComputedOperator(
@@ -25647,7 +25647,7 @@ internal static class TestCases
                                                 {
                                                     new BinaryOperator(
                                                         Left: new LetVariableOperator(
-                                                            LocalIndex: 0,
+                                                            LocalIndex: 1,
                                                             SupplementaryText: null
                                                         ),
                                                         Right: new PreComputedOperator(
@@ -25995,14 +25995,14 @@ internal static class TestCases
                         Operators: new IOperator[]
                         {
                             new LetOperator(
-                                LocalIndex: 1,
+                                LocalIndex: 2,
                                 Value: new InputOperator(
                                     SupplementaryText: null
                                 ),
                                 Body: new ConditionalOperator(
                                     Condition: new BinaryOperator(
                                         Left: new LetVariableOperator(
-                                            LocalIndex: 1,
+                                            LocalIndex: 2,
                                             SupplementaryText: null
                                         ),
                                         Right: new PreComputedOperator(
@@ -26016,10 +26016,10 @@ internal static class TestCases
                                     ),
                                     IfFalse: new StoreVariableOperator(
                                         Operand: new LetOperator(
-                                            LocalIndex: 0,
+                                            LocalIndex: 1,
                                             Value: new BinaryOperator(
                                                 Left: new LetVariableOperator(
-                                                    LocalIndex: 1,
+                                                    LocalIndex: 2,
                                                     SupplementaryText: null
                                                 ),
                                                 Right: new PreComputedOperator(
@@ -26031,7 +26031,7 @@ internal static class TestCases
                                             Body: new ConditionalOperator(
                                                 Condition: new BinaryOperator(
                                                     Left: new LetVariableOperator(
-                                                        LocalIndex: 0,
+                                                        LocalIndex: 1,
                                                         SupplementaryText: null
                                                     ),
                                                     Right: new PreComputedOperator(
@@ -26050,7 +26050,7 @@ internal static class TestCases
                                                         {
                                                             new BinaryOperator(
                                                                 Left: new LetVariableOperator(
-                                                                    LocalIndex: 0,
+                                                                    LocalIndex: 1,
                                                                     SupplementaryText: null
                                                                 ),
                                                                 Right: new PreComputedOperator(
@@ -26416,7 +26416,7 @@ internal static class TestCases
             ExpectedWhenOptimized:
                 new CompilationResult<Int32>(
                     Operator: new LetOperator(
-                        LocalIndex: 1,
+                        LocalIndex: 2,
                         Value: new ParenthesisOperator(
                             Operators: new IOperator[]
                             {
@@ -26438,7 +26438,7 @@ internal static class TestCases
                         Body: new ConditionalOperator(
                             Condition: new BinaryOperator(
                                 Left: new LetVariableOperator(
-                                    LocalIndex: 1,
+                                    LocalIndex: 2,
                                     SupplementaryText: null
                                 ),
                                 Right: new PreComputedOperator(
@@ -26452,10 +26452,10 @@ internal static class TestCases
                             ),
                             IfFalse: new LoadArrayOperator(
                                 Index: new LetOperator(
-                                    LocalIndex: 0,
+                                    LocalIndex: 1,
                                     Value: new BinaryOperator(
                                         Left: new LetVariableOperator(
-                                            LocalIndex: 1,
+                                            LocalIndex: 2,
                                             SupplementaryText: null
                                         ),
                                         Right: new PreComputedOperator(
@@ -26467,7 +26467,7 @@ internal static class TestCases
                                     Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new LetVariableOperator(
-                                                LocalIndex: 0,
+                                                LocalIndex: 1,
                                                 SupplementaryText: null
                                             ),
                                             Right: new PreComputedOperator(
@@ -26486,7 +26486,7 @@ internal static class TestCases
                                                 {
                                                     new BinaryOperator(
                                                         Left: new LetVariableOperator(
-                                                            LocalIndex: 0,
+                                                            LocalIndex: 1,
                                                             SupplementaryText: null
                                                         ),
                                                         Right: new PreComputedOperator(
@@ -26838,14 +26838,14 @@ internal static class TestCases
                     Operator: new LoadArrayOperator(
                         Index: new DecimalOperator(
                             Operand: new LetOperator(
-                                LocalIndex: 1,
+                                LocalIndex: 2,
                                 Value: new InputOperator(
                                     SupplementaryText: null
                                 ),
                                 Body: new ConditionalOperator(
                                     Condition: new BinaryOperator(
                                         Left: new LetVariableOperator(
-                                            LocalIndex: 1,
+                                            LocalIndex: 2,
                                             SupplementaryText: null
                                         ),
                                         Right: new PreComputedOperator(
@@ -26859,10 +26859,10 @@ internal static class TestCases
                                     ),
                                     IfFalse: new StoreArrayOperator(
                                         Value: new LetOperator(
-                                            LocalIndex: 0,
+                                            LocalIndex: 1,
                                             Value: new BinaryOperator(
                                                 Left: new LetVariableOperator(
-                                                    LocalIndex: 1,
+                                                    LocalIndex: 2,
                                                     SupplementaryText: null
                                                 ),
                                                 Right: new PreComputedOperator(
@@ -26874,7 +26874,7 @@ internal static class TestCases
                                             Body: new ConditionalOperator(
                                                 Condition: new BinaryOperator(
                                                     Left: new LetVariableOperator(
-                                                        LocalIndex: 0,
+                                                        LocalIndex: 1,
                                                         SupplementaryText: null
                                                     ),
                                                     Right: new PreComputedOperator(
@@ -26893,7 +26893,7 @@ internal static class TestCases
                                                         {
                                                             new BinaryOperator(
                                                                 Left: new LetVariableOperator(
-                                                                    LocalIndex: 0,
+                                                                    LocalIndex: 1,
                                                                     SupplementaryText: null
                                                                 ),
                                                                 Right: new PreComputedOperator(
@@ -27267,14 +27267,14 @@ internal static class TestCases
                     Operator: new LoadArrayOperator(
                         Index: new DecimalOperator(
                             Operand: new LetOperator(
-                                LocalIndex: 1,
+                                LocalIndex: 2,
                                 Value: new InputOperator(
                                     SupplementaryText: null
                                 ),
                                 Body: new ConditionalOperator(
                                     Condition: new BinaryOperator(
                                         Left: new LetVariableOperator(
-                                            LocalIndex: 1,
+                                            LocalIndex: 2,
                                             SupplementaryText: null
                                         ),
                                         Right: new PreComputedOperator(
@@ -27291,10 +27291,10 @@ internal static class TestCases
                                             Value: 5
                                         ),
                                         Index: new LetOperator(
-                                            LocalIndex: 0,
+                                            LocalIndex: 1,
                                             Value: new BinaryOperator(
                                                 Left: new LetVariableOperator(
-                                                    LocalIndex: 1,
+                                                    LocalIndex: 2,
                                                     SupplementaryText: null
                                                 ),
                                                 Right: new PreComputedOperator(
@@ -27306,7 +27306,7 @@ internal static class TestCases
                                             Body: new ConditionalOperator(
                                                 Condition: new BinaryOperator(
                                                     Left: new LetVariableOperator(
-                                                        LocalIndex: 0,
+                                                        LocalIndex: 1,
                                                         SupplementaryText: null
                                                     ),
                                                     Right: new PreComputedOperator(
@@ -27328,7 +27328,7 @@ internal static class TestCases
                                                         {
                                                             new BinaryOperator(
                                                                 Left: new LetVariableOperator(
-                                                                    LocalIndex: 0,
+                                                                    LocalIndex: 1,
                                                                     SupplementaryText: null
                                                                 ),
                                                                 Right: new PreComputedOperator(
@@ -27733,14 +27733,14 @@ internal static class TestCases
             ExpectedWhenOptimized:
                 new CompilationResult<Int32>(
                     Operator: new LetOperator(
-                        LocalIndex: 1,
+                        LocalIndex: 2,
                         Value: new InputOperator(
                             SupplementaryText: null
                         ),
                         Body: new ConditionalOperator(
                             Condition: new BinaryOperator(
                                 Left: new LetVariableOperator(
-                                    LocalIndex: 1,
+                                    LocalIndex: 2,
                                     SupplementaryText: null
                                 ),
                                 Right: new PreComputedOperator(
@@ -27755,7 +27755,7 @@ internal static class TestCases
                             IfFalse: new ConditionalOperator(
                                 Condition: new BinaryOperator(
                                     Left: new LetVariableOperator(
-                                        LocalIndex: 1,
+                                        LocalIndex: 2,
                                         SupplementaryText: null
                                     ),
                                     Right: new PreComputedOperator(
@@ -27765,10 +27765,10 @@ internal static class TestCases
                                     SupplementaryText: null
                                 ),
                                 IfTrue: new LetOperator(
-                                    LocalIndex: 0,
+                                    LocalIndex: 1,
                                     Value: new BinaryOperator(
                                         Left: new LetVariableOperator(
-                                            LocalIndex: 1,
+                                            LocalIndex: 2,
                                             SupplementaryText: null
                                         ),
                                         Right: new PreComputedOperator(
@@ -27780,7 +27780,7 @@ internal static class TestCases
                                     Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new LetVariableOperator(
-                                                LocalIndex: 0,
+                                                LocalIndex: 1,
                                                 SupplementaryText: null
                                             ),
                                             Right: new PreComputedOperator(
@@ -27795,7 +27795,7 @@ internal static class TestCases
                                         IfFalse: new ConditionalOperator(
                                             Condition: new BinaryOperator(
                                                 Left: new LetVariableOperator(
-                                                    LocalIndex: 0,
+                                                    LocalIndex: 1,
                                                     SupplementaryText: null
                                                 ),
                                                 Right: new PreComputedOperator(
@@ -27810,7 +27810,7 @@ internal static class TestCases
                                                 {
                                                     new BinaryOperator(
                                                         Left: new LetVariableOperator(
-                                                            LocalIndex: 0,
+                                                            LocalIndex: 1,
                                                             SupplementaryText: null
                                                         ),
                                                         Right: new PreComputedOperator(
@@ -28250,14 +28250,14 @@ internal static class TestCases
             ExpectedWhenOptimized:
                 new CompilationResult<Int32>(
                     Operator: new LetOperator(
-                        LocalIndex: 1,
+                        LocalIndex: 2,
                         Value: new InputOperator(
                             SupplementaryText: null
                         ),
                         Body: new ConditionalOperator(
                             Condition: new BinaryOperator(
                                 Left: new LetVariableOperator(
-                                    LocalIndex: 1,
+                                    LocalIndex: 2,
                                     SupplementaryText: null
                                 ),
                                 Right: new PreComputedOperator(
@@ -28272,7 +28272,7 @@ internal static class TestCases
                             IfFalse: new ConditionalOperator(
                                 Condition: new BinaryOperator(
                                     Left: new LetVariableOperator(
-                                        LocalIndex: 1,
+                                        LocalIndex: 2,
                                         SupplementaryText: null
                                     ),
                                     Right: new PreComputedOperator(
@@ -28282,10 +28282,10 @@ internal static class TestCases
                                     SupplementaryText: null
                                 ),
                                 IfTrue: new LetOperator(
-                                    LocalIndex: 0,
+                                    LocalIndex: 1,
                                     Value: new BinaryOperator(
                                         Left: new LetVariableOperator(
-                                            LocalIndex: 1,
+                                            LocalIndex: 2,
                                             SupplementaryText: null
                                         ),
                                         Right: new PreComputedOperator(
@@ -28297,7 +28297,7 @@ internal static class TestCases
                                     Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new LetVariableOperator(
-                                                LocalIndex: 0,
+                                                LocalIndex: 1,
                                                 SupplementaryText: null
                                             ),
                                             Right: new PreComputedOperator(
@@ -28312,7 +28312,7 @@ internal static class TestCases
                                         IfFalse: new ConditionalOperator(
                                             Condition: new BinaryOperator(
                                                 Left: new LetVariableOperator(
-                                                    LocalIndex: 0,
+                                                    LocalIndex: 1,
                                                     SupplementaryText: null
                                                 ),
                                                 Right: new PreComputedOperator(
@@ -28327,7 +28327,7 @@ internal static class TestCases
                                                 {
                                                     new BinaryOperator(
                                                         Left: new LetVariableOperator(
-                                                            LocalIndex: 0,
+                                                            LocalIndex: 1,
                                                             SupplementaryText: null
                                                         ),
                                                         Right: new PreComputedOperator(
@@ -33465,15 +33465,15 @@ internal static class TestCases
             ExpectedWhenOptimized:
                 new CompilationResult<Int32>(
                     Operator: new LetOperator(
-                        LocalIndex: 1,
+                        LocalIndex: 2,
                         Value: new InputOperator(
                             SupplementaryText: null
                         ),
                         Body: new LetOperator(
-                            LocalIndex: 0,
+                            LocalIndex: 1,
                             Value: new BinaryOperator(
                                 Left: new LetVariableOperator(
-                                    LocalIndex: 1,
+                                    LocalIndex: 2,
                                     SupplementaryText: null
                                 ),
                                 Right: new PreComputedOperator(
@@ -33484,11 +33484,11 @@ internal static class TestCases
                             ),
                             Body: new BinaryOperator(
                                 Left: new LetVariableOperator(
-                                    LocalIndex: 0,
+                                    LocalIndex: 1,
                                     SupplementaryText: null
                                 ),
                                 Right: new LetVariableOperator(
-                                    LocalIndex: 0,
+                                    LocalIndex: 1,
                                     SupplementaryText: null
                                 ),
                                 Type: BinaryType.Add,
