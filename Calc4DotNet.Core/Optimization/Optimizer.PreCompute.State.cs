@@ -66,7 +66,13 @@ public static partial class Optimizer
 
         public PreComputeState<TNumber> SetVariable(string? variableName, TNumber value)
         {
-            return new PreComputeState<TNumber>(variables.SetItem(ValueBox.Create(variableName), value),
+            var key = ValueBox.Create(variableName);
+            if (variables.TryGetValue(key, out var currentValue) && currentValue == value)
+            {
+                return this;
+            }
+
+            return new PreComputeState<TNumber>(variables.SetItem(key, value),
                                                 knownArrayValues,
                                                 unknownArrayIndices,
                                                 arguments,
@@ -76,7 +82,13 @@ public static partial class Optimizer
 
         public PreComputeState<TNumber> UnsetVariable(string? variableName)
         {
-            return new PreComputeState<TNumber>(variables.Remove(ValueBox.Create(variableName)),
+            var key = ValueBox.Create(variableName);
+            if (!variables.ContainsKey(key))
+            {
+                return this;
+            }
+
+            return new PreComputeState<TNumber>(variables.Remove(key),
                                                 knownArrayValues,
                                                 unknownArrayIndices,
                                                 arguments,
@@ -117,10 +129,22 @@ public static partial class Optimizer
             ImmutableDictionary<TNumber, TNumber> nextKnownArrayValues;
             if (arraysZeroInitialized && value == TNumber.Zero)
             {
+                if (!knownArrayValues.ContainsKey(index) && !unknownArrayIndices.Contains(index))
+                {
+                    return this;
+                }
+
                 nextKnownArrayValues = knownArrayValues.Remove(index);
             }
             else
             {
+                if (knownArrayValues.TryGetValue(index, out var currentValue)
+                    && currentValue == value
+                    && !unknownArrayIndices.Contains(index))
+                {
+                    return this;
+                }
+
                 nextKnownArrayValues = knownArrayValues.SetItem(index, value);
             }
 
@@ -134,6 +158,11 @@ public static partial class Optimizer
 
         public PreComputeState<TNumber> UnsetArrayValue(TNumber index)
         {
+            if (!knownArrayValues.ContainsKey(index) && unknownArrayIndices.Contains(index))
+            {
+                return this;
+            }
+
             return new PreComputeState<TNumber>(variables,
                                                 knownArrayValues.Remove(index),
                                                 unknownArrayIndices.Add(index),
@@ -144,6 +173,14 @@ public static partial class Optimizer
 
         public PreComputeState<TNumber> InvalidateAllArrayElements()
         {
+            if (!arraysZeroInitialized
+                && arrayElementsInvalidated
+                && knownArrayValues.IsEmpty
+                && unknownArrayIndices.IsEmpty)
+            {
+                return this;
+            }
+
             return new PreComputeState<TNumber>(variables,
                                                 [],
                                                 [],
@@ -166,6 +203,11 @@ public static partial class Optimizer
 
         public PreComputeState<TNumber> WithArguments(ImmutableDictionary<int, TNumber> arguments)
         {
+            if (ReferenceEquals(this.arguments, arguments))
+            {
+                return this;
+            }
+
             return new PreComputeState<TNumber>(variables,
                                                 knownArrayValues,
                                                 unknownArrayIndices,
@@ -177,6 +219,10 @@ public static partial class Optimizer
         public PreComputeState<TNumber> Apply(PotentialEffects effects)
         {
             var state = this;
+            if (effects.WrittenVariables.IsEmpty && !effects.MayWriteArray)
+            {
+                return state;
+            }
 
             foreach (var variableName in effects.WrittenVariables)
             {
@@ -194,6 +240,14 @@ public static partial class Optimizer
         public PreComputeState<TNumber> Apply(SpecializationStateDelta<TNumber> delta)
         {
             var state = this;
+            if (delta.KnownVariables.IsEmpty
+                && delta.UnknownVariables.IsEmpty
+                && delta.KnownArrayValues.IsEmpty
+                && delta.UnknownArrayIndices.IsEmpty
+                && !delta.InvalidateAllArrayElements)
+            {
+                return state;
+            }
 
             foreach (var variableName in delta.UnknownVariables)
             {
@@ -225,6 +279,11 @@ public static partial class Optimizer
 
         public static PreComputeState<TNumber> Merge(PreComputeState<TNumber> left, PreComputeState<TNumber> right)
         {
+            if (ReferenceEquals(left, right))
+            {
+                return left;
+            }
+
             var mergedVariables = ImmutableDictionary.CreateBuilder<ValueBox<string>, TNumber>();
 
             foreach (var (key, value) in left.variables)
