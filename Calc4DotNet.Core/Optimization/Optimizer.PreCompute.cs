@@ -412,11 +412,21 @@ public static partial class Optimizer
         {
             var currentState = frame.State;
             var operandResults = new PartialEvaluationResult<TNumber>[op.Operands.Length];
+            bool hasConstantOperand = false;
+            bool hasNonConstantOperand = false;
 
             for (int i = 0; i < op.Operands.Length; i++)
             {
                 operandResults[i] = Evaluate(op.Operands[i], frame with { State = currentState });
                 currentState = operandResults[i].ExitState;
+                if (operandResults[i] is ConstantEvaluationResult<TNumber>)
+                {
+                    hasConstantOperand = true;
+                }
+                else
+                {
+                    hasNonConstantOperand = true;
+                }
             }
 
             var rewrittenOperator = op with { Operands = operandResults.Select(result => result.Operator).ToImmutableArray() };
@@ -426,12 +436,15 @@ public static partial class Optimizer
                 return exactResult;
             }
 
-            if (TryPartiallySpecialize(op, operandResults, currentState, frame.Budget, out var specialized))
+            if (hasConstantOperand || op.Operands.Length == 0)
             {
-                return specialized;
+                if (TryPartiallySpecialize(op, operandResults, currentState, frame.Budget, out var specialized))
+                {
+                    return specialized;
+                }
             }
 
-            if (TryInlineWithLet(op, operandResults, currentState, frame.Budget, out var inlined))
+            if (hasNonConstantOperand && TryInlineWithLet(op, operandResults, currentState, frame.Budget, out var inlined))
             {
                 return inlined;
             }
