@@ -20,6 +20,7 @@ internal sealed class LowLevelModuleEqualityComparer<TNumber> : IEqualityCompare
             (null, _) => false,
             (_, null) => false,
             _ => x.EntryPoint.SequenceEqual(y.EntryPoint)
+                 && x.EntryPointLocalCount == y.EntryPointLocalCount
                  && x.ConstTable.SequenceEqual(y.ConstTable)
                  && x.UserDefinedOperators.SequenceEqual(y.UserDefinedOperators)
                  && x.Variables.SequenceEqual(y.Variables),

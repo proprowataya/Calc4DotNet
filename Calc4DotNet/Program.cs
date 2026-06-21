@@ -37,10 +37,6 @@ try
     {
         Start<Int128>();
     }
-    else if (setting.NumberType == typeof(Double))
-    {
-        Start<Double>();
-    }
     else if (setting.NumberType == typeof(BigInteger))
     {
         Start<BigInteger>();

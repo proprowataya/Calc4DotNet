@@ -78,7 +78,11 @@ internal static class CompilerImplementation
         var op = Parser.Parse(tokens, ref context);
         if (optimize)
         {
-            Optimizer.Optimize<TNumber>(ref op, ref context, OptimizeTarget.All);
+            Optimizer.Optimize<TNumber>(ref op,
+                                        ref context,
+                                        OptimizeTarget.All,
+                                        new DefaultVariableSource<TNumber>(),
+                                        new DefaultArraySource<TNumber>());
         }
         var module = LowLevelCodeGenerator.Generate<TNumber>(op, context, LowLevelCodeGenerationOption.Default);
 

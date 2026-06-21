@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Numerics;
 using System.Reflection;
+using System.Text;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Execution;
 using Calc4DotNet.Core.Operators;
@@ -37,6 +38,12 @@ internal struct CSharpSerializer
         WriteLine($"{nameof(TestCase.VariablesAfterExecution)}:");
         indent++;
         Serialize(testCase.VariablesAfterExecution);
+        WriteLine(",", insertIndent: false);
+        indent--;
+
+        WriteLine($"{nameof(TestCase.ArrayAfterExecution)}:");
+        indent++;
+        Serialize(testCase.ArrayAfterExecution);
         WriteLine(",", insertIndent: false);
         indent--;
 
@@ -185,6 +192,9 @@ internal struct CSharpSerializer
         Serialize(module.EntryPoint);
         WriteLine(",", insertIndent: false);
 
+        Serialize(module.EntryPointLocalCount);
+        WriteLine(",", insertIndent: false);
+
         Serialize(module.ConstTable);
         WriteLine(",", insertIndent: false);
 
@@ -264,6 +274,30 @@ internal struct CSharpSerializer
         Write(")");
     }
 
+    public void Serialize(ImmutableDictionary<Int32, Int32> dictionary, bool insertIndentFirst = true)
+    {
+        WriteLine($"{nameof(ImmutableDictionary)}.{nameof(ImmutableDictionary.CreateRange)}(", insertIndentFirst);
+
+        indent++;
+        WriteLine($"new {nameof(KeyValuePair<Int32, Int32>)}<{nameof(Int32)}, {nameof(Int32)}>[]");
+        WriteLine("{");
+        indent++;
+
+        foreach (var (key, value) in dictionary.OrderBy(pair => pair.Key))
+        {
+            Write($"new {nameof(KeyValuePair<Int32, Int32>)}<{nameof(Int32)}, {nameof(Int32)}>(");
+            Serialize(key, insertIndentFirst: false);
+            Write(", ", insertIndent: false);
+            Serialize(value, insertIndentFirst: false);
+            WriteLine("),", insertIndent: false);
+        }
+
+        indent--;
+        WriteLine("}");
+        indent--;
+        Write(")");
+    }
+
     public void Serialize(LowLevelUserDefinedOperator op, bool insertIndentFirst = true)
     {
         WriteLine($"new {nameof(LowLevelUserDefinedOperator)}(", insertIndentFirst);
@@ -273,6 +307,8 @@ internal struct CSharpSerializer
         Serialize(op.Operations);
         WriteLine(",", insertIndent: false);
         Serialize(op.MaxStackSize);
+        WriteLine(",", insertIndent: false);
+        Serialize(op.LocalCount);
         indent--;
         Write(")", insertIndent: false);
     }
@@ -289,7 +325,9 @@ internal struct CSharpSerializer
 
     public void Serialize(OperatorDefinition definition, bool insertIndentFirst = true)
     {
-        Write($"new {nameof(OperatorDefinition)}({nameof(OperatorDefinition.Name)}: \"{definition.Name}\", {nameof(OperatorDefinition.NumOperands)}: {definition.NumOperands})", insertIndentFirst);
+        Write($"new {nameof(OperatorDefinition)}({nameof(OperatorDefinition.Name)}: ", insertIndentFirst);
+        Serialize(definition.Name, insertIndentFirst: false);
+        Write($", {nameof(OperatorDefinition.NumOperands)}: {definition.NumOperands})", insertIndent: false);
     }
 
     public void Serialize<T>(ValueBox<T> box, bool insertIndentFirst = true)
@@ -315,7 +353,7 @@ internal struct CSharpSerializer
 
     public void Serialize(string str, bool insertIndentFirst = true)
     {
-        Write($"\"{str.Replace("\n", "\\n")}\"", insertIndentFirst);
+        Write($"\"{EscapeStringLiteral(str)}\"", insertIndentFirst);
     }
 
     public void Serialize(bool b, bool insertIndentFirst = true)
@@ -324,6 +362,61 @@ internal struct CSharpSerializer
     }
 
     /*****/
+
+    private static string EscapeStringLiteral(string value)
+    {
+        StringBuilder builder = new(value.Length);
+
+        foreach (char c in value)
+        {
+            switch (c)
+            {
+                case '"':
+                    builder.Append("\\\"");
+                    break;
+                case '\\':
+                    builder.Append("\\\\");
+                    break;
+                case '\0':
+                    builder.Append("\\0");
+                    break;
+                case '\a':
+                    builder.Append("\\a");
+                    break;
+                case '\b':
+                    builder.Append("\\b");
+                    break;
+                case '\f':
+                    builder.Append("\\f");
+                    break;
+                case '\n':
+                    builder.Append("\\n");
+                    break;
+                case '\r':
+                    builder.Append("\\r");
+                    break;
+                case '\t':
+                    builder.Append("\\t");
+                    break;
+                case '\v':
+                    builder.Append("\\v");
+                    break;
+                default:
+                    if (c < ' ' || c > '~')
+                    {
+                        builder.Append("\\u");
+                        builder.Append(((int)c).ToString("X4"));
+                    }
+                    else
+                    {
+                        builder.Append(c);
+                    }
+                    break;
+            }
+        }
+
+        return builder.ToString();
+    }
 
     private void Write(string? text = null, bool insertIndent = true)
     {

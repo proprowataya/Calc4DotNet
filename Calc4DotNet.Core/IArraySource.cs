@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Collections.Immutable;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Calc4DotNet.Core;
@@ -7,7 +8,13 @@ public interface IArraySource<TNumber>
     where TNumber : INumber<TNumber>
 {
     TNumber this[TNumber index] { get; set; }
-    IArraySource<TNumber> Clone();
+
+    bool TryGet(TNumber index, out TNumber value);
+    bool TrySet(TNumber index, TNumber value);
+
+    // Returns a snapshot of all observable non-zero array values.
+    // Zero-valued entries may be omitted and are interpreted as zero by optimizers.
+    ImmutableDictionary<TNumber, TNumber> ToImmutableDictionary();
 }
 
 public sealed class DefaultArraySource<TNumber> : IArraySource<TNumber>
@@ -16,18 +23,8 @@ public sealed class DefaultArraySource<TNumber> : IArraySource<TNumber>
     private const int ArrayLength = 2048;
     private static TNumber BaseOffset => TNumber.CreateTruncating(-1024);
 
-    private readonly TNumber[] array;
-    private Dictionary<TNumber, TNumber>? dictionary;   // [index] = value
-
-    public DefaultArraySource()
-        : this(new TNumber[ArrayLength], null)
-    { }
-
-    private DefaultArraySource(TNumber[] array, Dictionary<TNumber, TNumber>? dictionary)
-    {
-        this.array = array;
-        this.dictionary = dictionary;
-    }
+    private readonly TNumber[] array = new TNumber[ArrayLength];
+    private Dictionary<TNumber, TNumber>? dictionary = null;    // [index] = value
 
     public TNumber this[TNumber index]
     {
@@ -57,20 +54,55 @@ public sealed class DefaultArraySource<TNumber> : IArraySource<TNumber>
             }
             else
             {
-                dictionary ??= new();
+                dictionary ??= [];
                 dictionary[index] = value;
             }
         }
     }
 
-    public DefaultArraySource<TNumber> Clone()
+    public bool TryGet(TNumber index, out TNumber value)
     {
-        return new DefaultArraySource<TNumber>((TNumber[])array.Clone(), dictionary is not null ? new(dictionary) : null);
+        value = this[index];
+        return true;
     }
 
-    IArraySource<TNumber> IArraySource<TNumber>.Clone()
+    public bool TrySet(TNumber index, TNumber value)
     {
-        return Clone();
+        this[index] = value;
+        return true;
+    }
+
+    public ImmutableDictionary<TNumber, TNumber> ToImmutableDictionary()
+    {
+        // Calc4's memory is conceptually pre-populated with zero for every
+        // index, so "bound to zero" and "never bound" are externally indistinguishable.
+        // Drop zero entries so the snapshot reflects observable state only.
+
+        var builder = ImmutableDictionary.CreateBuilder<TNumber, TNumber>();
+
+        for (int i = 0; i < array.Length; i++)
+        {
+            TNumber value = array[i];
+
+            if (!TNumber.IsZero(value))
+            {
+                TNumber index = TNumber.CreateTruncating(i) + BaseOffset;
+                builder[index] = value;
+            }
+        }
+
+        if (dictionary is not null)
+        {
+            foreach (var (index, value) in dictionary)
+            {
+                if (!TNumber.IsZero(value))
+                {
+                    builder[index] = value;
+                }
+            }
+        }
+
+        return builder.ToImmutable();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -108,5 +140,19 @@ internal sealed class AlwaysThrowGlobalArraySource<TNumber> : IArraySource<TNumb
         set => throw new ArrayElementNotSetException();
     }
 
-    public IArraySource<TNumber> Clone() => this;
+    public bool TryGet(TNumber index, out TNumber value)
+    {
+        value = TNumber.Zero;
+        return false;
+    }
+
+    public bool TrySet(TNumber index, TNumber value)
+    {
+        return false;
+    }
+
+    public ImmutableDictionary<TNumber, TNumber> ToImmutableDictionary()
+    {
+        throw new ArrayElementNotSetException();
+    }
 }

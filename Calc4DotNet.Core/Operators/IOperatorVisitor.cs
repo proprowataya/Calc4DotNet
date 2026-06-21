@@ -5,6 +5,7 @@ public interface IOperatorVisitor
     void Visit(ZeroOperator op);
     void Visit(PreComputedOperator op);
     void Visit(ArgumentOperator op);
+    void Visit(LetVariableOperator op);
     void Visit(DefineOperator op);
     void Visit(LoadVariableOperator op);
     void Visit(InputOperator op);
@@ -16,6 +17,7 @@ public interface IOperatorVisitor
     void Visit(StoreArrayOperator op);
     void Visit(BinaryOperator op);
     void Visit(ConditionalOperator op);
+    void Visit(LetOperator op);
     void Visit(UserDefinedOperator op);
 }
 
@@ -24,6 +26,7 @@ public interface IOperatorVisitor<TResult>
     TResult Visit(ZeroOperator op);
     TResult Visit(PreComputedOperator op);
     TResult Visit(ArgumentOperator op);
+    TResult Visit(LetVariableOperator op);
     TResult Visit(DefineOperator op);
     TResult Visit(LoadVariableOperator op);
     TResult Visit(InputOperator op);
@@ -35,6 +38,7 @@ public interface IOperatorVisitor<TResult>
     TResult Visit(StoreArrayOperator op);
     TResult Visit(BinaryOperator op);
     TResult Visit(ConditionalOperator op);
+    TResult Visit(LetOperator op);
     TResult Visit(UserDefinedOperator op);
 }
 
@@ -43,6 +47,7 @@ public interface IOperatorVisitor<TResult, TParam>
     TResult Visit(ZeroOperator op, TParam param);
     TResult Visit(PreComputedOperator op, TParam param);
     TResult Visit(ArgumentOperator op, TParam param);
+    TResult Visit(LetVariableOperator op, TParam param);
     TResult Visit(DefineOperator op, TParam param);
     TResult Visit(LoadVariableOperator op, TParam param);
     TResult Visit(InputOperator op, TParam param);
@@ -54,5 +59,6 @@ public interface IOperatorVisitor<TResult, TParam>
     TResult Visit(StoreArrayOperator op, TParam param);
     TResult Visit(BinaryOperator op, TParam param);
     TResult Visit(ConditionalOperator op, TParam param);
+    TResult Visit(LetOperator op, TParam param);
     TResult Visit(UserDefinedOperator op, TParam param);
 }

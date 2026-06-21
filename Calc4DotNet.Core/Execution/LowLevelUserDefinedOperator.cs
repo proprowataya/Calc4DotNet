@@ -9,17 +9,22 @@ public readonly struct LowLevelUserDefinedOperator : IEquatable<LowLevelUserDefi
     public OperatorDefinition Definition { get; }
     public ImmutableArray<LowLevelOperation> Operations { get; }
     public int MaxStackSize { get; }
+    public int LocalCount { get; }
 
-    public LowLevelUserDefinedOperator(OperatorDefinition definition, ImmutableArray<LowLevelOperation> operations, int maxStackSize)
+    public LowLevelUserDefinedOperator(OperatorDefinition definition, ImmutableArray<LowLevelOperation> operations, int maxStackSize, int localCount)
     {
         Definition = definition;
         Operations = operations;
         MaxStackSize = maxStackSize;
+        LocalCount = localCount;
     }
 
     public bool Equals(LowLevelUserDefinedOperator other)
     {
-        return Definition.Equals(other.Definition) && Operations.SequenceEqual(other.Operations) && MaxStackSize == other.MaxStackSize;
+        return Definition.Equals(other.Definition)
+            && Operations.SequenceEqual(other.Operations)
+            && MaxStackSize == other.MaxStackSize
+            && LocalCount == other.LocalCount;
     }
 
     public override bool Equals([NotNullWhen(true)] object? obj)
@@ -38,6 +43,7 @@ public readonly struct LowLevelUserDefinedOperator : IEquatable<LowLevelUserDefi
         }
 
         hash.Add(MaxStackSize);
+        hash.Add(LocalCount);
         return hash.ToHashCode();
     }
 }

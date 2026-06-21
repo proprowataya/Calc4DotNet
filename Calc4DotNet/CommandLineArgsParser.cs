@@ -12,7 +12,6 @@ internal static class CommandLineArgs
     public const string EnableOptimization = "-O1";
     public const string DisableOptimization = "-O0";
     public const string DumpProgram = "--dump";
-    public const string DoubleFloatingPoint = "double";
     public const string InfinitePrecisionInteger = "inf";
 }
 
@@ -97,7 +96,6 @@ During the Repl mode, the following commands are available:
                         "32" => typeof(Int32),
                         "64" => typeof(Int64),
                         "128" => typeof(Int128),
-                        CommandLineArgs.DoubleFloatingPoint => typeof(Double),
                         CommandLineArgs.InfinitePrecisionInteger => typeof(BigInteger),
                         var arg => throw new CommandLineArgsParseException($"Type \"{arg}\" is not supported."),
                     };

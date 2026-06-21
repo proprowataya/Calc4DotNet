@@ -8,7 +8,6 @@ public interface IEvaluationState<TNumber>
     IVariableSource<TNumber> Variables { get; }
     IArraySource<TNumber> GlobalArray { get; }
     IIOService IOService { get; }
-    IEvaluationState<TNumber> Clone();
 }
 
 public sealed class SimpleEvaluationState<TNumber> : IEvaluationState<TNumber>
@@ -23,15 +22,5 @@ public sealed class SimpleEvaluationState<TNumber> : IEvaluationState<TNumber>
         Variables = variables;
         GlobalArray = globalArray;
         IOService = ioService;
-    }
-
-    public SimpleEvaluationState<TNumber> Clone()
-    {
-        return new SimpleEvaluationState<TNumber>(Variables.Clone(), GlobalArray.Clone(), IOService.Clone());
-    }
-
-    IEvaluationState<TNumber> IEvaluationState<TNumber>.Clone()
-    {
-        return Clone();
     }
 }

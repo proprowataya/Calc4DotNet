@@ -68,22 +68,30 @@ public static class ILCompiler
         where TNumber : INumber<TNumber>
     {
         // Emit Main(Run) operator
-        EmitILCore(module, module.EntryPoint, fieldBuilders, runMethod, 0, methods, isMain: true);
+        EmitILCore(module, module.EntryPoint, module.EntryPointLocalCount, fieldBuilders, runMethod, 0, methods, isMain: true);
 
         // Emit user-defined operators
         for (int i = 0; i < module.UserDefinedOperators.Length; i++)
         {
-            EmitILCore(module, module.UserDefinedOperators[i].Operations, fieldBuilders, methods[i].Method, methods[i].NumOperands, methods, isMain: false);
+            EmitILCore(module,
+                       module.UserDefinedOperators[i].Operations,
+                       module.UserDefinedOperators[i].LocalCount,
+                       fieldBuilders,
+                       methods[i].Method,
+                       methods[i].NumOperands,
+                       methods,
+                       isMain: false);
         }
     }
 
-    private static void EmitILCore<TNumber>(LowLevelModule<TNumber> module, ImmutableArray<LowLevelOperation> operations, FieldBuilder[] fieldBuilders, MethodBuilder method, int numOperands, (MethodBuilder Method, int NumOperands)[] methods, bool isMain)
+    private static void EmitILCore<TNumber>(LowLevelModule<TNumber> module, ImmutableArray<LowLevelOperation> operations, int localCount, FieldBuilder[] fieldBuilders, MethodBuilder method, int numOperands, (MethodBuilder Method, int NumOperands)[] methods, bool isMain)
         where TNumber : INumber<TNumber>
     {
         /* Locals */
         ILGenerator il = method.GetILGenerator();
         Dictionary<int, Label> labels = new Dictionary<int, Label>();
         Label methodEnd = il.DefineLabel();
+        LocalBuilder[] letLocals = new LocalBuilder[localCount];
         LocalBuilder? value = null, index = null, character = null;
         LocalBuilder? checkedLeft = null, checkedRight = null;
         int stateIndex = numOperands + (isMain ? 1 : 0);
@@ -108,6 +116,11 @@ public static class ILCompiler
         for (int i = 0; i < operations.Length; i++)
         {
             labels[i] = il.DefineLabel();
+        }
+
+        for (int i = 0; i < letLocals.Length; i++)
+        {
+            letLocals[i] = il.DeclareLocal(typeof(TNumber));
         }
 
         if (isMain && module.Variables.Length > 0)
@@ -163,6 +176,12 @@ public static class ILCompiler
                 case Opcode.StoreArg:
                     il.EmitStarg(RestoreMethodParameterIndex(op.Value));
                     break;
+                case Opcode.LoadLocal:
+                    il.Emit(OpCodes.Ldloc, letLocals[op.Value]);
+                    break;
+                case Opcode.StoreLocal:
+                    il.Emit(OpCodes.Stloc, letLocals[op.Value]);
+                    break;
                 case Opcode.LoadVariable:
                     il.Emit(OpCodes.Ldsfld, fieldBuilders[op.Value]);
                     break;
@@ -172,24 +191,24 @@ public static class ILCompiler
                     break;
                 case Opcode.LoadArrayElement:
                     index ??= il.DeclareLocal(typeof(TNumber));
-                    il.Emit(OpCodes.Stloc_S, index.LocalIndex);
+                    il.Emit(OpCodes.Stloc, index);
 
                     EmitLoadArraySource();
-                    il.Emit(OpCodes.Ldloc_S, index.LocalIndex);
+                    il.Emit(OpCodes.Ldloc, index);
                     il.Emit(OpCodes.Callvirt, typeof(IArraySource<TNumber>).GetMethod("get_Item", new[] { typeof(TNumber) })!);
                     break;
                 case Opcode.StoreArrayElement:
                     value ??= il.DeclareLocal(typeof(TNumber));
                     index ??= il.DeclareLocal(typeof(TNumber));
 
-                    il.Emit(OpCodes.Stloc_S, index.LocalIndex);
-                    il.Emit(OpCodes.Stloc_S, value.LocalIndex);
+                    il.Emit(OpCodes.Stloc, index);
+                    il.Emit(OpCodes.Stloc, value);
 
                     EmitLoadArraySource();
-                    il.Emit(OpCodes.Ldloc_S, index.LocalIndex);
-                    il.Emit(OpCodes.Ldloc_S, value.LocalIndex);
+                    il.Emit(OpCodes.Ldloc, index);
+                    il.Emit(OpCodes.Ldloc, value);
                     il.Emit(OpCodes.Callvirt, typeof(IArraySource<TNumber>).GetMethod("set_Item", new[] { typeof(TNumber), typeof(TNumber) })!);
-                    il.Emit(OpCodes.Ldloc_S, value.LocalIndex);
+                    il.Emit(OpCodes.Ldloc, value);
                     break;
                 case Opcode.Input:
                     EmitLoadIOService();
@@ -199,10 +218,10 @@ public static class ILCompiler
                 case Opcode.PrintChar:
                     character ??= il.DeclareLocal(typeof(char));
                     il.EmitConvToINumber<TNumber, char>();
-                    il.Emit(OpCodes.Stloc_S, character.LocalIndex);
+                    il.Emit(OpCodes.Stloc, character);
 
                     EmitLoadIOService();
-                    il.Emit(OpCodes.Ldloc_S, character.LocalIndex);
+                    il.Emit(OpCodes.Ldloc, character);
                     il.Emit(OpCodes.Callvirt, typeof(IIOService).GetMethod(nameof(IIOService.PrintChar))!);
                     il.EmitLdc(TNumber.Zero);
                     break;
@@ -242,9 +261,9 @@ public static class ILCompiler
                         checkedLeft ??= il.DeclareLocal(typeof(TNumber));
                         checkedRight ??= il.DeclareLocal(typeof(TNumber));
 
-                        il.Emit(OpCodes.Stloc_S, checkedRight.LocalIndex);
-                        il.Emit(OpCodes.Stloc_S, checkedLeft.LocalIndex);
-                        il.Emit(OpCodes.Ldloc_S, checkedRight.LocalIndex);
+                        il.Emit(OpCodes.Stloc, checkedRight);
+                        il.Emit(OpCodes.Stloc, checkedLeft);
+                        il.Emit(OpCodes.Ldloc, checkedRight);
                         il.Emit(OpCodes.Constrained, typeof(TNumber));
                         il.Emit(OpCodes.Call, GetInterfacePropertyGetter(typeof(INumberBase<TNumber>), nameof(TNumber.Zero)));
                         il.Emit(OpCodes.Constrained, typeof(TNumber));
@@ -257,8 +276,8 @@ public static class ILCompiler
 
                         // Operate
                         il.MarkLabel(whenNotZero);
-                        il.Emit(OpCodes.Ldloc_S, checkedLeft.LocalIndex);
-                        il.Emit(OpCodes.Ldloc_S, checkedRight.LocalIndex);
+                        il.Emit(OpCodes.Ldloc, checkedLeft);
+                        il.Emit(OpCodes.Ldloc, checkedRight);
                         il.Emit(OpCodes.Constrained, typeof(TNumber));
                         il.Emit(OpCodes.Call,
                                 op.Opcode switch

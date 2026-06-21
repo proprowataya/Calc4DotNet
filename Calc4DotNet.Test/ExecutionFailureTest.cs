@@ -15,6 +15,9 @@ public class ExecutionFailureTest
         new ExecutionFailureTestCase("D[x||{x} + 1] {x}",
                                      typeof(Calc4DotNet.Core.Exceptions.StackOverflowException),
                                      ExecutorTypes: new[]{ ExecutorType.LowLevel }),
+        new ExecutionFailureTestCase("D[x||{x} + 1] ({x})(I)",
+                                     typeof(Calc4DotNet.Core.Exceptions.StackOverflowException),
+                                     ExecutorTypes: new[]{ ExecutorType.LowLevel }),
         new ExecutionFailureTestCase("1/0",
                                      typeof(Calc4DotNet.Core.Exceptions.ZeroDivisionException)),
         new ExecutionFailureTestCase("1/(10 - 10)",
@@ -38,6 +41,10 @@ public class ExecutionFailureTest
         new ExecutionFailureTestCase("1&&(1/0)",
                                      typeof(Calc4DotNet.Core.Exceptions.ZeroDivisionException)),
         new ExecutionFailureTestCase("0||(1/0)",
+                                     typeof(Calc4DotNet.Core.Exceptions.ZeroDivisionException)),
+        new ExecutionFailureTestCase("D[f||1/0] ({f})(I)",
+                                     typeof(Calc4DotNet.Core.Exceptions.ZeroDivisionException)),
+        new ExecutionFailureTestCase("D[f||1/0] ({f})==({f})",
                                      typeof(Calc4DotNet.Core.Exceptions.ZeroDivisionException)),
     };
 

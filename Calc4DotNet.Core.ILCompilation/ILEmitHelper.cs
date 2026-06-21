@@ -56,9 +56,6 @@ internal static class ILEmitHelper
             case Int64 i64:
                 il.Emit(OpCodes.Ldc_I8, i64);
                 break;
-            case Double d:
-                il.Emit(OpCodes.Ldc_R8, d);
-                break;
             case BigInteger bigInteger:
                 try
                 {

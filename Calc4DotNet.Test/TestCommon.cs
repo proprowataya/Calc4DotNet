@@ -10,7 +10,7 @@ namespace Calc4DotNet.Test;
 
 internal static class TestCommon
 {
-    public static readonly Type[] ValueTypes = new[] { typeof(Int32), typeof(Int64), typeof(Int128), typeof(Double), typeof(BigInteger) };
+    public static readonly Type[] ValueTypes = new[] { typeof(Int32), typeof(Int64), typeof(Int128), typeof(BigInteger) };
 
     public static readonly ExecutorType[] ExecutorTypes = Enum.GetValues<ExecutorType>();
 
@@ -27,7 +27,11 @@ internal static class TestCommon
         IOperator op = Parser.Parse(tokens, ref context);
         if (target is not null)
         {
-            Optimizer.Optimize<TNumber>(ref op, ref context, target.GetValueOrDefault(), new DefaultVariableSource<TNumber>());
+            Optimizer.Optimize<TNumber>(ref op,
+                                        ref context,
+                                        target.GetValueOrDefault(),
+                                        new DefaultVariableSource<TNumber>(),
+                                        new DefaultArraySource<TNumber>());
         }
         LowLevelModule<TNumber> module = LowLevelCodeGenerator.Generate<TNumber>(op, context, LowLevelCodeGenerationOption.Default);
 
