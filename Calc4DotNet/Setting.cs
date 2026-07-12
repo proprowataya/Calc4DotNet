@@ -1,4 +1,4 @@
-﻿namespace Calc4DotNet;
+namespace Calc4DotNet;
 
 internal enum ExecutorType
 {

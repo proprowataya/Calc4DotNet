@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Numerics;
 
 namespace Calc4DotNet.Core.Optimization;

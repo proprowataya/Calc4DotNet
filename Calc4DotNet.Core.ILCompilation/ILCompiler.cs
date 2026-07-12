@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Numerics;
 using System.Reflection;
 using System.Reflection.Emit;

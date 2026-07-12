@@ -1,4 +1,4 @@
-﻿namespace Calc4DotNet.Core.Operators;
+namespace Calc4DotNet.Core.Operators;
 
 public sealed record OperatorDefinition(string Name, int NumOperands)
 {

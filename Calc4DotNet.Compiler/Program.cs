@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Numerics;
 using Calc4DotNet.Compiler;
 using Calc4DotNet.Core.Exceptions;

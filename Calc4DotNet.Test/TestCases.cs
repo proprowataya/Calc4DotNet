@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 using System.Collections.Immutable;
 using Calc4DotNet.Core;

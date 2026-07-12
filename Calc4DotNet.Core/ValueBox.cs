@@ -1,4 +1,4 @@
-﻿namespace Calc4DotNet.Core;
+namespace Calc4DotNet.Core;
 
 public readonly record struct ValueBox<T>(T? Value);
 
