@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Reflection.Emit;
 using static Calc4DotNet.Core.ILCompilation.ReflectionHelper;

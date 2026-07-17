@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 using Calc4DotNet;
 
 Setting setting;

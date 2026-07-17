@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text;
 using Calc4DotNet.Core;
 using Calc4DotNet.Core.Evaluation;
@@ -253,7 +253,7 @@ string outputPath = Path.GetFullPath(Path.Join(new[] { Assembly.GetExecutingAsse
 Console.WriteLine($"Output test cases to \"{outputPath}\"");
 
 using var stream = new FileStream(outputPath, FileMode.Create);
-using var writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
+using var writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
 
 writer.Write(
 @"#nullable disable

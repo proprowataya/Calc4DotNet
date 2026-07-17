@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using Calc4DotNet.Core;
 
 namespace Calc4DotNet.Test;

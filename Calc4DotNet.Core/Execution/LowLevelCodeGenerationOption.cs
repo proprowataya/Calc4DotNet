@@ -1,4 +1,4 @@
-﻿namespace Calc4DotNet.Core.Execution;
+namespace Calc4DotNet.Core.Execution;
 
 public sealed record LowLevelCodeGenerationOption
 {
