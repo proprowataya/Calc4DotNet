@@ -27,9 +27,9 @@ public static class LowLevelCodeGenerator
         {
             var visitor = new Visitor<TNumber>(context, option, constTable, operatorLabels, implement.Definition, variableIndices);
 
-            var operatorBody = implement.Operator;
-            Debug.Assert(operatorBody is not null);
-            visitor.Generate(operatorBody);
+            var resolved = implement as ResolvedOperatorImplement;
+            Debug.Assert(resolved is not null);
+            visitor.Generate(resolved.Body);
             if (visitor.StackSize != 0)
             {
                 throw new InvalidOperationException($"Stacksize is not zero: {visitor.StackSize}");

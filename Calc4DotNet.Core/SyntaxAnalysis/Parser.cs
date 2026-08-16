@@ -39,8 +39,9 @@ public static class Parser
         foreach (var token in tokens.OfType<DefineToken>())
         {
             IOperator op = ParseCore(token.Tokens, context);
+            var implement = context.Value.LookupOperatorImplement(token.Name);
             context.Value = context.Value.WithAddOrUpdateOperatorImplement(
-                context.Value.LookupOperatorImplement(token.Name) with { Operator = op });
+                new ResolvedOperatorImplement(implement.Definition, op, IsOptimized: false));
         }
     }
 

@@ -970,9 +970,9 @@ public static partial class Optimizer
 
         private IOperator LookupOperatorBody(string operatorName)
         {
-            var implement = compilationContext.LookupOperatorImplement(operatorName);
-            Debug.Assert(implement.Operator is not null);
-            return implement.Operator;
+            var resolved = compilationContext.LookupOperatorImplement(operatorName) as ResolvedOperatorImplement;
+            Debug.Assert(resolved is not null);
+            return resolved.Body;
         }
 
         private PotentialEffects LookupEffects(string operatorName)
