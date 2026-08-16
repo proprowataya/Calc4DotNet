@@ -36,8 +36,8 @@ public static partial class Optimizer
                                                             ImmutableHashSet<TNumber> UnknownArrayIndices)
         where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>;
 
-    private abstract record SpecializationResult<TNumber>(IOperator Body,
-                                                          SpecializationStateDelta<TNumber> ExitDelta)
+    private closed record SpecializationResult<TNumber>(IOperator Body,
+                                                        SpecializationStateDelta<TNumber> ExitDelta)
         where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>;
 
     private sealed record ConstantSpecializationResult<TNumber>(IOperator Body,
