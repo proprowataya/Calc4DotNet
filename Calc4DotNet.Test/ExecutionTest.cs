@@ -210,8 +210,8 @@ public class ExecutionTest
 
         var context = CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
         [
-            new OperatorImplement(inner, IsOptimized: true, innerBody),
-            new OperatorImplement(caller, IsOptimized: false, callerBody),
+            new ResolvedOperatorImplement(inner, innerBody, IsOptimized: true),
+            new ResolvedOperatorImplement(caller, callerBody, IsOptimized: false),
         ]);
 
         IOperator op = new UserDefinedOperator(

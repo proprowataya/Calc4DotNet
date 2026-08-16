@@ -175,14 +175,14 @@ public static partial class Optimizer
 
         foreach (var implement in context.OperatorImplements)
         {
-            if (implement.Operator is null)
+            if (implement is not ResolvedOperatorImplement resolved)
             {
                 continue;
             }
 
             PotentialEffectsBuilder directEffects = new();
             HashSet<string> directCallees = [];
-            CollectDirectEffects<TNumber>(implement.Operator, directEffects, directCallees);
+            CollectDirectEffects<TNumber>(resolved.Body, directEffects, directCallees);
             effects[implement.Definition.Name] = directEffects;
             callees[implement.Definition.Name] = directCallees;
         }
