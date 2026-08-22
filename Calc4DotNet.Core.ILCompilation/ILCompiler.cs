@@ -31,7 +31,7 @@ public static class ILCompiler
             = moduleBuilder.DefineType(ClassName,
                                        TypeAttributes.Class | TypeAttributes.Public,
                                        typeof(object),
-                                       new[] { typeof(ICompiledModule<TNumber>) });
+                                       [typeof(ICompiledModule<TNumber>)]);
         // Define variables
         FieldBuilder[] fieldBuilders = new FieldBuilder[module.Variables.Length];
         for (int i = 0; i < fieldBuilders.Length; i++)
@@ -43,7 +43,7 @@ public static class ILCompiler
             = typeBuilder.DefineMethod(nameof(ICompiledModule<TNumber>.Run),
                                        MethodAttributes.Public | MethodAttributes.Virtual,
                                        typeof(TNumber),
-                                       new[] { typeof(IEvaluationState<TNumber>) });
+                                       [typeof(IEvaluationState<TNumber>)]);
         typeBuilder.DefineMethodOverride(runMethod,
                                          typeof(ICompiledModule<TNumber>).GetMethod(nameof(ICompiledModule<TNumber>.Run))!);
 
@@ -89,7 +89,7 @@ public static class ILCompiler
     {
         /* Locals */
         ILGenerator il = method.GetILGenerator();
-        Dictionary<int, Label> labels = new Dictionary<int, Label>();
+        Dictionary<int, Label> labels = [];
         Label methodEnd = il.DefineLabel();
         LocalBuilder[] letLocals = new LocalBuilder[localCount];
         LocalBuilder? value = null, index = null, character = null;
@@ -145,7 +145,7 @@ public static class ILCompiler
                     il.Emit(OpCodes.Ldnull);
                 }
 
-                il.Emit(OpCodes.Callvirt, typeof(IVariableSource<TNumber>).GetMethod("get_Item", new[] { typeof(string) })!);
+                il.Emit(OpCodes.Callvirt, typeof(IVariableSource<TNumber>).GetMethod("get_Item", [typeof(string)])!);
                 il.Emit(OpCodes.Stsfld, fieldBuilders[i]);
             }
         }
@@ -195,7 +195,7 @@ public static class ILCompiler
 
                     EmitLoadArraySource();
                     il.Emit(OpCodes.Ldloc, index);
-                    il.Emit(OpCodes.Callvirt, typeof(IArraySource<TNumber>).GetMethod("get_Item", new[] { typeof(TNumber) })!);
+                    il.Emit(OpCodes.Callvirt, typeof(IArraySource<TNumber>).GetMethod("get_Item", [typeof(TNumber)])!);
                     break;
                 case Opcode.StoreArrayElement:
                     value ??= il.DeclareLocal(typeof(TNumber));
@@ -207,7 +207,7 @@ public static class ILCompiler
                     EmitLoadArraySource();
                     il.Emit(OpCodes.Ldloc, index);
                     il.Emit(OpCodes.Ldloc, value);
-                    il.Emit(OpCodes.Callvirt, typeof(IArraySource<TNumber>).GetMethod("set_Item", new[] { typeof(TNumber), typeof(TNumber) })!);
+                    il.Emit(OpCodes.Callvirt, typeof(IArraySource<TNumber>).GetMethod("set_Item", [typeof(TNumber), typeof(TNumber)])!);
                     il.Emit(OpCodes.Ldloc, value);
                     break;
                 case Opcode.Input:
@@ -378,7 +378,7 @@ public static class ILCompiler
                     }
 
                     il.Emit(OpCodes.Ldsfld, fieldBuilders[i]);
-                    il.Emit(OpCodes.Callvirt, typeof(IVariableSource<TNumber>).GetMethod("set_Item", new[] { typeof(string), typeof(TNumber) })!);
+                    il.Emit(OpCodes.Callvirt, typeof(IVariableSource<TNumber>).GetMethod("set_Item", [typeof(string), typeof(TNumber)])!);
                 }
             }
 

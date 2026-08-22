@@ -525,7 +525,7 @@ public static partial class Optimizer
                 : cachedEntry.Specialization;
 
             // Keep any operand whose evaluation is still observable at the call site.
-            var pieces = new List<IOperator>();
+            List<IOperator> pieces = [];
             for (int i = 0; i < operandResults.Length; i++)
             {
                 var rewrittenOperand = operandResults[i].Operator;

@@ -63,13 +63,13 @@ public static class Parser
         {
             if (maxNumOperands == 0)
             {
-                IOperator result = CreateOperator(tokens[index], Array.Empty<IOperator>());
+                IOperator result = CreateOperator(tokens[index], []);
                 index++;
                 return (result, index);
             }
             else
             {
-                List<IOperator> operands = new List<IOperator>();
+                List<IOperator> operands = [];
 
                 var lower = ReadLower();
                 if (lower.Count == 0 && tokens.FirstOrDefault() is DecimalToken)
@@ -144,7 +144,7 @@ public static class Parser
 
         private IReadOnlyList<IToken> ReadLower()
         {
-            List<IToken> list = new List<IToken>();
+            List<IToken> list = [];
 
             while (index < tokens.Count && tokens[index].NumOperands < maxNumOperands)
             {

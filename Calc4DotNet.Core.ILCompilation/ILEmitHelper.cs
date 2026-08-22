@@ -61,7 +61,7 @@ internal static class ILEmitHelper
                 {
                     long i64 = (long)bigInteger;
                     il.EmitLdc(i64);
-                    il.Emit(OpCodes.Newobj, typeof(BigInteger).GetConstructor(new[] { typeof(long) })!);
+                    il.Emit(OpCodes.Newobj, typeof(BigInteger).GetConstructor([typeof(long)])!);
                 }
                 catch (OverflowException)
                 {
@@ -77,7 +77,7 @@ internal static class ILEmitHelper
                         il.Emit(OpCodes.Stelem_I1);
                     }
 
-                    il.Emit(OpCodes.Newobj, typeof(BigInteger).GetConstructor(new[] { typeof(byte[]) })!);
+                    il.Emit(OpCodes.Newobj, typeof(BigInteger).GetConstructor([typeof(byte[])])!);
                 }
                 break;
             default:

@@ -28,7 +28,7 @@ public sealed class CompilationContext
 
     private CompilationContext()
     {
-        this.userDefinedOperators = ImmutableDictionary<string, OperatorImplement>.Empty;
+        this.userDefinedOperators = [];
     }
 
     internal CompilationContext(ImmutableDictionary<string, OperatorImplement> userDefinedOperators)

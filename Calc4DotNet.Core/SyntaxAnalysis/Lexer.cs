@@ -9,7 +9,7 @@ public static class Lexer
     public static List<IToken> Lex(string text, ref CompilationContext context)
     {
         var boxedContext = new CompilationContext.Boxed(context);
-        var implement = new Implement(boxedContext, text, new Dictionary<string, int>());
+        var implement = new Implement(boxedContext, text, []);
         var tokens = implement.Lex();
         if (implement.Index < text.Length)
         {
@@ -37,7 +37,7 @@ public static class Lexer
 
         public List<IToken> Lex()
         {
-            var list = new List<IToken>();
+            List<IToken> list = [];
 
             while (Index < text.Length && text[Index] != ')')
             {
@@ -146,7 +146,7 @@ public static class Lexer
             }
 
             string name = elems[0];
-            string[] arguments = elems[1].Length > 0 ? elems[1].Replace(" ", "").Split(",") : Array.Empty<string>();
+            string[] arguments = elems[1].Length > 0 ? elems[1].Replace(" ", "").Split(",") : [];
             string content = elems[2];
 
             var definition = new OperatorDefinition(name, arguments.Length);
