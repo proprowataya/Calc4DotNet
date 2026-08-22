@@ -107,8 +107,9 @@ internal abstract class Calc4Base<TNumber>
         {
             Console.WriteLine($"Operator \"{implement.Definition.Name}\"");
             Console.WriteLine("{");
-            Debug.Assert(implement.Operator is not null);
-            PrintTree(implement.Operator, 1);
+            var resolved = implement as ResolvedOperatorImplement;
+            Debug.Assert(resolved is not null);
+            PrintTree(resolved.Body, 1);
             Console.WriteLine("}");
             Console.WriteLine();
         }

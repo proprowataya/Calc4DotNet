@@ -10,8 +10,8 @@ public static partial class Optimizer
      * Partial evaluation results
      */
 
-    private abstract record PartialEvaluationResult<TNumber>(IOperator Operator,
-                                                             PreComputeState<TNumber> ExitState)
+    private closed record PartialEvaluationResult<TNumber>(IOperator Operator,
+                                                           PreComputeState<TNumber> ExitState)
         where TNumber : INumber<TNumber>;
 
     private sealed record ConstantEvaluationResult<TNumber>(IOperator Operator,
@@ -36,8 +36,8 @@ public static partial class Optimizer
                                                             ImmutableHashSet<TNumber> UnknownArrayIndices)
         where TNumber : INumber<TNumber>;
 
-    private abstract record SpecializationResult<TNumber>(IOperator Body,
-                                                          SpecializationStateDelta<TNumber> ExitDelta)
+    private closed record SpecializationResult<TNumber>(IOperator Body,
+                                                        SpecializationStateDelta<TNumber> ExitDelta)
         where TNumber : INumber<TNumber>;
 
     private sealed record ConstantSpecializationResult<TNumber>(IOperator Body,

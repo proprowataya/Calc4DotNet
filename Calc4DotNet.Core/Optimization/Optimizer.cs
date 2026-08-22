@@ -45,9 +45,12 @@ public static partial class Optimizer
             // Optimize user defined operators
             foreach (var implement in context.OperatorImplements)
             {
-                if (!implement.IsOptimized)
+                var resolved = implement as ResolvedOperatorImplement;
+                Debug.Assert(resolved is not null);
+
+                if (!resolved.IsOptimized)
                 {
-                    OptimizeUserDefinedOperator<TNumber>(implement, ref context, allVariableNames, effects, session, ref nextLetLocalIndex);
+                    OptimizeUserDefinedOperator<TNumber>(resolved, ref context, allVariableNames, effects, session, ref nextLetLocalIndex);
                 }
             }
         }
@@ -59,7 +62,7 @@ public static partial class Optimizer
         }
     }
 
-    private static void OptimizeUserDefinedOperator<TNumber>(OperatorImplement implement,
+    private static void OptimizeUserDefinedOperator<TNumber>(ResolvedOperatorImplement implement,
                                                              ref CompilationContext context,
                                                              HashSet<string?> allVariableNames,
                                                              ImmutableDictionary<string, PotentialEffects> effects,
@@ -69,11 +72,9 @@ public static partial class Optimizer
     {
         Debug.Assert(!implement.IsOptimized);
 
-        var op = implement.Operator;
-        Debug.Assert(op is not null);
         // User-defined operators are invoked in the middle of a program.
         // Their caller's variable and array states are inherited and cannot be assumed.
-        var newRoot = OptimizeCore<TNumber>(op,
+        var newRoot = OptimizeCore<TNumber>(implement.Body,
                                             context,
                                             allVariableNames,
                                             initalVariableValues: null,
@@ -81,7 +82,7 @@ public static partial class Optimizer
                                             effects,
                                             session,
                                             ref nextLetLocalIndex);
-        context = context.WithAddOrUpdateOperatorImplement(implement with { Operator = newRoot, IsOptimized = true });
+        context = context.WithAddOrUpdateOperatorImplement(implement with { Body = newRoot, IsOptimized = true });
     }
 
     private static IOperator OptimizeCore<TNumber>(IOperator op,
@@ -162,7 +163,9 @@ public static partial class Optimizer
         // Process user defined operators
         foreach (var implement in context.OperatorImplements)
         {
-            Process(implement.Operator ?? throw new InvalidOperationException("Implement is null"), variables);
+            var resolved = implement as ResolvedOperatorImplement;
+            Debug.Assert(resolved is not null);
+            Process(resolved.Body, variables);
         }
 
         return variables;

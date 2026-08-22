@@ -373,12 +373,12 @@ public static class Evaluator
                 stack[i] = operandResult.Value;
             }
 
-            var userDefinedOperatorBody = compilationContext.LookupOperatorImplement(op.Definition.Name).Operator;
-            Debug.Assert(userDefinedOperatorBody is not null);
+            var resolved = compilationContext.LookupOperatorImplement(op.Definition.Name) as ResolvedOperatorImplement;
+            Debug.Assert(resolved is not null);
             letFrames.Push([]);
             try
             {
-                return userDefinedOperatorBody.Accept(this, stack);
+                return resolved.Body.Accept(this, stack);
             }
             finally
             {

@@ -150,7 +150,7 @@ public static class Lexer
             string content = elems[2];
 
             var definition = new OperatorDefinition(name, arguments.Length);
-            context.Value = context.Value.WithAddOrUpdateOperatorImplement(new OperatorImplement(definition, IsOptimized: false));
+            context.Value = context.Value.WithAddOrUpdateOperatorImplement(new UnresolvedOperatorImplement(definition));
 
             var dictionary = arguments.Select((argumentName, argumentIndex) => (argumentName, argumentIndex))
                                       .ToDictionary(t => t.argumentName, t => t.argumentIndex);
