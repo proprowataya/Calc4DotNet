@@ -10,14 +10,14 @@ namespace Calc4DotNet.Test;
 
 public class ExecutionFailureTest
 {
-    private static readonly ExecutionFailureTestCase[] ExecutionFailureTestCases = new[]
-    {
+    private static readonly ExecutionFailureTestCase[] ExecutionFailureTestCases =
+    [
         new ExecutionFailureTestCase("D[x||{x} + 1] {x}",
                                      typeof(Calc4DotNet.Core.Exceptions.StackOverflowException),
-                                     ExecutorTypes: new[]{ ExecutorType.LowLevel }),
+                                     ExecutorTypes: [ExecutorType.LowLevel]),
         new ExecutionFailureTestCase("D[x||{x} + 1] ({x})(I)",
                                      typeof(Calc4DotNet.Core.Exceptions.StackOverflowException),
-                                     ExecutorTypes: new[]{ ExecutorType.LowLevel }),
+                                     ExecutorTypes: [ExecutorType.LowLevel]),
         new ExecutionFailureTestCase("1/0",
                                      typeof(Calc4DotNet.Core.Exceptions.ZeroDivisionException)),
         new ExecutionFailureTestCase("1/(10 - 10)",
@@ -46,7 +46,7 @@ public class ExecutionFailureTest
                                      typeof(Calc4DotNet.Core.Exceptions.ZeroDivisionException)),
         new ExecutionFailureTestCase("D[f||1/0] ({f})==({f})",
                                      typeof(Calc4DotNet.Core.Exceptions.ZeroDivisionException)),
-    };
+    ];
 
     public static readonly object[][] Source =
         (from testCase in ExecutionFailureTestCases

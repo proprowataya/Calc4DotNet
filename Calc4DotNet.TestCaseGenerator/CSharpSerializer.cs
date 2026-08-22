@@ -59,7 +59,7 @@ internal struct CSharpSerializer
         WriteLine(",", insertIndent: false);
         indent--;
 
-        Write($"{nameof(TestCase.SkipTypes)}: {(testCase.SkipTypes is null ? "null" : $"new[] {{ {string.Join(", ", testCase.SkipTypes.Select(t => $"typeof({t.Name})"))} }}")}");
+        Write($"{nameof(TestCase.SkipTypes)}: {(testCase.SkipTypes is null ? "null" : $"[{string.Join(", ", testCase.SkipTypes.Select(t => $"typeof({t.Name})"))}]")}");
 
         if (testCase.ExpectedConsoleOutput is { } consoleOutput)
         {
@@ -116,15 +116,27 @@ internal struct CSharpSerializer
             {
                 WriteLine(null, insertIndent: false);
             }
-            Write($"{parameters[i].Name}: ");
 
-            if (value is null)
+            // Write collection expressions on the line after the parameter name.
+            if (value is ImmutableArray<IOperator> array)
             {
-                Write("null", insertIndent: false);
+                WriteLine($"{parameters[i].Name}:");
+                indent++;
+                Serialize(array);
+                indent--;
             }
             else
             {
-                Serialize((dynamic)value, insertIndentFirst: false);
+                Write($"{parameters[i].Name}: ");
+
+                if (value is null)
+                {
+                    Write("null", insertIndent: false);
+                }
+                else
+                {
+                    Serialize((dynamic)value, insertIndentFirst: false);
+                }
             }
 
             if (i < parameters.Length - 1)
@@ -149,11 +161,10 @@ internal struct CSharpSerializer
     {
         WriteLine($"{nameof(CompilationContext)}.{nameof(CompilationContext.Empty)}.{nameof(CompilationContext.WithAddOrUpdateOperatorImplements)}(", insertIndentFirst);
         indent++;
-        WriteLine($"new {nameof(OperatorImplement)}[]");
-        WriteLine("{");
+        OperatorImplement[] implements = context.OperatorImplements.ToArray();
+        WriteLine("[");
 
         indent++;
-        OperatorImplement[] implements = context.OperatorImplements.ToArray();
         for (int i = 0; i < implements.Length; i++)
         {
             OperatorImplement implement = implements[i];
@@ -178,7 +189,7 @@ internal struct CSharpSerializer
         }
         indent--;
 
-        WriteLine("}");
+        WriteLine("]");
         indent--;
         Write(")");
     }
@@ -210,8 +221,7 @@ internal struct CSharpSerializer
 
     public void Serialize<T>(ImmutableArray<T> array, bool insertIndentFirst = true)
     {
-        WriteLine($"new {typeof(T).Name}[]", insertIndentFirst);
-        WriteLine("{");
+        WriteLine("[", insertIndentFirst);
         indent++;
         for (int i = 0; i < array.Length; i++)
         {
@@ -236,18 +246,17 @@ internal struct CSharpSerializer
             WriteLine(i < array.Length - 1 ? "," : "", insertIndent: false);
         }
         indent--;
-        Write($"}}.{nameof(ImmutableArray.ToImmutableArray)}()");
+        Write("]");
     }
 
     public void Serialize<TNumber>(ImmutableDictionary<ValueBox<string>, TNumber> dictionary, bool insertIndentFirst = true)
     {
         const string ValueBoxTypeName = $"{nameof(ValueBox)}<string>";
 
-        WriteLine($"{nameof(ImmutableDictionary)}.{nameof(ImmutableDictionary.CreateRange)}(", insertIndentFirst);
+        WriteLine($"{nameof(ImmutableDictionary)}.{nameof(ImmutableDictionary.CreateRange)}<{ValueBoxTypeName}, {typeof(TNumber).Name}>(", insertIndentFirst);
 
         indent++;
-        WriteLine($"new {nameof(KeyValuePair<ValueBox<string>, TNumber>)}<{ValueBoxTypeName}, {typeof(TNumber).Name}>[]");
-        WriteLine("{");
+        WriteLine("[");
         indent++;
 
         foreach (var (key, value) in dictionary.OrderBy(pair => pair.Key.Value))
@@ -269,18 +278,17 @@ internal struct CSharpSerializer
         }
 
         indent--;
-        WriteLine("}");
+        WriteLine("]");
         indent--;
         Write(")");
     }
 
     public void Serialize(ImmutableDictionary<Int32, Int32> dictionary, bool insertIndentFirst = true)
     {
-        WriteLine($"{nameof(ImmutableDictionary)}.{nameof(ImmutableDictionary.CreateRange)}(", insertIndentFirst);
+        WriteLine($"{nameof(ImmutableDictionary)}.{nameof(ImmutableDictionary.CreateRange)}<{nameof(Int32)}, {nameof(Int32)}>(", insertIndentFirst);
 
         indent++;
-        WriteLine($"new {nameof(KeyValuePair<Int32, Int32>)}<{nameof(Int32)}, {nameof(Int32)}>[]");
-        WriteLine("{");
+        WriteLine("[");
         indent++;
 
         foreach (var (key, value) in dictionary.OrderBy(pair => pair.Key))
@@ -293,7 +301,7 @@ internal struct CSharpSerializer
         }
 
         indent--;
-        WriteLine("}");
+        WriteLine("]");
         indent--;
         Write(")");
     }

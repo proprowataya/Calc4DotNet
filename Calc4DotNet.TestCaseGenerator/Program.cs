@@ -8,8 +8,8 @@ using Calc4DotNet.Core.Optimization;
 using Calc4DotNet.Core.SyntaxAnalysis;
 using Calc4DotNet.Test;
 
-var testCaseInputs = new (string Source, string StandardInput, Type[]? SkipTypes)[]
-{
+(string Source, string StandardInput, Type[]? SkipTypes)[] testCaseInputs =
+[
     ("200", "", null),
     ("1<2", "", null),
     ("1<=2", "", null),
@@ -247,9 +247,9 @@ var testCaseInputs = new (string Source, string StandardInput, Type[]? SkipTypes
     // survive the delta application.
     ("D[setx|flag|{flag}?((5S[x])I)?((7S[y])I)] (9S[z]) (1{setx}) L[z]", "A", null),
     ("D[setarr|flag|{flag}?((5->2)I)?((7->3)I)] (9->4) (1{setarr}) (4)@", "A", null),
-};
+];
 
-string outputPath = Path.GetFullPath(Path.Join(new[] { Assembly.GetExecutingAssembly().Location, "..", "..", "..", "..", "..", "Calc4DotNet.Test", "TestCases.cs" }));
+string outputPath = Path.GetFullPath(Path.Join([Assembly.GetExecutingAssembly().Location, "..", "..", "..", "..", "..", "Calc4DotNet.Test", "TestCases.cs"]));
 Console.WriteLine($"Output test cases to \"{outputPath}\"");
 
 using var stream = new FileStream(outputPath, FileMode.Create);
@@ -267,7 +267,7 @@ using Calc4DotNet.Test;
 internal static class TestCases
 {
     public static readonly TestCase[] Values =
-    {
+    [
 ");
 
 var serializer = new CSharpSerializer(writer, 2);
@@ -279,7 +279,7 @@ foreach (var (source, standardInput, skipTypes) in testCaseInputs)
 }
 
 writer.Write(
-@"    };
+@"    ];
 }
 ");
 

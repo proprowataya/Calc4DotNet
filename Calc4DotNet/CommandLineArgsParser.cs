@@ -61,7 +61,7 @@ During the Repl mode, the following commands are available:
 #endif
         bool optimize = true;
         bool dump = false;
-        List<string> sourcePaths = new();
+        List<string> sourcePaths = [];
         bool printHelp = false;
 
         for (int i = 0; i < args.Length; i++)

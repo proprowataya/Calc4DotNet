@@ -10,10 +10,10 @@ public static class LowLevelCodeGenerator
     public static LowLevelModule<TNumber> Generate<TNumber>(IOperator op, CompilationContext context, LowLevelCodeGenerationOption option)
         where TNumber : INumber<TNumber>
     {
-        var constTable = new List<TNumber>();
+        List<TNumber> constTable = [];
+        Dictionary<OperatorDefinition, int> operatorLabels = [];
+        Dictionary<ValueBox<string>, int> variableIndices = [];
         var userDefinedOperators = ImmutableArray.CreateBuilder<LowLevelUserDefinedOperator>();
-        var operatorLabels = new Dictionary<OperatorDefinition, int>();
-        var variableIndices = new Dictionary<ValueBox<string>, int>();
 
         // Initialize operatorLabels
         int index = 0;
@@ -73,7 +73,7 @@ public static class LowLevelCodeGenerator
         private readonly Dictionary<ValueBox<string>, int> variableIndices;
         private readonly Dictionary<int, int> localIndices = [];
 
-        private List<LowLevelOperation> list = new List<LowLevelOperation>();
+        private List<LowLevelOperation> list = [];
         private int nextLabel = OperatorBeginLabel;
         private int stackSize = 0;
         private int maxStackSize = 0;
@@ -133,8 +133,8 @@ public static class LowLevelCodeGenerator
 
         private void ResolveLavels()
         {
-            List<LowLevelOperation> newList = new List<LowLevelOperation>();
-            Dictionary<int, int> labelMap = new Dictionary<int, int>();
+            List<LowLevelOperation> newList = [];
+            Dictionary<int, int> labelMap = [];
 
             // First pass removes label operations and records their address.
             foreach (var op in list)
