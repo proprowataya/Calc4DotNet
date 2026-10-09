@@ -50,8 +50,8 @@ public static class LowLevelExecutor
         ref int firstStackSizes = ref maxStackSizes[0];
         ref int firstLocalFrameSizes = ref localFrameSizes[0];
 
-        TNumber[] stack = new TNumber[StackSize];
-        int[] ptrStack = new int[PtrStackSize];
+        TNumber[] stack = GC.AllocateUninitializedArray<TNumber>(StackSize);
+        int[] ptrStack = GC.AllocateUninitializedArray<int>(PtrStackSize);
         ref TNumber stackBegin = ref stack[0];
         ref TNumber stackEnd = ref stack[^1];
         ref TNumber top = ref Unsafe.Add(ref stackBegin, module.EntryPointLocalCount);
