@@ -89,7 +89,7 @@ public static class ILCompiler
     {
         /* Locals */
         ILGenerator il = method.GetILGenerator();
-        Dictionary<int, Label> labels = [];
+        Label[] labels = new Label[operations.Length];
         Label methodEnd = il.DefineLabel();
         LocalBuilder[] letLocals = new LocalBuilder[localCount];
         LocalBuilder? value = null, index = null, character = null;
@@ -113,7 +113,7 @@ public static class ILCompiler
 
         /* Start emit code */
 
-        for (int i = 0; i < operations.Length; i++)
+        for (int i = 0; i < labels.Length; i++)
         {
             labels[i] = il.DefineLabel();
         }
