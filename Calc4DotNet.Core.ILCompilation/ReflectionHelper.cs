@@ -4,14 +4,13 @@ namespace Calc4DotNet.Core.ILCompilation;
 
 internal static class ReflectionHelper
 {
-    public static MethodInfo GetInterfaceMethod(Type typeOfTNumber, Type typeOfInterface, string methodName)
+    public static MethodInfo GetInterfaceMethod(Type typeOfInterface, string methodName)
     {
-        return typeOfTNumber.GetInterfaceMap(typeOfInterface).InterfaceMethods.Single(method => method.Name == methodName);
+        return typeOfInterface.GetMethod(methodName)!;
     }
 
-    public static MethodInfo GetInterfacePropertyGetter(Type typeOfTNumber, Type typeOfInterface, string propertyName)
+    public static MethodInfo GetInterfacePropertyGetter(Type typeOfInterface, string propertyName)
     {
-        // TODO
-        return typeOfTNumber.GetInterfaceMap(typeOfInterface).InterfaceMethods.Single(property => property.Name == $"get_{propertyName}");
+        return typeOfInterface.GetProperty(propertyName)!.GetMethod!;
     }
 }

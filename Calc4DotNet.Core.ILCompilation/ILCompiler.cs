@@ -387,12 +387,12 @@ public static class ILCompiler
 
         static MethodInfo GetInterfaceMethod(Type typeOfInterface, string methodName)
         {
-            return ReflectionHelper.GetInterfaceMethod(typeof(TNumber), typeOfInterface, methodName);
+            return ReflectionHelper.GetInterfaceMethod(typeOfInterface, methodName);
         }
 
         static MethodInfo GetInterfacePropertyGetter(Type typeOfInterface, string propertyName)
         {
-            return ReflectionHelper.GetInterfacePropertyGetter(typeof(TNumber), typeOfInterface, propertyName);
+            return ReflectionHelper.GetInterfacePropertyGetter(typeOfInterface, propertyName);
         }
     }
 
