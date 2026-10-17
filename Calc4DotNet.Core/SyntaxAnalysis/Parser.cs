@@ -18,11 +18,18 @@ public static class Parser
     private static IOperator ParseCore(IReadOnlyList<IToken> tokens, CompilationContext.Boxed context)
     {
         var operators = ImmutableArray.CreateBuilder<IOperator>();
+        int[] maxNumOperands = new int[tokens.Count];
+        int max = int.MinValue;
+        for (int i = tokens.Count - 1; i >= 0; i--)
+        {
+            max = Math.Max(max, tokens[i]?.NumOperands ?? 0);
+            maxNumOperands[i] = max;
+        }
 
         int index = 0;
         while (index < tokens.Count)
         {
-            (var op, index) = new Implement(tokens, context, index).ParseOne();
+            (var op, index) = new Implement(tokens, context, index, maxNumOperands[index]).ParseOne();
             operators.Add(op);
         }
 
@@ -51,11 +58,11 @@ public static class Parser
         private readonly int maxNumOperands;
         private int index;
 
-        public Implement(IReadOnlyList<IToken> tokens, CompilationContext.Boxed context, int startIndex)
+        public Implement(IReadOnlyList<IToken> tokens, CompilationContext.Boxed context, int startIndex, int maxNumOperands)
         {
             this.tokens = tokens ?? throw new ArgumentNullException(nameof(tokens));
             this.context = context ?? throw new ArgumentNullException(nameof(context));
-            this.maxNumOperands = tokens.Skip(startIndex).DefaultIfEmpty(null).Max(t => t?.NumOperands ?? 0);
+            this.maxNumOperands = maxNumOperands;
             this.index = startIndex;
         }
 
