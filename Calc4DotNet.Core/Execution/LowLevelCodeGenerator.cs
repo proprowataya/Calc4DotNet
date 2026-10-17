@@ -284,7 +284,7 @@ public static class LowLevelCodeGenerator
                     StackSize -= 2;
                     break;
                 case Opcode.Call:
-                    StackSize -= operatorLabels.Single(p => p.Value == operation.Value).Key.NumOperands - 1;
+                    // The call visitor updates the stack size using the operator definition.
                     break;
                 case Opcode.Lavel:
                     // Do nothing
@@ -640,6 +640,10 @@ public static class LowLevelCodeGenerator
             else
             {
                 AddOperation(new LowLevelOperation(Opcode.Call, operatorLabels[op.Definition]));
+
+                // Normally AddOperation updates the stack size.
+                // For calls, do it here because the operator definition is already available.
+                StackSize -= op.Definition.NumOperands - 1;
             }
         }
 
