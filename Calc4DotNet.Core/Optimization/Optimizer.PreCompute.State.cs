@@ -6,7 +6,7 @@ namespace Calc4DotNet.Core.Optimization;
 public static partial class Optimizer
 {
     private sealed class PreComputeState<TNumber>
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         private readonly ImmutableDictionary<ValueBox<string>, TNumber> variables;
         private readonly ImmutableDictionary<TNumber, TNumber> knownArrayValues;

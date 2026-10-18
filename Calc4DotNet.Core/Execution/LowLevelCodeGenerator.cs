@@ -8,7 +8,7 @@ namespace Calc4DotNet.Core.Execution;
 public static class LowLevelCodeGenerator
 {
     public static LowLevelModule<TNumber> Generate<TNumber>(IOperator op, CompilationContext context, LowLevelCodeGenerationOption option)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         List<TNumber> constTable = [];
         Dictionary<OperatorDefinition, int> operatorLabels = [];
@@ -61,7 +61,7 @@ public static class LowLevelCodeGenerator
     }
 
     private sealed class Visitor<TNumber> : IOperatorVisitor
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         private const int OperatorBeginLabel = 0;
 

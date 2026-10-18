@@ -56,7 +56,7 @@ public class AotCompilerTest
     }
 
     private static void RunCompilationGeneric<TNumber>(string sourcePath, Setting setting, TNumber dummy)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         CompilerImplementation.Run<TNumber>(sourcePath, setting);
     }

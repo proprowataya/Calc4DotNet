@@ -14,7 +14,7 @@ public static class ILCompiler
     private const string RunMethodName = nameof(ICompiledModule<int>.Run);
 
     public static ICompiledModule<TNumber> Compile<TNumber>(LowLevelModule<TNumber> module)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(AsmName, AssemblyBuilderAccess.Run);
         var (_, typeBuilder) = CompileToAssembly(module, assemblyBuilder);
@@ -23,7 +23,7 @@ public static class ILCompiler
     }
 
     public static (ModuleBuilder ModuleBuilder, TypeBuilder TypeBuilder) CompileToAssembly<TNumber>(LowLevelModule<TNumber> module, AssemblyBuilder assemblyBuilder)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         ModuleBuilder moduleBuilder
             = assemblyBuilder.DefineDynamicModule(AsmName.Name!);
@@ -65,7 +65,7 @@ public static class ILCompiler
     }
 
     private static void EmitIL<TNumber>(LowLevelModule<TNumber> module, FieldBuilder[] fieldBuilders, MethodBuilder runMethod, (MethodBuilder Method, int NumOperands)[] methods)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         // Emit Main(Run) operator
         EmitILCore(module, module.EntryPoint, module.EntryPointLocalCount, fieldBuilders, runMethod, 0, methods, isMain: true);
@@ -85,7 +85,7 @@ public static class ILCompiler
     }
 
     private static void EmitILCore<TNumber>(LowLevelModule<TNumber> module, ImmutableArray<LowLevelOperation> operations, int localCount, FieldBuilder[] fieldBuilders, MethodBuilder method, int numOperands, (MethodBuilder Method, int NumOperands)[] methods, bool isMain)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         /* Locals */
         ILGenerator il = method.GetILGenerator();

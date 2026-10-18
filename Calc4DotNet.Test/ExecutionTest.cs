@@ -41,7 +41,7 @@ public class ExecutionTest
                                                  OptimizeTarget? target,
                                                  TestCase testCase,
                                                  TNumber dummy)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         /*****
          * Compile
@@ -292,7 +292,7 @@ public class ExecutionTest
     }
 
     private sealed class UnknownVariableSource<TNumber> : IVariableSource<TNumber>
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         public TNumber this[string? variableName]
         {
@@ -313,7 +313,7 @@ public class ExecutionTest
     }
 
     private sealed class UnknownArraySource<TNumber> : IArraySource<TNumber>
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         public TNumber this[TNumber index]
         {

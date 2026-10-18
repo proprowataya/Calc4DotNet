@@ -13,7 +13,7 @@ internal static class ReplCommand
 }
 
 internal class Repl<TNumber> : Calc4Base<TNumber>
-    where TNumber : INumber<TNumber>
+    where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
 {
     public Repl(Setting setting) : base(setting)
     { }

@@ -5,7 +5,7 @@ using System.Numerics;
 namespace Calc4DotNet.Core;
 
 public interface IVariableSource<TNumber>
-    where TNumber : INumber<TNumber>
+    where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
 {
     TNumber this[string? variableName] { get; set; }
 
@@ -17,7 +17,7 @@ public interface IVariableSource<TNumber>
 }
 
 public sealed class DefaultVariableSource<TNumber> : IVariableSource<TNumber>
-    where TNumber : INumber<TNumber>
+    where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
 {
     private readonly Dictionary<ValueBox<string>, TNumber> variables = [];
 

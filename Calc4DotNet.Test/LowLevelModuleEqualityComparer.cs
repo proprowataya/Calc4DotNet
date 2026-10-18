@@ -5,7 +5,7 @@ using Calc4DotNet.Core.Execution;
 namespace Calc4DotNet.Test;
 
 internal sealed class LowLevelModuleEqualityComparer<TNumber> : IEqualityComparer<LowLevelModule<TNumber>>
-    where TNumber : INumber<TNumber>
+    where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
 {
     public static readonly LowLevelModuleEqualityComparer<TNumber> Instance = new();
 

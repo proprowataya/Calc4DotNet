@@ -9,7 +9,7 @@ public static partial class Optimizer
     private readonly record struct PreComputeFrame<TNumber>(PreComputeState<TNumber> State,
                                                             UserDefinedCallBudget Budget,
                                                             ImmutableDictionary<int, TNumber> LetValues)
-        where TNumber : INumber<TNumber>;
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>;
 
     private readonly record struct UserDefinedCallBudget(int RemainingUserDefinedCalls)
     {

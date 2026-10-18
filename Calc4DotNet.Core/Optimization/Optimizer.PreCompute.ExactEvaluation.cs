@@ -9,7 +9,7 @@ public static partial class Optimizer
     { }
 
     private sealed class RecordingKnownVariableSource<TNumber> : IVariableSource<TNumber>
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         private readonly PreComputeState<TNumber> initialState;
         private readonly Dictionary<ValueBox<string>, TNumber> values = [];
@@ -66,7 +66,7 @@ public static partial class Optimizer
     }
 
     private sealed class RecordingKnownArraySource<TNumber> : IArraySource<TNumber>
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         private readonly PreComputeState<TNumber> initialState;
         private readonly Dictionary<TNumber, TNumber> values = [];

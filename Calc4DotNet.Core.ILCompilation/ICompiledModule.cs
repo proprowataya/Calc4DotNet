@@ -4,7 +4,7 @@ using Calc4DotNet.Core.Evaluation;
 namespace Calc4DotNet.Core.ILCompilation;
 
 public interface ICompiledModule<TNumber>
-    where TNumber : INumber<TNumber>
+    where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
 {
     TNumber Run(IEvaluationState<TNumber> state);
 }

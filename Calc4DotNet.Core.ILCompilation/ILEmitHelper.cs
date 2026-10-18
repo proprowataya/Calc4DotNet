@@ -8,7 +8,7 @@ namespace Calc4DotNet.Core.ILCompilation;
 internal static class ILEmitHelper
 {
     public static void EmitLdc<TNumber>(this ILGenerator il, TNumber value)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         switch (value)
         {

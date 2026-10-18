@@ -12,18 +12,18 @@ public static partial class Optimizer
 
     private abstract record PartialEvaluationResult<TNumber>(IOperator Operator,
                                                              PreComputeState<TNumber> ExitState)
-        where TNumber : INumber<TNumber>;
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>;
 
     private sealed record ConstantEvaluationResult<TNumber>(IOperator Operator,
                                                             PreComputeState<TNumber> ExitState,
                                                             TNumber ConstantValue)
         : PartialEvaluationResult<TNumber>(Operator, ExitState)
-        where TNumber : INumber<TNumber>;
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>;
 
     private sealed record UnknownEvaluationResult<TNumber>(IOperator Operator,
                                                            PreComputeState<TNumber> ExitState)
         : PartialEvaluationResult<TNumber>(Operator, ExitState)
-        where TNumber : INumber<TNumber>;
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>;
 
     /*
      * Specialization results
@@ -34,20 +34,20 @@ public static partial class Optimizer
                                                             bool InvalidateAllArrayElements,
                                                             ImmutableDictionary<TNumber, TNumber> KnownArrayValues,
                                                             ImmutableHashSet<TNumber> UnknownArrayIndices)
-        where TNumber : INumber<TNumber>;
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>;
 
     private abstract record SpecializationResult<TNumber>(IOperator Body,
                                                           SpecializationStateDelta<TNumber> ExitDelta)
-        where TNumber : INumber<TNumber>;
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>;
 
     private sealed record ConstantSpecializationResult<TNumber>(IOperator Body,
                                                                 SpecializationStateDelta<TNumber> ExitDelta,
                                                                 TNumber ConstantValue)
         : SpecializationResult<TNumber>(Body, ExitDelta)
-        where TNumber : INumber<TNumber>;
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>;
 
     private sealed record UnknownSpecializationResult<TNumber>(IOperator Body,
                                                                SpecializationStateDelta<TNumber> ExitDelta)
         : SpecializationResult<TNumber>(Body, ExitDelta)
-        where TNumber : INumber<TNumber>;
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>;
 }

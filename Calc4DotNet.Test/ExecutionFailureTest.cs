@@ -63,7 +63,7 @@ public class ExecutionFailureTest
     }
 
     private static void TestFailureGeneric<TNumber>(ExecutionFailureTestCase testCase, ExecutorType executorType, OptimizeTarget? target, TNumber dummy)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         // This test intends to check whether the expected exception is thrown in execution time.
         // So, we compile the given code outside Assert.Throws().

@@ -3,7 +3,7 @@ using System.Numerics;
 namespace Calc4DotNet;
 
 internal sealed class Executor<TNumber> : Calc4Base<TNumber>
-    where TNumber : INumber<TNumber>
+    where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
 {
     private readonly string[] sourcePaths;
 

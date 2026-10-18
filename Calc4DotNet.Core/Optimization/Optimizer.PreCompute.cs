@@ -11,7 +11,7 @@ namespace Calc4DotNet.Core.Optimization;
 public static partial class Optimizer
 {
     private sealed class PreComputeSession<TNumber>
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         public Dictionary<SpecializationCacheKey<TNumber>, SpecializationCacheEntry<TNumber>?> SpecializationCache { get; } = [];
         public Dictionary<SpecializationCacheKey<TNumber>, LetInlineCacheEntry<TNumber>> LetInlineCache { get; } = [];
@@ -19,19 +19,19 @@ public static partial class Optimizer
     }
 
     private readonly record struct SpecializationBinding<TNumber>(int Index, TNumber Value)
-        where TNumber : INumber<TNumber>;
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>;
 
     private sealed record SpecializationCacheEntry<TNumber>(SpecializationResult<TNumber> Specialization,
                                                             ImmutableArray<int> GeneratedLocalIndices)
-        where TNumber : INumber<TNumber>;
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>;
 
     private sealed record LetInlineCacheEntry<TNumber>(SpecializationResult<TNumber> Specialization,
                                                        ImmutableDictionary<int, int> UsageCounts,
                                                        ImmutableArray<int> GeneratedLocalIndices)
-        where TNumber : INumber<TNumber>;
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>;
 
     private readonly struct SpecializationCacheKey<TNumber> : IEquatable<SpecializationCacheKey<TNumber>>
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         private readonly string operatorName;
         private readonly IOperator operatorBody;
@@ -89,7 +89,7 @@ public static partial class Optimizer
     }
 
     private sealed class PreComputeVisitor<TNumber> : IOperatorVisitor<PartialEvaluationResult<TNumber>, PreComputeFrame<TNumber>>
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         private const int NoTemporaryLetLocalIndex = 0;
         private readonly CompilationContext compilationContext;

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 namespace Calc4DotNet.Core;
 
 public interface IArraySource<TNumber>
-    where TNumber : INumber<TNumber>
+    where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
 {
     TNumber this[TNumber index] { get; set; }
 
@@ -18,7 +18,7 @@ public interface IArraySource<TNumber>
 }
 
 public sealed class DefaultArraySource<TNumber> : IArraySource<TNumber>
-    where TNumber : INumber<TNumber>
+    where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
 {
     private const int ArrayLength = 2048;
     private static TNumber BaseOffset => TNumber.CreateTruncating(-1024);
@@ -127,7 +127,7 @@ internal sealed class ArrayElementNotSetException : Exception
 { }
 
 internal sealed class AlwaysThrowGlobalArraySource<TNumber> : IArraySource<TNumber>
-    where TNumber : INumber<TNumber>
+    where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
 {
     public static readonly AlwaysThrowGlobalArraySource<TNumber> Instance = new();
 

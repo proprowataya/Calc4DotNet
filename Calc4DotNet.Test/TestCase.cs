@@ -17,4 +17,4 @@ internal sealed record TestCase(string Source,
                                 string? ExpectedConsoleOutput = null);
 
 internal sealed record CompilationResult<TNumber>(IOperator Operator, CompilationContext Context, LowLevelModule<TNumber> Module)
-    where TNumber : INumber<TNumber>;
+    where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>;

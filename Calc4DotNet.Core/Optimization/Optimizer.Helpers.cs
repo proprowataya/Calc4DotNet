@@ -14,7 +14,7 @@ public static partial class Optimizer
     // Passing null falls back to the conservative answer (UserDefinedOperator is
     // treated as impure).
     private static bool IsPure<TNumber>(IOperator op, ImmutableDictionary<string, PotentialEffects>? effectsMap = null)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         switch (op)
         {
@@ -79,19 +79,19 @@ public static partial class Optimizer
     }
 
     private static bool IsNonZeroConstant<TNumber>(IOperator op)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         return op is PreComputedOperator preComputed && !TNumber.IsZero((TNumber)preComputed.Value);
     }
 
     private static bool IsDefinitelyNonZeroConstant<TNumber>(IOperator op)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         return TryEvaluateLiteral<TNumber>(op, out var value) && !TNumber.IsZero(value);
     }
 
     private static bool TryEvaluateLiteral<TNumber>(IOperator op, out TNumber value)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         switch (op)
         {
@@ -193,7 +193,7 @@ public static partial class Optimizer
     }
 
     private static bool CanInlineAtUseSite<TNumber>(IOperator op)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         switch (op)
         {

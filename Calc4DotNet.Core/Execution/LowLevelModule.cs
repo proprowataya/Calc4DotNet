@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace Calc4DotNet.Core.Execution;
 
 public sealed class LowLevelModule<TNumber>
-    where TNumber : INumber<TNumber>
+    where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
 {
     public ImmutableArray<LowLevelOperation> EntryPoint { get; }
     public int EntryPointLocalCount { get; }

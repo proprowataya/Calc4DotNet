@@ -168,7 +168,7 @@ public static partial class Optimizer
     }
 
     private static ImmutableDictionary<string, PotentialEffects> ComputePotentialEffects<TNumber>(CompilationContext context)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         Dictionary<string, PotentialEffectsBuilder> effects = [];
         Dictionary<string, HashSet<string>> callees = [];
@@ -256,7 +256,7 @@ public static partial class Optimizer
     }
 
     private static void CollectDirectEffects<TNumber>(IOperator op, PotentialEffectsBuilder effects, HashSet<string> callees)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         CollectEffectsFromTree<TNumber>(op, effects, userDefined => callees.Add(userDefined.Definition.Name));
     }
@@ -264,7 +264,7 @@ public static partial class Optimizer
     private static void CollectEffectsFromTree<TNumber>(IOperator op,
                                                         PotentialEffectsBuilder effects,
                                                         Action<UserDefinedOperator> collectUserDefined)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         switch (op)
         {

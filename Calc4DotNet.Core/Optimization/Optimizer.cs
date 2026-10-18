@@ -27,7 +27,7 @@ public static partial class Optimizer
                                          OptimizeTarget target,
                                          IVariableSource<TNumber>? initalVariableValues = null,
                                          IArraySource<TNumber>? initialGlobalArray = null)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         if (target == OptimizeTarget.None)
         {
@@ -65,7 +65,7 @@ public static partial class Optimizer
                                                              ImmutableDictionary<string, PotentialEffects> effects,
                                                              PreComputeSession<TNumber> session,
                                                              ref int nextLetLocalIndex)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         Debug.Assert(!implement.IsOptimized);
 
@@ -92,7 +92,7 @@ public static partial class Optimizer
                                                    ImmutableDictionary<string, PotentialEffects> effects,
                                                    PreComputeSession<TNumber> session,
                                                    ref int nextLetLocalIndex)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         var state = PreComputeState<TNumber>.Create(arraysZeroInitialized: initialGlobalArray is not null);
 

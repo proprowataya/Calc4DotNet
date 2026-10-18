@@ -17,7 +17,7 @@ internal sealed class EvaluationVariableNotSetException : Exception
 public static class Evaluator
 {
     public static TNumber Evaluate<TNumber>(IOperator op, CompilationContext compilationContext, IEvaluationState<TNumber> evaluationState, int maxStep = int.MaxValue)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         var result = op.Accept(new Visitor<TNumber>(compilationContext, evaluationState, maxStep), null);
         return result.Succeeded ? result.Value : throw CreateException(result.Failure);
@@ -28,7 +28,7 @@ public static class Evaluator
                                             IEvaluationState<TNumber> evaluationState,
                                             int maxStep,
                                             out TNumber value)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         var result = op.Accept(new Visitor<TNumber>(compilationContext, evaluationState, maxStep), null);
         if (!result.Succeeded)
@@ -52,7 +52,7 @@ public static class Evaluator
     }
 
     private readonly record struct EvaluationResult<TNumber>(bool Succeeded, TNumber Value, EvaluationFailure Failure)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         public static EvaluationResult<TNumber> Success(TNumber value) => new(true, value, default);
         public static EvaluationResult<TNumber> Fail(EvaluationFailure failure) => new(false, TNumber.Zero, failure);
@@ -75,7 +75,7 @@ public static class Evaluator
 
     private sealed class Visitor<TNumber>
         : IOperatorVisitor<EvaluationResult<TNumber>, TNumber[]? /* arguments */>
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         private readonly CompilationContext compilationContext;
         private readonly IEvaluationState<TNumber> evaluationState;

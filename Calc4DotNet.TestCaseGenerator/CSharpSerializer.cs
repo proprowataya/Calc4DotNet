@@ -74,7 +74,7 @@ internal struct CSharpSerializer
     }
 
     public void Serialize<TNumber>(CompilationResult<TNumber> result, bool insertIndentFirst = true)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         WriteLine($"new {nameof(CompilationResult<TNumber>)}<{typeof(TNumber).Name}>(", insertIndentFirst);
 
@@ -195,7 +195,7 @@ internal struct CSharpSerializer
     }
 
     public void Serialize<TNumber>(LowLevelModule<TNumber> module, bool insertIndentFirst = true)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         WriteLine($"new {nameof(LowLevelModule<TNumber>)}<{typeof(TNumber).Name}>(", insertIndentFirst);
         indent++;

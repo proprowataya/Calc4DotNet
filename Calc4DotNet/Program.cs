@@ -53,7 +53,7 @@ catch (Exception e)
 }
 
 void Start<TNumber>()
-    where TNumber : INumber<TNumber>
+    where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
 {
     if (sourcePaths.Length > 0)
     {

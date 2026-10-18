@@ -11,7 +11,7 @@ public static class LowLevelExecutor
     private const int PtrStackSize = 1 << 20;
 
     public static TNumber Execute<TNumber>(LowLevelModule<TNumber> module, IEvaluationState<TNumber> state)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         // Get variable's values from IEvaluationState
         TNumber[] variables = new TNumber[module.Variables.Length];
@@ -37,7 +37,7 @@ public static class LowLevelExecutor
     }
 
     private static TNumber ExecuteCore<TNumber>(LowLevelModule<TNumber> module, TNumber[] variables, DefaultArraySource<TNumber> array, IIOService ioService)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         var (operationsArray, maxStackSizesArray, localFrameSizesArray) = module.FlattenOperations();
         Span<LowLevelOperation> operations = stackalloc LowLevelOperation[operationsArray.Length];

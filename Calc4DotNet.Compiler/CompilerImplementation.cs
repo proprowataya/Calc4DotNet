@@ -36,7 +36,7 @@ internal static class CompilerImplementation
         """;
 
     public static void Run<TNumber>(string sourcePath, Setting setting)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         string source = File.ReadAllText(sourcePath);
         string outputDirectory = Path.GetDirectoryName(sourcePath) ?? throw new InvalidOperationException();
@@ -68,7 +68,7 @@ internal static class CompilerImplementation
     }
 
     private static LowLevelModule<TNumber> Compile<TNumber>(string source, bool optimize)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         /*
          * Parse and compile the given code.
@@ -90,7 +90,7 @@ internal static class CompilerImplementation
     }
 
     private static void GenerateDll<TNumber>(LowLevelModule<TNumber> module, string outputDllPath, bool optimize)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         /*
          * Make PersistedAssemblyBuilder and compile the given module to the builder.

@@ -3,7 +3,7 @@ using System.Numerics;
 namespace Calc4DotNet.Core.Evaluation;
 
 public interface IEvaluationState<TNumber>
-    where TNumber : INumber<TNumber>
+    where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
 {
     IVariableSource<TNumber> Variables { get; }
     IArraySource<TNumber> GlobalArray { get; }
@@ -11,7 +11,7 @@ public interface IEvaluationState<TNumber>
 }
 
 public sealed class SimpleEvaluationState<TNumber> : IEvaluationState<TNumber>
-    where TNumber : INumber<TNumber>
+    where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
 {
     public IVariableSource<TNumber> Variables { get; }
     public IArraySource<TNumber> GlobalArray { get; }

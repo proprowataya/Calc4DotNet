@@ -15,7 +15,7 @@ using Calc4DotNet.Core.SyntaxAnalysis;
 namespace Calc4DotNet;
 
 internal abstract class Calc4Base<TNumber>
-    where TNumber : INumber<TNumber>
+    where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
 {
     protected const int Indent = 4;
 

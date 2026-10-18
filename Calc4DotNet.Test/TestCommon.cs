@@ -20,7 +20,7 @@ internal static class TestCommon
                                                                    .ToArray();
 
     public static CompilationResult<TNumber> CompileGeneric<TNumber>(string source, OptimizeTarget? target, TNumber dummy)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         CompilationContext context = CompilationContext.Empty;
         List<IToken> tokens = Lexer.Lex(source, ref context);
@@ -39,7 +39,7 @@ internal static class TestCommon
     }
 
     public static IEvaluationState<TNumber> CreateEvaluationState<TNumber>(string standardInput, TNumber? dummy = default)
-        where TNumber : INumber<TNumber>
+        where TNumber : IBinaryInteger<TNumber>, ISignedNumber<TNumber>
     {
         return new SimpleEvaluationState<TNumber>(new DefaultVariableSource<TNumber>(),
                                                   new DefaultArraySource<TNumber>(),
