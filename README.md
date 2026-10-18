@@ -26,7 +26,7 @@ For the full grammar and rationale, see the [C++ repository](https://github.com/
 
 ## Requirements
 
-[.NET](https://dotnet.microsoft.com/) (>= 10.0)
+[.NET](https://dotnet.microsoft.com/) (>= 11.0)
 
 ## Getting Started
 

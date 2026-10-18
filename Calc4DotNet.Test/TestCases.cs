@@ -3202,10 +3202,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "print", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new PrintCharOperator(
+                                    Body: new PrintCharOperator(
                                         Character: new DecimalOperator(
                                             Operand: new DecimalOperator(
                                                 Operand: new PrintCharOperator(
@@ -3288,7 +3288,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -3433,10 +3433,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "print", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new ParenthesisOperator(
+                                    Body: new ParenthesisOperator(
                                         Operators:
                                             [
                                                 new PrintCharOperator(
@@ -3478,7 +3478,7 @@ internal static class TestCases
                                             ],
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -3586,10 +3586,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "add", NumOperands: 2),
                                     IsOptimized: false,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -3601,7 +3601,7 @@ internal static class TestCases
                                         Type: BinaryType.Add,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -3655,10 +3655,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "add", NumOperands: 2),
                                     IsOptimized: true,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -3670,7 +3670,7 @@ internal static class TestCases
                                         Type: BinaryType.Add,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -3748,10 +3748,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get12345", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new DecimalOperator(
+                                    Body: new DecimalOperator(
                                         Operand: new DecimalOperator(
                                             Operand: new DecimalOperator(
                                                 Operand: new DecimalOperator(
@@ -3772,7 +3772,7 @@ internal static class TestCases
                                         Value: 5,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -3830,13 +3830,13 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get12345", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new PreComputedOperator(
+                                    Body: new PreComputedOperator(
                                         Value: 12345
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -3907,10 +3907,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fact", NumOperands: 2),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -3963,7 +3963,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -4030,10 +4030,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fact", NumOperands: 2),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -4131,7 +4131,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -7603,10 +7603,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "true", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new DecimalOperator(
                                             Operand: new ZeroOperator(),
                                             Value: 1,
@@ -7620,7 +7620,7 @@ internal static class TestCases
                                         Type: BinaryType.LogicalOr,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -7670,13 +7670,13 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "true", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new PreComputedOperator(
+                                    Body: new PreComputedOperator(
                                         Value: 1
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -7772,10 +7772,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "select", NumOperands: 2),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -7790,7 +7790,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -7852,10 +7852,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "select", NumOperands: 2),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -7870,7 +7870,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -7980,10 +7980,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "pick", NumOperands: 3),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -7998,7 +7998,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -8070,10 +8070,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "pick", NumOperands: 3),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -8088,7 +8088,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -8175,10 +8175,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "sum", NumOperands: 2),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -8232,7 +8232,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -8307,10 +8307,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "sum", NumOperands: 2),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -8406,7 +8406,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -9552,10 +9552,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "write", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new ParenthesisOperator(
+                                    Body: new ParenthesisOperator(
                                         Operators:
                                             [
                                                 new StoreArrayOperator(
@@ -9582,7 +9582,7 @@ internal static class TestCases
                                             ],
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -9655,10 +9655,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "write", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new ParenthesisOperator(
+                                    Body: new ParenthesisOperator(
                                         Operators:
                                             [
                                                 new StoreVariableOperator(
@@ -9682,7 +9682,7 @@ internal static class TestCases
                                             ],
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -9756,10 +9756,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -9825,7 +9825,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -9893,10 +9893,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -10068,7 +10068,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -10184,10 +10184,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new UserDefinedOperator(
+                                    Body: new UserDefinedOperator(
                                         Definition: new OperatorDefinition(Name: "fibImpl", NumOperands: 3),
                                         Operands:
                                             [
@@ -10210,10 +10210,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fibImpl", NumOperands: 3),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -10281,7 +10281,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -10370,10 +10370,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new LetOperator(
+                                    Body: new LetOperator(
                                         LocalIndex: 0,
                                         Value: new ArgumentOperator(
                                             Index: 0,
@@ -10434,10 +10434,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fibImpl", NumOperands: 3),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -10569,7 +10569,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -10709,10 +10709,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 5),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 4,
@@ -11009,10 +11009,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new UserDefinedOperator(
+                                    Body: new UserDefinedOperator(
                                         Definition: new OperatorDefinition(Name: "f", NumOperands: 5),
                                         Operands:
                                             [
@@ -11044,7 +11044,7 @@ internal static class TestCases
                                         IsTailCall: null,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -11213,10 +11213,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 5),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 4,
@@ -11501,10 +11501,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new LetOperator(
+                                    Body: new LetOperator(
                                         LocalIndex: 0,
                                         Value: new ArgumentOperator(
                                             Index: 0,
@@ -11605,7 +11605,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -11797,10 +11797,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "tarai", NumOperands: 3),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -11914,7 +11914,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -12002,10 +12002,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "tarai", NumOperands: 3),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -12449,7 +12449,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -12959,24 +12959,24 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new LoadVariableOperator(
+                                    Body: new LoadVariableOperator(
                                         SupplementaryText: "var"
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: "var"
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -13051,24 +13051,24 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new LoadVariableOperator(
+                                    Body: new LoadVariableOperator(
                                         SupplementaryText: "var"
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: "var"
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -13153,17 +13153,17 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -13209,17 +13209,17 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -13330,17 +13330,17 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -13425,17 +13425,17 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -14254,10 +14254,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new ParenthesisOperator(
                                             Operators:
                                                 [
@@ -14289,7 +14289,7 @@ internal static class TestCases
                                         Type: BinaryType.Mult,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -14355,10 +14355,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new ParenthesisOperator(
+                                    Body: new ParenthesisOperator(
                                         Operators:
                                             [
                                                 new StoreVariableOperator(
@@ -14373,7 +14373,7 @@ internal static class TestCases
                                             ],
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -14461,10 +14461,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new LoadVariableOperator(
                                             SupplementaryText: null
                                         ),
@@ -14474,7 +14474,7 @@ internal static class TestCases
                                         Type: BinaryType.Mult,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -14540,10 +14540,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new LoadVariableOperator(
                                             SupplementaryText: null
                                         ),
@@ -14553,7 +14553,7 @@ internal static class TestCases
                                         Type: BinaryType.Mult,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -14643,10 +14643,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -14712,7 +14712,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -14849,10 +14849,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -15024,7 +15024,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -15214,10 +15214,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -15284,24 +15284,24 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new LoadVariableOperator(
+                                    Body: new LoadVariableOperator(
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -15510,10 +15510,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -15686,24 +15686,24 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new LoadVariableOperator(
+                                    Body: new LoadVariableOperator(
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -15912,10 +15912,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -15982,24 +15982,24 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new LoadVariableOperator(
+                                    Body: new LoadVariableOperator(
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -16212,10 +16212,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -16388,24 +16388,24 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new LoadVariableOperator(
+                                    Body: new LoadVariableOperator(
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -16572,10 +16572,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -16642,10 +16642,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib2", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new UserDefinedOperator(
+                                    Body: new UserDefinedOperator(
                                         Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                         Operands:
                                             [
@@ -16657,17 +16657,17 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -16768,10 +16768,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -16944,10 +16944,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib2", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new UserDefinedOperator(
+                                    Body: new UserDefinedOperator(
                                         Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                         Operands:
                                             [
@@ -16959,17 +16959,17 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -17125,10 +17125,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -17195,10 +17195,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib2", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new UserDefinedOperator(
+                                    Body: new UserDefinedOperator(
                                         Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                         Operands:
                                             [
@@ -17210,17 +17210,17 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -17333,10 +17333,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -17509,10 +17509,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib2", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new UserDefinedOperator(
+                                    Body: new UserDefinedOperator(
                                         Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                         Operands:
                                             [
@@ -17524,17 +17524,17 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -17682,10 +17682,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -17752,10 +17752,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib2", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new UserDefinedOperator(
+                                    Body: new UserDefinedOperator(
                                         Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                         Operands:
                                             [
@@ -17767,17 +17767,17 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -17878,10 +17878,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -18054,10 +18054,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib2", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new UserDefinedOperator(
+                                    Body: new UserDefinedOperator(
                                         Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                         Operands:
                                             [
@@ -18069,17 +18069,17 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -18230,10 +18230,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -18300,10 +18300,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib2", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new UserDefinedOperator(
+                                    Body: new UserDefinedOperator(
                                         Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                         Operands:
                                             [
@@ -18315,17 +18315,17 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -18438,10 +18438,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -18614,10 +18614,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib2", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new UserDefinedOperator(
+                                    Body: new UserDefinedOperator(
                                         Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                         Operands:
                                             [
@@ -18629,17 +18629,17 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "set", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new StoreVariableOperator(
+                                    Body: new StoreVariableOperator(
                                         Operand: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -18779,10 +18779,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ParenthesisOperator(
+                                    Body: new ParenthesisOperator(
                                         Operators:
                                             [
                                                 new StoreVariableOperator(
@@ -18869,7 +18869,7 @@ internal static class TestCases
                                             ],
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -19041,10 +19041,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "fib", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ParenthesisOperator(
+                                    Body: new ParenthesisOperator(
                                         Operators:
                                             [
                                                 new StoreVariableOperator(
@@ -19261,7 +19261,7 @@ internal static class TestCases
                                             ],
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -20589,10 +20589,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "func", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new LoadArrayOperator(
+                                    Body: new LoadArrayOperator(
                                         Index: new DecimalOperator(
                                             Operand: new DecimalOperator(
                                                 Operand: new ParenthesisOperator(
@@ -20633,7 +20633,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -20716,10 +20716,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "func", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new LoadArrayOperator(
+                                    Body: new LoadArrayOperator(
                                         Index: new DecimalOperator(
                                             Operand: new DecimalOperator(
                                                 Operand: new ParenthesisOperator(
@@ -20748,7 +20748,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -20841,10 +20841,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "func", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new ParenthesisOperator(
+                                    Body: new ParenthesisOperator(
                                         Operators:
                                             [
                                                 new StoreArrayOperator(
@@ -20901,7 +20901,7 @@ internal static class TestCases
                                             ],
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -20995,10 +20995,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "func", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new StoreArrayOperator(
+                                    Body: new StoreArrayOperator(
                                         Value: new PreComputedOperator(
                                             Value: 10
                                         ),
@@ -21007,7 +21007,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -21091,10 +21091,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "func", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new LoadArrayOperator(
+                                    Body: new LoadArrayOperator(
                                         Index: new DecimalOperator(
                                             Operand: new DecimalOperator(
                                                 Operand: new ParenthesisOperator(
@@ -21136,10 +21136,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new LoadArrayOperator(
+                                    Body: new LoadArrayOperator(
                                         Index: new DecimalOperator(
                                             Operand: new DecimalOperator(
                                                 Operand: new ZeroOperator(),
@@ -21151,7 +21151,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -21253,10 +21253,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "func", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new LoadArrayOperator(
+                                    Body: new LoadArrayOperator(
                                         Index: new DecimalOperator(
                                             Operand: new DecimalOperator(
                                                 Operand: new ParenthesisOperator(
@@ -21286,16 +21286,16 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new LoadArrayOperator(
+                                    Body: new LoadArrayOperator(
                                         Index: new PreComputedOperator(
                                             Value: 20
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -21396,10 +21396,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "func", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new ParenthesisOperator(
+                                    Body: new ParenthesisOperator(
                                         Operators:
                                             [
                                                 new StoreArrayOperator(
@@ -21457,10 +21457,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new LoadArrayOperator(
+                                    Body: new LoadArrayOperator(
                                         Index: new DecimalOperator(
                                             Operand: new DecimalOperator(
                                                 Operand: new ZeroOperator(),
@@ -21472,7 +21472,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -21576,10 +21576,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "func", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new StoreArrayOperator(
+                                    Body: new StoreArrayOperator(
                                         Value: new PreComputedOperator(
                                             Value: 10
                                         ),
@@ -21589,16 +21589,16 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new LoadArrayOperator(
+                                    Body: new LoadArrayOperator(
                                         Index: new PreComputedOperator(
                                             Value: 20
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -21930,13 +21930,13 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "Input", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new InputOperator(
+                                    Body: new InputOperator(
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -21972,13 +21972,13 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "Input", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new InputOperator(
+                                    Body: new InputOperator(
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -23271,24 +23271,24 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "_2F", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new DecimalOperator(
+                                    Body: new DecimalOperator(
                                         Operand: new ZeroOperator(),
                                         Value: 2,
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "/", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new DecimalOperator(
+                                    Body: new DecimalOperator(
                                         Operand: new ZeroOperator(),
                                         Value: 1,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -23344,20 +23344,20 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "_2F", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new PreComputedOperator(
+                                    Body: new PreComputedOperator(
                                         Value: 2
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "/", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new PreComputedOperator(
+                                    Body: new PreComputedOperator(
                                         Value: 1
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -23444,24 +23444,24 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "_1", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new DecimalOperator(
+                                    Body: new DecimalOperator(
                                         Operand: new ZeroOperator(),
                                         Value: 2,
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "1", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new DecimalOperator(
+                                    Body: new DecimalOperator(
                                         Operand: new ZeroOperator(),
                                         Value: 1,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -23517,20 +23517,20 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "_1", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new PreComputedOperator(
+                                    Body: new PreComputedOperator(
                                         Value: 2
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "1", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new PreComputedOperator(
+                                    Body: new PreComputedOperator(
                                         Value: 1
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -23696,15 +23696,15 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "a-b", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new DecimalOperator(
+                                    Body: new DecimalOperator(
                                         Operand: new ZeroOperator(),
                                         Value: 1,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -23744,13 +23744,13 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "a-b", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new PreComputedOperator(
+                                    Body: new PreComputedOperator(
                                         Value: 1
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -23817,10 +23817,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -23865,7 +23865,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -24001,10 +24001,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -24078,7 +24078,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -24192,10 +24192,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -24244,7 +24244,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -24396,10 +24396,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -24473,7 +24473,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -24597,10 +24597,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -24645,7 +24645,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -24812,10 +24812,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -24889,7 +24889,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -25004,10 +25004,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -25057,7 +25057,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -25216,10 +25216,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -25299,7 +25299,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -25419,10 +25419,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -25472,7 +25472,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -25631,10 +25631,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -25714,7 +25714,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -25826,10 +25826,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -25908,7 +25908,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -26100,10 +26100,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -26205,7 +26205,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -26329,10 +26329,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -26411,7 +26411,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -26603,10 +26603,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -26708,7 +26708,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -28796,10 +28796,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new ParenthesisOperator(
+                                    Body: new ParenthesisOperator(
                                         Operators:
                                             [
                                                 new LoadVariableOperator(
@@ -28811,7 +28811,7 @@ internal static class TestCases
                                             ],
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -28850,13 +28850,13 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new InputOperator(
+                                    Body: new InputOperator(
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -28920,10 +28920,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new ParenthesisOperator(
+                                    Body: new ParenthesisOperator(
                                         Operators:
                                             [
                                                 new LoadVariableOperator(
@@ -28938,7 +28938,7 @@ internal static class TestCases
                                             ],
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -28980,13 +28980,13 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new InputOperator(
+                                    Body: new InputOperator(
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -29050,10 +29050,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new ParenthesisOperator(
+                                    Body: new ParenthesisOperator(
                                         Operators:
                                             [
                                                 new LoadVariableOperator(
@@ -29074,7 +29074,7 @@ internal static class TestCases
                                             ],
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -29125,16 +29125,16 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new PrintCharOperator(
+                                    Body: new PrintCharOperator(
                                         Character: new PreComputedOperator(
                                             Value: 65
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -29201,10 +29201,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new ParenthesisOperator(
+                                    Body: new ParenthesisOperator(
                                         Operators:
                                             [
                                                 new BinaryOperator(
@@ -29234,7 +29234,7 @@ internal static class TestCases
                                             ],
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -29285,13 +29285,13 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new InputOperator(
+                                    Body: new InputOperator(
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -29355,10 +29355,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new ParenthesisOperator(
+                                    Body: new ParenthesisOperator(
                                         Operators:
                                             [
                                                 new BinaryOperator(
@@ -29388,7 +29388,7 @@ internal static class TestCases
                                             ],
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -29439,13 +29439,13 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new InputOperator(
+                                    Body: new InputOperator(
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -29507,10 +29507,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -29530,7 +29530,7 @@ internal static class TestCases
                                         Type: BinaryType.Add,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -29584,10 +29584,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -29605,7 +29605,7 @@ internal static class TestCases
                                         Type: BinaryType.Add,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -29680,10 +29680,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 2),
                                     IsOptimized: false,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -29695,7 +29695,7 @@ internal static class TestCases
                                         Type: BinaryType.Add,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -29756,10 +29756,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 2),
                                     IsOptimized: true,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -29771,7 +29771,7 @@ internal static class TestCases
                                         Type: BinaryType.Add,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -29839,10 +29839,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "g", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -29861,7 +29861,7 @@ internal static class TestCases
                                         Type: BinaryType.Add,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -29911,10 +29911,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "g", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -29933,7 +29933,7 @@ internal static class TestCases
                                         Type: BinaryType.Add,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -30008,10 +30008,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "h", NumOperands: 2),
                                     IsOptimized: false,
-                                    Operator: new ParenthesisOperator(
+                                    Body: new ParenthesisOperator(
                                         Operators:
                                             [
                                                 new PrintCharOperator(
@@ -30031,7 +30031,7 @@ internal static class TestCases
                                             ],
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -30102,10 +30102,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "h", NumOperands: 2),
                                     IsOptimized: true,
-                                    Operator: new ParenthesisOperator(
+                                    Body: new ParenthesisOperator(
                                         Operators:
                                             [
                                                 new PrintCharOperator(
@@ -30125,7 +30125,7 @@ internal static class TestCases
                                             ],
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -30212,10 +30212,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -30226,7 +30226,7 @@ internal static class TestCases
                                         Type: BinaryType.Add,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -30286,10 +30286,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -30300,7 +30300,7 @@ internal static class TestCases
                                         Type: BinaryType.Add,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -30379,10 +30379,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -30393,7 +30393,7 @@ internal static class TestCases
                                         Type: BinaryType.Add,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -30457,10 +30457,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "f", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -30471,7 +30471,7 @@ internal static class TestCases
                                         Type: BinaryType.Add,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -30546,10 +30546,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "double", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -30561,7 +30561,7 @@ internal static class TestCases
                                         Type: BinaryType.Add,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -30616,10 +30616,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "double", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -30631,7 +30631,7 @@ internal static class TestCases
                                         Type: BinaryType.Add,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -30707,10 +30707,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "add1", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -30724,10 +30724,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "caller", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new UserDefinedOperator(
+                                    Body: new UserDefinedOperator(
                                         Definition: new OperatorDefinition(Name: "add1", NumOperands: 1),
                                         Operands:
                                             [
@@ -30748,7 +30748,7 @@ internal static class TestCases
                                         IsTailCall: null,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -30830,10 +30830,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "add1", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -30845,10 +30845,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "caller", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new BinaryOperator(
                                             Left: new ArgumentOperator(
                                                 Index: 0,
@@ -30866,7 +30866,7 @@ internal static class TestCases
                                         Type: BinaryType.Add,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -30956,10 +30956,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "caller", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new UserDefinedOperator(
+                                    Body: new UserDefinedOperator(
                                         Definition: new OperatorDefinition(Name: "ignore", NumOperands: 1),
                                         Operands:
                                             [
@@ -30981,15 +30981,15 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "ignore", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new DecimalOperator(
+                                    Body: new DecimalOperator(
                                         Operand: new ZeroOperator(),
                                         Value: 1,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -31056,20 +31056,20 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "caller", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new PreComputedOperator(
+                                    Body: new PreComputedOperator(
                                         Value: 1
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "ignore", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new PreComputedOperator(
+                                    Body: new PreComputedOperator(
                                         Value: 1
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -31149,10 +31149,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "caller", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new UserDefinedOperator(
+                                    Body: new UserDefinedOperator(
                                         Definition: new OperatorDefinition(Name: "double", NumOperands: 1),
                                         Operands:
                                             [
@@ -31174,10 +31174,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "double", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -31189,7 +31189,7 @@ internal static class TestCases
                                         Type: BinaryType.Add,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -31276,10 +31276,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "caller", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new LetOperator(
+                                    Body: new LetOperator(
                                         LocalIndex: 0,
                                         Value: new BinaryOperator(
                                             Left: new ArgumentOperator(
@@ -31307,10 +31307,10 @@ internal static class TestCases
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "double", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new BinaryOperator(
+                                    Body: new BinaryOperator(
                                         Left: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -31322,7 +31322,7 @@ internal static class TestCases
                                         Type: BinaryType.Add,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -31416,10 +31416,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "ignore", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new PrintCharOperator(
+                                    Body: new PrintCharOperator(
                                         Character: new DecimalOperator(
                                             Operand: new DecimalOperator(
                                                 Operand: new ZeroOperator(),
@@ -31431,7 +31431,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -31493,16 +31493,16 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "ignore", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new PrintCharOperator(
+                                    Body: new PrintCharOperator(
                                         Character: new PreComputedOperator(
                                             Value: 66
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -31575,17 +31575,17 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new LoadVariableOperator(
+                                    Body: new LoadVariableOperator(
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: false,
-                                    Operator: new UserDefinedOperator(
+                                    Body: new UserDefinedOperator(
                                         Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                         Operands:
                                             [
@@ -31593,7 +31593,7 @@ internal static class TestCases
                                         IsTailCall: null,
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -31640,20 +31640,20 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "get", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new LoadVariableOperator(
+                                    Body: new LoadVariableOperator(
                                         SupplementaryText: null
                                     )
                                 ),
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "op", NumOperands: 0),
                                     IsOptimized: true,
-                                    Operator: new LoadVariableOperator(
+                                    Body: new LoadVariableOperator(
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -31734,10 +31734,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "setx", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -31778,7 +31778,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -31854,10 +31854,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "setx", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -31894,7 +31894,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -31983,10 +31983,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "setx", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -32027,7 +32027,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -32103,10 +32103,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "setx", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -32143,7 +32143,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -32237,10 +32237,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "setarr", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -32291,7 +32291,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -32383,10 +32383,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "setarr", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -32429,7 +32429,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -32524,10 +32524,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "setarr", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -32578,7 +32578,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -32670,10 +32670,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "setarr", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -32716,7 +32716,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -32817,10 +32817,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "setarr", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ParenthesisOperator(
+                                    Body: new ParenthesisOperator(
                                         Operators:
                                             [
                                                 new StoreArrayOperator(
@@ -32854,7 +32854,7 @@ internal static class TestCases
                                             ],
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -32959,10 +32959,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "setarr", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ParenthesisOperator(
+                                    Body: new ParenthesisOperator(
                                         Operators:
                                             [
                                                 new StoreArrayOperator(
@@ -32990,7 +32990,7 @@ internal static class TestCases
                                             ],
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -33092,10 +33092,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "setx", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -33136,7 +33136,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -33228,10 +33228,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "setx", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -33268,7 +33268,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -33381,10 +33381,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "setarr", NumOperands: 1),
                                     IsOptimized: false,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -33435,7 +33435,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:
@@ -33550,10 +33550,10 @@ internal static class TestCases
                     Context:
                         CompilationContext.Empty.WithAddOrUpdateOperatorImplements(
                             [
-                                new OperatorImplement(
+                                new ResolvedOperatorImplement(
                                     Definition: new OperatorDefinition(Name: "setarr", NumOperands: 1),
                                     IsOptimized: true,
-                                    Operator: new ConditionalOperator(
+                                    Body: new ConditionalOperator(
                                         Condition: new ArgumentOperator(
                                             Index: 0,
                                             SupplementaryText: null
@@ -33596,7 +33596,7 @@ internal static class TestCases
                                         ),
                                         SupplementaryText: null
                                     )
-                                )
+                                ),
                             ]
                         ),
                     Module:

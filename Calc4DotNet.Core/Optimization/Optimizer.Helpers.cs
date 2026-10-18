@@ -161,9 +161,9 @@ public static partial class Optimizer
 
         foreach (var implement in context.OperatorImplements)
         {
-            if (implement.Operator is not null)
+            if (implement is ResolvedOperatorImplement resolved)
             {
-                nextIndex = Math.Max(nextIndex, FindNextLetLocalIndex(implement.Operator));
+                nextIndex = Math.Max(nextIndex, FindNextLetLocalIndex(resolved.Body));
             }
         }
 

@@ -161,31 +161,28 @@ internal struct CSharpSerializer
     {
         WriteLine($"{nameof(CompilationContext)}.{nameof(CompilationContext.Empty)}.{nameof(CompilationContext.WithAddOrUpdateOperatorImplements)}(", insertIndentFirst);
         indent++;
-        OperatorImplement[] implements = context.OperatorImplements.ToArray();
         WriteLine("[");
 
         indent++;
-        for (int i = 0; i < implements.Length; i++)
+        foreach (var implement in context.OperatorImplements.Cast<ResolvedOperatorImplement>())
         {
-            OperatorImplement implement = implements[i];
-
-            WriteLine($"new {nameof(OperatorImplement)}(");
+            WriteLine($"new {nameof(ResolvedOperatorImplement)}(");
             indent++;
 
-            Write($"{nameof(OperatorImplement.Definition)}: ");
+            Write($"{nameof(ResolvedOperatorImplement.Definition)}: ");
             Serialize(implement.Definition, insertIndentFirst: false);
             WriteLine(",", insertIndent: false);
 
-            Write($"{nameof(OperatorImplement.IsOptimized)}: ");
+            Write($"{nameof(ResolvedOperatorImplement.IsOptimized)}: ");
             Serialize(implement.IsOptimized, insertIndentFirst: false);
             WriteLine(",", insertIndent: false);
 
-            Write($"{nameof(OperatorImplement.Operator)}: ");
-            Serialize(implement.Operator ?? throw new InvalidOperationException(), insertIndentFirst: false);
+            Write($"{nameof(ResolvedOperatorImplement.Body)}: ");
+            Serialize(implement.Body, insertIndentFirst: false);
             WriteLine(null, insertIndent: false);
 
             indent--;
-            WriteLine(i < implements.Length - 1 ? ")," : ")");
+            WriteLine("),");
         }
         indent--;
 
